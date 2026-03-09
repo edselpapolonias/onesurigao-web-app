@@ -6,6 +6,8 @@ import AdminLogin from "./components/admin/AdminLogin";
 import AdminForm from "./components/admin/adminForm";
 import AdminAnnouncement from "./components/admin/AdminAnnouncement";
 import PinnedAnnouncement from "./components/admin/PinnedAnnouncement";
+import AdminEvent from "./components/admin/AdminEvent";
+
 
 function App() {
   return (
@@ -16,7 +18,8 @@ function App() {
           <Route path="/" element={<AdminLogin />} />
           <Route path="/register" element={<AdminForm />} />
           <Route path="/announcements" element={<AdminAnnouncement />} />
-          <Route path="/pinnedAnnouncememnts" element={<PinnedAnnouncement />} />
+          <Route path="/pinnedAnnouncements" element={<PinnedAnnouncement />} />
+          <Route path="/events" element={<AdminEvent />} />
         </Routes>
       </div>
     </BrowserRouter>

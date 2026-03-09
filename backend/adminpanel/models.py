@@ -27,3 +27,23 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+
+class Event(models.Model):
+    eventID      = models.AutoField(primary_key=True)
+    admin        = models.ForeignKey(Admin, on_delete=models.CASCADE,
+                                     related_name="events", null=True, blank=True)
+    title        = models.CharField(max_length=200)
+    description  = models.TextField(blank=True)
+    eventDate    = models.DateTimeField()
+    location     = models.CharField(max_length=300)
+    posterPath   = models.ImageField(upload_to="event_posters/", null=True, blank=True)
+    createdDate  = models.DateTimeField(auto_now_add=True)
+    approvedBy   = models.IntegerField(null=True, blank=True)
+    approvedDate = models.DateTimeField(null=True, blank=True)
+    isApproved   = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-createdDate"]
+
+    def __str__(self):
+        return self.title

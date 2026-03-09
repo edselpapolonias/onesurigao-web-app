@@ -219,7 +219,7 @@ export const SurigaoNavBar = ({
 
   const tabRoutes = {
     "ANNOUNCEMENT":   "/announcements",
-    "PINNED":         "/pinnedAnnouncememnts",
+    "PINNED":         "/pinnedAnnouncements",
     "EVENT":          "/events",
     "REPORT PROBLEM": "/report-problem",
     "HOTLINES":       "/hotlines",
@@ -228,7 +228,7 @@ export const SurigaoNavBar = ({
   // ✅ Derive activeTab from URL — instant, no delay, no useState needed
   const routeToTab = {
     "/announcements":        "ANNOUNCEMENT",
-    "/pinnedAnnouncememnts": "PINNED",
+    "/pinnedAnnouncements": "PINNED",
     "/events":               "EVENT",
     "/report-problem":       "REPORT PROBLEM",
     "/hotlines":             "HOTLINES",
