@@ -202,8 +202,9 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
 
 function PinnedAnnouncement() {
   const location = useLocation();
-  const adminID = location.state?.adminID;
-  const officeName = location.state?.officeName;
+  // ✅ Always fall back to sessionStorage — location.state is lost when switching tabs
+  const adminID = location.state?.adminID || Number(sessionStorage.getItem("adminID")) || null;
+  const officeName = location.state?.officeName || sessionStorage.getItem("officeName") || "";
 
   const [pinned, setPinned] = useState([]);
   const [loading, setLoading] = useState(true);

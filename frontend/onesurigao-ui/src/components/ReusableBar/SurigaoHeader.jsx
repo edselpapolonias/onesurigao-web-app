@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";  // ✅ added useLocation
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 
@@ -87,38 +87,22 @@ export const SurigaoHeader = () => (
     width: "100%",
     boxSizing: "border-box",
     gap: 16,
-    // ✅ Sticky — stays at top when scrolling
     position: "sticky",
     top: 0,
     zIndex: 100,
   }}>
     <CipSealLogo />
-
     <div style={{ textAlign: "center", padding: "0 16px" }}>
-      <p style={{
-        color: "#c9e0ff", fontSize: 11, letterSpacing: 3,
-        textTransform: "uppercase", margin: "0 0 2px 0",
-        fontFamily: "'Segoe UI', sans-serif", fontWeight: 400,
-      }}>
+      <p style={{ color: "#c9e0ff", fontSize: 11, letterSpacing: 3, textTransform: "uppercase", margin: "0 0 2px 0", fontFamily: "'Segoe UI', sans-serif", fontWeight: 400 }}>
         Republic of the Philippines
       </p>
-      <h1 style={{
-        color: "#ffffff", fontSize: 32, fontWeight: 900,
-        fontStyle: "italic", letterSpacing: 2,
-        fontFamily: "'Georgia', 'Times New Roman', serif",
-        margin: "0 0 4px 0", textShadow: "0 1px 4px rgba(0,0,0,0.3)", lineHeight: 1.1,
-      }}>
+      <h1 style={{ color: "#ffffff", fontSize: 32, fontWeight: 900, fontStyle: "italic", letterSpacing: 2, fontFamily: "'Georgia', 'Times New Roman', serif", margin: "0 0 4px 0", textShadow: "0 1px 4px rgba(0,0,0,0.3)", lineHeight: 1.1 }}>
         CITY OF SURIGAO
       </h1>
-      <a href="#" style={{
-        color: "#c9e0ff", fontSize: 11, letterSpacing: 2,
-        textTransform: "uppercase", textDecoration: "underline",
-        fontFamily: "'Segoe UI', sans-serif", fontWeight: 400,
-      }}>
+      <a href="#" style={{ color: "#c9e0ff", fontSize: 11, letterSpacing: 2, textTransform: "uppercase", textDecoration: "underline", fontFamily: "'Segoe UI', sans-serif", fontWeight: 400 }}>
         Community Information &amp; Public Service Platform
       </a>
     </div>
-
     <SurigaoSealLogo />
   </header>
 );
@@ -129,7 +113,6 @@ const ProfileDropdown = ({ officeName, onLogout }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
@@ -138,14 +121,12 @@ const ProfileDropdown = ({ officeName, onLogout }) => {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // Get initials from officeName
   const initials = officeName
     ? officeName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
     : "AD";
 
   return (
     <div ref={ref} style={{ position: "relative", flexShrink: 0 }}>
-      {/* Profile Circle Button */}
       <button
         onClick={() => setOpen(!open)}
         title={officeName || "Account"}
@@ -160,19 +141,12 @@ const ProfileDropdown = ({ officeName, onLogout }) => {
           boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
           transition: "box-shadow 0.2s, transform 0.15s",
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "0 3px 10px rgba(25,118,210,0.4)";
-          e.currentTarget.style.transform = "scale(1.05)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.15)";
-          e.currentTarget.style.transform = "scale(1)";
-        }}
+        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 3px 10px rgba(25,118,210,0.4)"; e.currentTarget.style.transform = "scale(1.05)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.15)"; e.currentTarget.style.transform = "scale(1)"; }}
       >
         {initials}
       </button>
 
-      {/* Dropdown Menu */}
       {open && (
         <div style={{
           position: "absolute", top: "calc(100% + 10px)", right: 0,
@@ -189,52 +163,24 @@ const ProfileDropdown = ({ officeName, onLogout }) => {
               to   { opacity: 1; transform: translateY(0); }
             }
           `}</style>
-
-          {/* Office info header */}
-          <div style={{
-            padding: "14px 16px",
-            borderBottom: "1px solid #f0f0f0",
-            background: "#f9fafb",
-          }}>
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-            }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: "50%",
-                background: "linear-gradient(135deg, #1a56a0, #1976d2)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                color: "#fff", fontSize: 14, fontWeight: 700,
-                flexShrink: 0,
-              }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid #f0f0f0", background: "#f9fafb" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg, #1a56a0, #1976d2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
                 {initials}
               </div>
               <div>
-                <div style={{
-                  fontSize: 13, fontWeight: 700, color: "#1a1a1a",
-                  fontFamily: "'Segoe UI', sans-serif",
-                  whiteSpace: "nowrap", overflow: "hidden",
-                  textOverflow: "ellipsis", maxWidth: 150,
-                }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", fontFamily: "'Segoe UI', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 150 }}>
                   {officeName || "Admin"}
                 </div>
-                <div style={{ fontSize: 11, color: "#888", fontFamily: "'Segoe UI', sans-serif" }}>
-                  Office Account
-                </div>
+                <div style={{ fontSize: 11, color: "#888", fontFamily: "'Segoe UI', sans-serif" }}>Office Account</div>
               </div>
             </div>
           </div>
-
-          {/* Menu Items */}
           <div style={{ padding: "6px 0" }}>
             <DropdownItem icon={<UserIcon />} label="My Profile" onClick={() => setOpen(false)} />
             <DropdownItem icon={<SettingsIcon />} label="Account Settings" onClick={() => setOpen(false)} />
             <div style={{ borderTop: "1px solid #f0f0f0", margin: "6px 0" }} />
-            <DropdownItem
-              icon={<LogoutIcon />}
-              label="Sign Out"
-              danger
-              onClick={() => { setOpen(false); onLogout(); }}
-            />
+            <DropdownItem icon={<LogoutIcon />} label="Sign Out" danger onClick={() => { setOpen(false); onLogout(); }} />
           </div>
         </div>
       )}
@@ -264,35 +210,45 @@ const DropdownItem = ({ icon, label, onClick, danger = false }) => (
 // ─── NavBar Component ─────────────────────────────────────────────────────────
 
 export const SurigaoNavBar = ({
-  activeTab = "ANNOUNCEMENT",
-  onTabChange = () => {},
   onSearch = () => {},
-  officeName = "",       // ✅ pass officeName from login state
+  officeName = "",
 }) => {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();  // ✅ read current URL
 
   const tabRoutes = {
-    "ANNOUNCEMENT": "/announcements",
-    "PINNED": "/pinnedAnnouncememnts",
-    "EVENT": "/events",
+    "ANNOUNCEMENT":   "/announcements",
+    "PINNED":         "/pinnedAnnouncememnts",
+    "EVENT":          "/events",
     "REPORT PROBLEM": "/report-problem",
-    "HOTLINES": "/hotlines",
+    "HOTLINES":       "/hotlines",
   };
+
+  // ✅ Derive activeTab from URL — instant, no delay, no useState needed
+  const routeToTab = {
+    "/announcements":        "ANNOUNCEMENT",
+    "/pinnedAnnouncememnts": "PINNED",
+    "/events":               "EVENT",
+    "/report-problem":       "REPORT PROBLEM",
+    "/hotlines":             "HOTLINES",
+  };
+  const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
 
   const tabs = ["ANNOUNCEMENT", "PINNED", "EVENT", "REPORT PROBLEM", "HOTLINES"];
 
   const handleTabClick = (tab) => {
-    onTabChange(tab);
     if (tabRoutes[tab]) navigate(tabRoutes[tab]);
   };
 
   const handleLogout = () => {
-    navigate("/"); // redirect to login
+    sessionStorage.removeItem("adminID");
+    sessionStorage.removeItem("officeName");
+    sessionStorage.removeItem("announcement_drafts");
+    navigate("/");
   };
 
   return (
-    // ✅ Sticky — sticks just below the header
     <nav style={{
       background: "#ffffff",
       borderBottom: "1px solid #e0e0e0",
@@ -306,11 +262,10 @@ export const SurigaoNavBar = ({
       boxSizing: "border-box",
       gap: 24,
       position: "sticky",
-      top: 96,       // ✅ sits right below the header (header minHeight = 96)
+      top: 96,
       zIndex: 99,
     }}>
 
-      {/* ✅ Profile Circle — left of tabs */}
       <ProfileDropdown officeName={officeName} onLogout={handleLogout} />
 
       {/* Tabs */}
@@ -323,9 +278,7 @@ export const SurigaoNavBar = ({
               onClick={() => handleTabClick(tab)}
               style={{
                 height: 36, padding: "0 20px", border: "none",
-                background: isActive
-                  ? "linear-gradient(135deg, #1a56a0, #1976d2)"
-                  : "transparent",
+                background: isActive ? "linear-gradient(135deg, #1a56a0, #1976d2)" : "transparent",
                 color: isActive ? "#ffffff" : "#555555",
                 fontWeight: isActive ? 700 : 500,
                 fontSize: 12, letterSpacing: 0.8, cursor: "pointer",
@@ -336,16 +289,10 @@ export const SurigaoNavBar = ({
                 boxShadow: isActive ? "0 2px 8px rgba(25,118,210,0.35)" : "none",
               }}
               onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "#eef2fb";
-                  e.currentTarget.style.color = "#1a56a0";
-                }
+                if (!isActive) { e.currentTarget.style.background = "#eef2fb"; e.currentTarget.style.color = "#1a56a0"; }
               }}
               onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#555555";
-                }
+                if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#555555"; }
               }}
             >
               {tab}
@@ -362,20 +309,14 @@ export const SurigaoNavBar = ({
         minWidth: 280, maxWidth: 380,
         transition: "border-color 0.2s", boxSizing: "border-box",
       }}>
-        <span style={{ color: "#999", marginRight: 8, display: "flex" }}>
-          <SearchIcon />
-        </span>
+        <span style={{ color: "#999", marginRight: 8, display: "flex" }}><SearchIcon /></span>
         <input
           type="text"
           placeholder="Search announcements, pages..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSearch(searchValue)}
-          style={{
-            border: "none", background: "transparent", outline: "none",
-            fontSize: 13, color: "#333", width: "100%",
-            fontFamily: "'Segoe UI', sans-serif",
-          }}
+          style={{ border: "none", background: "transparent", outline: "none", fontSize: 13, color: "#333", width: "100%", fontFamily: "'Segoe UI', sans-serif" }}
         />
       </div>
     </nav>
@@ -385,14 +326,10 @@ export const SurigaoNavBar = ({
 // ─── Default Export ───────────────────────────────────────────────────────────
 
 export default function SurigaoHeaderDemo() {
-  const [activeTab, setActiveTab] = useState("ANNOUNCEMENT");
-
   return (
     <div style={{ fontFamily: "'Segoe UI', sans-serif", minHeight: "200vh", background: "#f0f2f5" }}>
       <SurigaoHeader />
       <SurigaoNavBar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
         onSearch={(q) => console.log("Search:", q)}
         officeName="City Health Office"
       />

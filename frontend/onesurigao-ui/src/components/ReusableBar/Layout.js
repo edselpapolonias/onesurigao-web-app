@@ -1,5 +1,5 @@
 // src/components/ReusableBar/Layout.js
-import React, { useState } from "react";
+import React from "react";
 import { useLocation } from "react-router-dom";
 import { SurigaoHeader, SurigaoNavBar } from "./SurigaoHeader";
 import { DepartmentSidebar } from "./DepartmentSidebar";
@@ -8,19 +8,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
 
   // ✅ Get officeName passed from login via navigate state
-  const officeName = location.state?.officeName || "";
-
-  const routeToTab = {
-    "/announcements": "ANNOUNCEMENT",
-    "/pinned": "PINNED",
-    "/events": "EVENT",
-    "/report-problem": "REPORT PROBLEM",
-    "/hotlines": "HOTLINES",
-  };
-
-  const [activeTab, setActiveTab] = useState(
-    routeToTab[location.pathname] || "ANNOUNCEMENT"
-  );
+  const officeName = location.state?.officeName || sessionStorage.getItem("officeName") || "";
 
   return (
     <div style={{ margin: 0, padding: 0, minHeight: "100vh", background: "#f0f2f5" }}>
@@ -28,10 +16,8 @@ const Layout = ({ children }) => {
       {/* ── Sticky Header & Nav ── */}
       <SurigaoHeader />
       <SurigaoNavBar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
         onSearch={(query) => console.log("Search:", query)}
-        officeName={officeName}   
+        officeName={officeName}
       />
 
       {/* ── Page Body: Sidebar + Content ── */}

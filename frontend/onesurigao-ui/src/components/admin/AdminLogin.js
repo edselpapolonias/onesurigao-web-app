@@ -22,6 +22,9 @@ function AdminLogin() {
     loginAdmin(loginData)
       .then((response) => {
         if (response.data.success) {
+          sessionStorage.setItem("adminID", response.data.adminID);
+          sessionStorage.setItem("officeName", response.data.officeName);
+
           navigate("/announcements", {
             state: {
               adminID: response.data.adminID,

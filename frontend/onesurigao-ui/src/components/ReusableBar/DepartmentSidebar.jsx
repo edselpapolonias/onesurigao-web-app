@@ -51,6 +51,9 @@ export const DepartmentSidebar = () => {
       boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
       overflow: "hidden",
       alignSelf: "flex-start",
+      // ✅ Sticky — stays fixed while main content scrolls independently
+      position: "sticky",
+      top: 172,  // header (96px) + navbar (56px) + page padding (20px) = 172px
     }}>
 
       {/* ── Header ── */}
@@ -88,9 +91,9 @@ export const DepartmentSidebar = () => {
         </span>
       </div>
 
-      {/* ── Office List ── */}
+      {/* ── Office List — scrolls independently inside the fixed sidebar ── */}
       <div style={{
-        maxHeight: 520,
+        maxHeight: "calc(100vh - 240px)", // ✅ fills remaining viewport height
         overflowY: "auto",
         scrollbarWidth: "thin",
         scrollbarColor: "#dde3ec #f5f7fa",
@@ -106,9 +109,10 @@ export const DepartmentSidebar = () => {
               gap: 12,
               padding: "10px 14px",
               background: hoveredId === office.id ? "#f5f7fa" : "#ffffff",
-              borderLeft: "3px solid transparent",
+              borderLeft: hoveredId === office.id ? "3px solid #1976d2" : "3px solid transparent",
               borderBottom: "1px solid #f0f0f0",
-              transition: "background 0.15s ease",
+              transition: "background 0.15s ease, border-left 0.15s ease",
+              cursor: "pointer",
             }}
           >
             <DefaultSeal />
@@ -116,11 +120,12 @@ export const DepartmentSidebar = () => {
               <div style={{
                 fontSize: 12,
                 fontWeight: 700,
-                color: "#222",
+                color: hoveredId === office.id ? "#1976d2" : "#222",
                 fontFamily: "'Segoe UI', sans-serif",
                 lineHeight: 1.3,
                 textTransform: "uppercase",
                 letterSpacing: 0.2,
+                transition: "color 0.15s",
               }}>
                 {truncate(office.name, 28)}
               </div>
