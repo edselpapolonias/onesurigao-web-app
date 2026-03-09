@@ -6,13 +6,18 @@ from .models import Announcement
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
-        fields = ["adminID", "officeName", "username", "email", "contactNumber"]
+        fields = ["adminID", "officeName", "username", "password",
+                  "email", "contactNumber", "createdDate", "isActive"]
+        extra_kwargs = {
+            "password": {"write_only": False},  # ✅ ensure password is saved as-is
+            "createdDate": {"read_only": True},
+            "adminID": {"read_only": True},
+        }
+
 
 class AnnouncementSerializer(serializers.ModelSerializer):
-    # ✅ Returns nested admin object so the card can show officeName
     admin = AdminSerializer(read_only=True)
 
-    # ✅ Accepts admin ID when creating a new announcement
     admin_id = serializers.PrimaryKeyRelatedField(
         queryset=Admin.objects.all(),
         source="admin",
@@ -23,13 +28,5 @@ class AnnouncementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Announcement
-        fields = [
-            "id",
-            "admin",       # read: returns { adminID, officeName, ... }
-            "admin_id",    # write: accepts admin's primary key
-            "title",
-            "content",
-            "createdDate",
-            "isActive",
-        ]
+        fields = ["id", "admin", "admin_id", "title", "content", "createdDate", "isActive", "isPinned"]
         read_only_fields = ["id", "createdDate"]

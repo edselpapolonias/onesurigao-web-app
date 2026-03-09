@@ -15,17 +15,15 @@ class Admin(models.Model):
 
 
 class Announcement(models.Model):
-    admin = models.ForeignKey(          # ✅ links announcement to the office that posted it
-        Admin,
-        on_delete=models.CASCADE,
-        related_name="announcements",
-        null=True,
-        blank=True,
+    admin = models.ForeignKey(
+        Admin, on_delete=models.CASCADE,
+        related_name="announcements", null=True, blank=True
     )
     title = models.CharField(max_length=200)
     content = models.TextField()
     createdDate = models.DateTimeField(auto_now_add=True)
     isActive = models.BooleanField(default=True)
+    isPinned = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
