@@ -225,13 +225,12 @@ export const SurigaoNavBar = ({
     "HOTLINES":       "/hotlines",
   };
 
-  // ✅ Derive activeTab from URL — instant, no delay, no useState needed
   const routeToTab = {
-    "/announcements":        "ANNOUNCEMENT",
-    "/pinnedAnnouncements": "PINNED",
-    "/events":               "EVENT",
-    "/report-problem":       "REPORT PROBLEM",
-    "/hotlines":             "HOTLINES",
+    "/announcements":      "ANNOUNCEMENT",
+    "/pinnedAnnouncements": "PINNED",       // ✅ fixed typo (was pinnedAnnouncememnts)
+    "/events":             "EVENT",
+    "/report-problem":     "REPORT PROBLEM",
+    "/hotlines":           "HOTLINES",
   };
   const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
 
@@ -313,6 +312,104 @@ export const SurigaoNavBar = ({
         <input
           type="text"
           placeholder="Search announcements, pages..."
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSearch(searchValue)}
+          style={{ border: "none", background: "transparent", outline: "none", fontSize: 13, color: "#333", width: "100%", fontFamily: "'Segoe UI', sans-serif" }}
+        />
+      </div>
+    </nav>
+  );
+};
+
+// ─── Public NavBar Component ──────────────────────────────────────────────────
+
+export const PublicNavBar = ({ onSearch = () => {} }) => {
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const tabRoutes = {
+    "ANNOUNCEMENT":   "/home",
+    "PINNED":         "/home/pinned",
+    "EVENT":          "/home/events",
+    "REPORT PROBLEM": "/home/report",
+    "HOTLINES":       "/home/hotlines",
+  };
+
+  const routeToTab = {
+    "/home":           "ANNOUNCEMENT",
+    "/home/pinned":    "PINNED",
+    "/home/events":    "EVENT",
+    "/home/report":    "REPORT PROBLEM",
+    "/home/hotlines":  "HOTLINES",
+  };
+
+  const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
+  const tabs = ["ANNOUNCEMENT", "PINNED", "EVENT", "REPORT PROBLEM", "HOTLINES"];
+
+  return (
+    <nav style={{
+      background: "#ffffff",
+      borderBottom: "1px solid #e0e0e0",
+      padding: "0 24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: 56,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+      width: "100%",
+      boxSizing: "border-box",
+      gap: 24,
+      position: "sticky",
+      top: 96,
+      zIndex: 99,
+    }}>
+      {/* Tabs */}
+      <div style={{ display: "flex", alignItems: "center", gap: 2, height: "100%" }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => navigate(tabRoutes[tab])}
+              style={{
+                height: 36, padding: "0 20px", border: "none",
+                background: isActive ? "linear-gradient(135deg, #1a56a0, #1976d2)" : "transparent",
+                color: isActive ? "#ffffff" : "#555555",
+                fontWeight: isActive ? 700 : 500,
+                fontSize: 12, letterSpacing: 0.8, cursor: "pointer",
+                borderRadius: 8, textTransform: "uppercase",
+                fontFamily: "'Segoe UI', sans-serif",
+                transition: "background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease",
+                whiteSpace: "nowrap",
+                boxShadow: isActive ? "0 2px 8px rgba(25,118,210,0.35)" : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) { e.currentTarget.style.background = "#eef2fb"; e.currentTarget.style.color = "#1a56a0"; }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#555555"; }
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search Bar */}
+      <div style={{
+        display: "flex", alignItems: "center",
+        background: "#f5f7fa", border: "1.5px solid #dde3ec",
+        borderRadius: 24, padding: "0 16px", height: 38,
+        minWidth: 280, maxWidth: 380,
+        transition: "border-color 0.2s", boxSizing: "border-box",
+      }}>
+        <span style={{ color: "#999", marginRight: 8, display: "flex" }}><SearchIcon /></span>
+        <input
+          type="text"
+          placeholder="Search announcements, events..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && onSearch(searchValue)}
