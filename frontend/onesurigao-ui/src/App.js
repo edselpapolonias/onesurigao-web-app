@@ -14,6 +14,7 @@ import SuperAdminLogin from "./components/superadmin/SuperAdminLogin";
 import SuperAdminAnnouncement from "./components/superadmin/SuperAdminAnnouncement";
 import SuperAdminPinned from "./components/superadmin/SuperAdminPinned";
 import SuperAdminRegister from "./components/superadmin/SuperAdminRegister";
+import SuperAdminEvent from "./components/superadmin/SuperAdminEvent";
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
           <Route path="/superadmin/register" element={<SuperAdminRegister />} />
           <Route path="/superadmin/announcements" element={<SuperAdminAnnouncement />} />
           <Route path="/superadmin/pinned" element={<SuperAdminPinned />} />
+          <Route path="/superadmin/events" element={<SuperAdminEvent />} />
         </Routes>
       </div>
     </BrowserRouter>

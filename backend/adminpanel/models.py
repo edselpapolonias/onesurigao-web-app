@@ -1,4 +1,6 @@
+# adminpanel/models.py
 from django.db import models
+
 
 class Admin(models.Model):
     adminID = models.AutoField(primary_key=True)
@@ -11,7 +13,7 @@ class Admin(models.Model):
     isActive = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.username
+        return self.officeName
 
 
 class Announcement(models.Model):
@@ -28,6 +30,25 @@ class Announcement(models.Model):
     def __str__(self):
         return self.title
 
+
+class AnnouncementMedia(models.Model):
+    """Stores one image or video per row, linked to an Announcement."""
+    MEDIA_TYPES = [
+        ("image", "Image"),
+        ("video", "Video"),
+    ]
+    announcement = models.ForeignKey(
+        Announcement, on_delete=models.CASCADE,
+        related_name="media"
+    )
+    file = models.FileField(upload_to="announcement_media/")
+    mediaType = models.CharField(max_length=10, choices=MEDIA_TYPES, default="image")
+    uploadedAt = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.mediaType} for {self.announcement.title}"
+
+
 class Event(models.Model):
     eventID      = models.AutoField(primary_key=True)
     admin        = models.ForeignKey(Admin, on_delete=models.CASCADE,
@@ -41,6 +62,7 @@ class Event(models.Model):
     approvedBy   = models.IntegerField(null=True, blank=True)
     approvedDate = models.DateTimeField(null=True, blank=True)
     isApproved   = models.BooleanField(default=False)
+    declineReason = models.TextField(null=True, blank=True)
 
     class Meta:
         ordering = ["-createdDate"]

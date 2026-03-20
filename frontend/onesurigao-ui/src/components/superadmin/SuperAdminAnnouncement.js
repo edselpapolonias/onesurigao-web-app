@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import MediaGallery from "../ReusableBar/MediaGallery";
 
 const API_URL = "http://127.0.0.1:8000/superadmin/announcements/";
 
@@ -101,6 +102,9 @@ const AnnouncementCard = ({ announcement }) => {
           </button>
         )}
       </div>
+
+      {/* Media attachments */}
+      <MediaGallery media={announcement.media} />
 
       <div style={{ padding: "10px 20px", borderTop: "1px solid #f5f5f5", display: "flex", alignItems: "center", gap: 6 }}>
         <OfficeIcon />

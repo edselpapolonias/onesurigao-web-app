@@ -330,17 +330,19 @@ export const SuperAdminNavBar = ({ onSearch = () => {}, superAdminName = "" }) =
   const location = useLocation();
 
   const tabRoutes = {
-    "ANNOUNCEMENT":   "/superadmin/announcements",
-    "PINNED":         "/superadmin/pinned",
+    "ANNOUNCEMENT":     "/superadmin/announcements",
+    "PINNED":           "/superadmin/pinned",
+    "EVENT":            "/superadmin/events",
   };
 
   const routeToTab = {
     "/superadmin/announcements": "ANNOUNCEMENT",
     "/superadmin/pinned":        "PINNED",
+    "/superadmin/events":        "EVENT",
   };
 
   const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
-  const tabs = ["ANNOUNCEMENT", "PINNED"];
+  const tabs = ["ANNOUNCEMENT", "PINNED", "EVENT"];
 
   const handleLogout = () => {
     sessionStorage.removeItem("superAdminID");

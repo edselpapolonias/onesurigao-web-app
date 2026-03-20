@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
+import MediaGallery from "../ReusableBar/MediaGallery";
 
 const API_URL = "http://127.0.0.1:8000/api/announcements/";
 
@@ -573,6 +574,9 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
         ))}
       </div>
 
+      {/* ✅ Media attachments */}
+      <MediaGallery media={announcement.media} />
+
       <div style={{ borderTop: "1px solid #f0f0f0", margin: "0 18px" }} />
 
       <div style={{ padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -644,8 +648,14 @@ function AdminAnnouncement() {
       return;
     }
 
-    // Immediate post
-    axios.post(API_URL, { title: form.title, content: form.content, admin_id: adminID })
+    // ✅ Send as multipart/form-data so media files are included
+    const formData = new FormData();
+    formData.append("title", form.title);
+    formData.append("content", form.content);
+    if (adminID) formData.append("admin_id", adminID);
+    (form.mediaFiles || []).forEach(f => formData.append("mediaFiles", f));
+
+    axios.post(API_URL, formData, { headers: { "Content-Type": "multipart/form-data" } })
       .then((res) => {
         setAnnouncements([res.data, ...announcements]);
         setShowModal(false);
