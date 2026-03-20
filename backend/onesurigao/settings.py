@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'adminpanel',
     'publicpanel',
+    'superpanel',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -10,6 +10,10 @@ import AdminEvent from "./components/admin/AdminEvent";
 import PublicAnnouncement from "./components/public/PublicAnnouncement";
 import PublicPinned from "./components/public/PublicPinned";
 import PublicEvent from "./components/public/PublicEvent";
+import SuperAdminLogin from "./components/superadmin/SuperAdminLogin";
+import SuperAdminAnnouncement from "./components/superadmin/SuperAdminAnnouncement";
+import SuperAdminPinned from "./components/superadmin/SuperAdminPinned";
+import SuperAdminRegister from "./components/superadmin/SuperAdminRegister";
 
 
 function App() {
@@ -26,6 +30,10 @@ function App() {
           <Route path="/home" element={<PublicAnnouncement />} />
           <Route path="/home/pinned" element={<PublicPinned />} />
           <Route path="/home/events" element={<PublicEvent />} />
+          <Route path="/superadmin" element={<SuperAdminLogin />} />
+          <Route path="/superadmin/register" element={<SuperAdminRegister />} />
+          <Route path="/superadmin/announcements" element={<SuperAdminAnnouncement />} />
+          <Route path="/superadmin/pinned" element={<SuperAdminPinned />} />
         </Routes>
       </div>
     </BrowserRouter>

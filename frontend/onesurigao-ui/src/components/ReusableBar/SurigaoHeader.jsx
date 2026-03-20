@@ -219,7 +219,7 @@ export const SurigaoNavBar = ({
 
   const tabRoutes = {
     "ANNOUNCEMENT":   "/announcements",
-    "PINNED":         "/pinnedAnnouncements",
+    "PINNED":         "/pinnedAnnouncememnts",
     "EVENT":          "/events",
     "REPORT PROBLEM": "/report-problem",
     "HOTLINES":       "/hotlines",
@@ -319,6 +319,183 @@ export const SurigaoNavBar = ({
         />
       </div>
     </nav>
+  );
+};
+
+// ─── Super Admin NavBar Component ────────────────────────────────────────────
+
+export const SuperAdminNavBar = ({ onSearch = () => {}, superAdminName = "" }) => {
+  const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const tabRoutes = {
+    "ANNOUNCEMENT":   "/superadmin/announcements",
+    "PINNED":         "/superadmin/pinned",
+  };
+
+  const routeToTab = {
+    "/superadmin/announcements": "ANNOUNCEMENT",
+    "/superadmin/pinned":        "PINNED",
+  };
+
+  const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
+  const tabs = ["ANNOUNCEMENT", "PINNED"];
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("superAdminID");
+    sessionStorage.removeItem("superAdminName");
+    navigate("/superadmin");
+  };
+
+  const initials = superAdminName
+    ? superAdminName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
+    : "SA";
+
+  return (
+    <nav style={{
+      background: "#ffffff",
+      borderBottom: "1px solid #e0e0e0",
+      padding: "0 24px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      height: 56,
+      boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+      width: "100%",
+      boxSizing: "border-box",
+      gap: 24,
+      position: "sticky",
+      top: 96,
+      zIndex: 99,
+    }}>
+
+      {/* Profile Dropdown */}
+      <SuperAdminProfileDropdown
+        superAdminName={superAdminName}
+        initials={initials}
+        onLogout={handleLogout}
+      />
+
+      {/* Tabs */}
+      <div style={{ display: "flex", alignItems: "center", gap: 2, height: "100%" }}>
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              onClick={() => navigate(tabRoutes[tab])}
+              style={{
+                height: 36, padding: "0 20px", border: "none",
+                background: isActive ? "linear-gradient(135deg, #0d3b7a, #1976d2)" : "transparent",
+                color: isActive ? "#ffffff" : "#555555",
+                fontWeight: isActive ? 700 : 500,
+                fontSize: 12, letterSpacing: 0.8, cursor: "pointer",
+                borderRadius: 8, textTransform: "uppercase",
+                fontFamily: "'Segoe UI', sans-serif",
+                transition: "background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease",
+                whiteSpace: "nowrap",
+                boxShadow: isActive ? "0 2px 8px rgba(13,59,122,0.35)" : "none",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) { e.currentTarget.style.background = "#eef2fb"; e.currentTarget.style.color = "#0d3b7a"; }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#555555"; }
+              }}
+            >
+              {tab}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search Bar */}
+      <div style={{
+        display: "flex", alignItems: "center",
+        background: "#f5f7fa", border: "1.5px solid #dde3ec",
+        borderRadius: 24, padding: "0 16px", height: 38,
+        minWidth: 280, maxWidth: 380,
+        transition: "border-color 0.2s", boxSizing: "border-box",
+      }}>
+        <span style={{ color: "#999", marginRight: 8, display: "flex" }}><SearchIcon /></span>
+        <input
+          type="text"
+          placeholder="Search announcements..."
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && onSearch(searchValue)}
+          style={{ border: "none", background: "transparent", outline: "none", fontSize: 13, color: "#333", width: "100%", fontFamily: "'Segoe UI', sans-serif" }}
+        />
+      </div>
+    </nav>
+  );
+};
+
+const SuperAdminProfileDropdown = ({ superAdminName, initials, onLogout }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} style={{ position: "relative", flexShrink: 0 }}>
+      <button
+        onClick={() => setOpen(!open)}
+        title={superAdminName || "Super Admin"}
+        style={{
+          width: 36, height: 36, borderRadius: "50%",
+          background: "linear-gradient(135deg, #0d3b7a, #1976d2)",
+          border: "2px solid #dde3ec",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          cursor: "pointer", color: "#fff",
+          fontSize: 13, fontWeight: 700, fontFamily: "'Segoe UI', sans-serif",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+          transition: "box-shadow 0.2s, transform 0.15s",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 3px 10px rgba(13,59,122,0.4)"; e.currentTarget.style.transform = "scale(1.05)"; }}
+        onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.15)"; e.currentTarget.style.transform = "scale(1)"; }}
+      >
+        {initials}
+      </button>
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 10px)", right: 0,
+          background: "#fff", borderRadius: 10,
+          boxShadow: "0 8px 32px rgba(0,0,0,0.14)",
+          border: "1px solid #e8ecf0",
+          minWidth: 220, zIndex: 999, overflow: "hidden",
+          animation: "fadeDown 0.15s ease",
+        }}>
+          <div style={{ padding: "14px 16px", borderBottom: "1px solid #f0f0f0", background: "#f9fafb" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", background: "linear-gradient(135deg, #0d3b7a, #1976d2)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+                {initials}
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a", fontFamily: "'Segoe UI', sans-serif", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 150 }}>
+                  {superAdminName || "Super Admin"}
+                </div>
+                <div style={{ fontSize: 11, color: "#888", fontFamily: "'Segoe UI', sans-serif" }}>Super Admin Account</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ padding: "6px 0" }}>
+            <DropdownItem icon={<UserIcon />} label="My Profile" onClick={() => setOpen(false)} />
+            <DropdownItem icon={<SettingsIcon />} label="Account Settings" onClick={() => setOpen(false)} />
+            <div style={{ borderTop: "1px solid #f0f0f0", margin: "6px 0" }} />
+            <DropdownItem icon={<LogoutIcon />} label="Sign Out" danger onClick={() => { setOpen(false); onLogout(); }} />
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
