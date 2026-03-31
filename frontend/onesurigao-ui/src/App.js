@@ -15,6 +15,12 @@ import SuperAdminAnnouncement from "./components/superadmin/SuperAdminAnnounceme
 import SuperAdminPinned from "./components/superadmin/SuperAdminPinned";
 import SuperAdminRegister from "./components/superadmin/SuperAdminRegister";
 import SuperAdminEvent from "./components/superadmin/SuperAdminEvent";
+import PublicReport from "./components/public/PublicReport";
+import SuperAdminReport from "./components/superadmin/SuperAdminReport";
+import AdminReport from "./components/admin/AdminReport";
+import PublicHotlines from "./components/public/PublicHotlines";
+import AdminHotlines from "./components/admin/AdminHotlines";
+import SuperAdminHotlines from "./components/superadmin/SuperAdminHotlines";
 
 
 function App() {
@@ -36,6 +42,12 @@ function App() {
           <Route path="/superadmin/announcements" element={<SuperAdminAnnouncement />} />
           <Route path="/superadmin/pinned" element={<SuperAdminPinned />} />
           <Route path="/superadmin/events" element={<SuperAdminEvent />} />
+          <Route path="/home/report" element={<PublicReport />} />
+          <Route path="/superadmin/reports" element={<SuperAdminReport />} />
+          <Route path="/report-problem" element={<AdminReport />} />
+          <Route path="/home/hotlines" element={<PublicHotlines />} />
+          <Route path="/hotlines" element={<AdminHotlines />} />
+          <Route path="/superadmin/hotlines" element={<SuperAdminHotlines />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -16,7 +16,6 @@ const UploadIcon = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="
 const XIcon = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>);
 const StatusIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>);
 
-// ─── Info Row ─────────────────────────────────────────────────────────────────
 const InfoRow = ({ icon, label, value }) => (
   <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
     <span style={{ color: "#1976d2", marginTop: 1, flexShrink: 0 }}>{icon}</span>
@@ -25,6 +24,16 @@ const InfoRow = ({ icon, label, value }) => (
       <span style={{ color: "#555", marginLeft: 6 }}>- {value}</span>
     </div>
   </div>
+);
+
+// ─── Tab Button ───────────────────────────────────────────────────────────────
+const TabButton = ({ label, active, onClick, count }) => (
+  <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, background: active ? "linear-gradient(135deg, #1a56a0, #1976d2)" : "#fff", color: active ? "#fff" : "#555", fontFamily: "'Segoe UI', sans-serif", boxShadow: active ? "0 2px 8px rgba(25,118,210,0.3)" : "0 1px 4px rgba(0,0,0,0.07)", transition: "all 0.2s" }}>
+    {label}
+    {count !== undefined && count > 0 && (
+      <span style={{ background: active ? "rgba(255,255,255,0.25)" : "#e53935", color: "#fff", borderRadius: 12, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{count}</span>
+    )}
+  </button>
 );
 
 // ─── Add Event Modal ──────────────────────────────────────────────────────────
@@ -38,7 +47,6 @@ const AddEventModal = ({ onClose, onSubmit, adminOfficeName }) => {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const handleFile = (file) => { if (!file || !file.type.startsWith("image/")) return; setForm(f => ({ ...f, posterFile: file })); setPreview(URL.createObjectURL(file)); };
   const handleDrop = (e) => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); };
-
   const handleSubmit = async () => {
     if (!form.title || !form.eventDate || !form.location) { alert("Please fill in Title, Event Date, and Location."); return; }
     setSubmitting(true);
@@ -144,21 +152,29 @@ const EventDetailsModal = ({ event, onClose }) => {
   );
 };
 
-// ─── Event Card ───────────────────────────────────────────────────────────────
-const EventCard = ({ event, onClick }) => {
+// ─── Approved Event Card ──────────────────────────────────────────────────────
+const EventCard = ({ event, onClick, isPast = false }) => {
   const [hovered, setHovered] = useState(false);
   const dateStr = event.eventDate ? new Date(event.eventDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: hovered ? "0 6px 24px rgba(0,0,0,0.13)" : "0 2px 10px rgba(0,0,0,0.08)", transition: "box-shadow 0.2s, transform 0.2s", transform: hovered ? "translateY(-2px)" : "translateY(0)", cursor: "pointer" }}>
-      <div style={{ height: 120, background: "linear-gradient(135deg, #1a56a0, #0d3b7a)", overflow: "hidden", position: "relative" }}>
-        {event.posterUrl ? <img src={event.posterUrl} alt={event.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s", transform: hovered ? "scale(1.04)" : "scale(1)" }} /> : (
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: hovered ? "0 6px 24px rgba(0,0,0,0.13)" : "0 2px 10px rgba(0,0,0,0.08)", transition: "box-shadow 0.2s, transform 0.2s", transform: hovered ? "translateY(-2px)" : "translateY(0)", cursor: "pointer", opacity: isPast ? 0.85 : 1 }}>
+      <div style={{ height: 120, background: isPast ? "linear-gradient(135deg, #555, #333)" : "linear-gradient(135deg, #1a56a0, #0d3b7a)", overflow: "hidden", position: "relative" }}>
+        {event.posterUrl ? (
+          <img src={event.posterUrl} alt={event.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform 0.3s", transform: hovered ? "scale(1.04)" : "scale(1)", filter: isPast ? "grayscale(40%)" : "none" }} />
+        ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
           </div>
         )}
+        {isPast && (
+          <div style={{ position: "absolute", top: 8, left: 8, background: "rgba(0,0,0,0.65)", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20, fontFamily: "'Segoe UI', sans-serif" }}>
+            EVENT DONE
+          </div>
+        )}
       </div>
       <div style={{ padding: "10px 12px" }}>
-        <div style={{ fontWeight: 800, fontSize: 12, color: "#1a1a1a", marginBottom: 7, fontFamily: "'Segoe UI', sans-serif", textTransform: "uppercase", letterSpacing: 0.3, lineHeight: 1.3 }}>{event.title}</div>
+        <div style={{ fontWeight: 800, fontSize: 12, color: isPast ? "#888" : "#1a1a1a", marginBottom: 7, fontFamily: "'Segoe UI', sans-serif", textTransform: "uppercase", letterSpacing: 0.3, lineHeight: 1.3 }}>{event.title}</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 9 }}>
           <InfoRow icon={<LocationIcon />} label="Location" value={event.location?.length > 20 ? event.location.slice(0, 20) + "..." : event.location} />
           <InfoRow icon={<CalendarIcon />} label="Event Date" value={dateStr} />
@@ -176,7 +192,8 @@ const EventCard = ({ event, onClick }) => {
 const AddEventCard = ({ onClick }) => {
   const [hovered, setHovered] = useState(false);
   return (
-    <div onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: hovered ? "0 6px 24px rgba(0,0,0,0.1)" : "0 2px 10px rgba(0,0,0,0.07)", transition: "all 0.2s", transform: hovered ? "translateY(-2px)" : "translateY(0)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 220, border: `2px dashed ${hovered ? "#1976d2" : "#c8d6e8"}` }}>
+    <div onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: hovered ? "0 6px 24px rgba(0,0,0,0.1)" : "0 2px 10px rgba(0,0,0,0.07)", transition: "all 0.2s", transform: hovered ? "translateY(-2px)" : "translateY(0)", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 220, border: `2px dashed ${hovered ? "#1976d2" : "#c8d6e8"}` }}>
       <div style={{ width: 60, height: 60, borderRadius: "50%", background: hovered ? "linear-gradient(135deg, #1a56a0, #1976d2)" : "#1976d2", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, transition: "all 0.2s", boxShadow: "0 3px 12px rgba(25,118,210,0.3)", color: "#fff" }}><PlusIcon /></div>
       <span style={{ fontSize: 14, fontWeight: 800, color: "#1976d2", fontFamily: "'Segoe UI', sans-serif", letterSpacing: 1, textTransform: "uppercase" }}>ADD EVENT</span>
     </div>
@@ -188,7 +205,6 @@ const PendingEventCard = ({ event }) => {
   const dateStr = event.eventDate ? new Date(event.eventDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
   const isDeclined = !event.isApproved && event.declineReason;
   const isApproved = event.isApproved;
-
   return (
     <div style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: "0 2px 10px rgba(0,0,0,0.08)", border: `1.5px solid ${isDeclined ? "#ffcdd2" : isApproved ? "#bbf7d0" : "#fde68a"}` }}>
       <div style={{ height: 100, background: "linear-gradient(135deg, #1a56a0, #0d3b7a)", overflow: "hidden", position: "relative" }}>
@@ -197,7 +213,6 @@ const PendingEventCard = ({ event }) => {
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
           </div>
         )}
-        {/* Status badge */}
         <div style={{ position: "absolute", top: 8, right: 8, background: isDeclined ? "#e53935" : isApproved ? "#16a34a" : "#f59e0b", color: "#fff", fontSize: 10, fontWeight: 700, padding: "3px 8px", borderRadius: 20, fontFamily: "'Segoe UI', sans-serif" }}>
           {isDeclined ? "DECLINED" : isApproved ? "APPROVED" : "PENDING"}
         </div>
@@ -208,22 +223,9 @@ const PendingEventCard = ({ event }) => {
           <InfoRow icon={<LocationIcon />} label="Location" value={event.location?.length > 20 ? event.location.slice(0, 20) + "..." : event.location} />
           <InfoRow icon={<CalendarIcon />} label="Event Date" value={dateStr} />
         </div>
-        {/* Status message */}
-        {isApproved && (
-          <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#166534", fontFamily: "'Segoe UI', sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
-            ✅ Your event has been <strong style={{ marginLeft: 3 }}>approved</strong> and is now visible to the public.
-          </div>
-        )}
-        {isDeclined && (
-          <div style={{ background: "#fff3f3", border: "1px solid #ffcdd2", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#c62828", fontFamily: "'Segoe UI', sans-serif" }}>
-            ❌ <strong>Declined:</strong> {event.declineReason}
-          </div>
-        )}
-        {!isApproved && !isDeclined && (
-          <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#92400e", fontFamily: "'Segoe UI', sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
-            ⏳ Waiting for Super Admin approval.
-          </div>
-        )}
+        {isApproved && <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#166534", fontFamily: "'Segoe UI', sans-serif" }}>✅ Your event has been <strong>approved</strong> and is now visible to the public.</div>}
+        {isDeclined && <div style={{ background: "#fff3f3", border: "1px solid #ffcdd2", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#c62828", fontFamily: "'Segoe UI', sans-serif" }}>❌ <strong>Declined:</strong> {event.declineReason}</div>}
+        {!isApproved && !isDeclined && <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 6, padding: "8px 10px", fontSize: 11, color: "#92400e", fontFamily: "'Segoe UI', sans-serif" }}>⏳ Waiting for Super Admin approval.</div>}
       </div>
     </div>
   );
@@ -237,16 +239,6 @@ const EventSkeleton = () => (
       {[90, 70, 60, 50].map((w, i) => (<div key={i} style={{ height: 12, width: `${w}%`, background: "#f0f2f5", borderRadius: 6, marginBottom: 10, animation: "pulse 1.5s ease-in-out infinite" }} />))}
     </div>
   </div>
-);
-
-// ─── Tab Button ───────────────────────────────────────────────────────────────
-const TabButton = ({ label, active, onClick, count }) => (
-  <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 7, padding: "8px 18px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, background: active ? "linear-gradient(135deg, #1a56a0, #1976d2)" : "#fff", color: active ? "#fff" : "#555", fontFamily: "'Segoe UI', sans-serif", boxShadow: active ? "0 2px 8px rgba(25,118,210,0.3)" : "0 1px 4px rgba(0,0,0,0.07)", transition: "all 0.2s" }}>
-    {label}
-    {count !== undefined && count > 0 && (
-      <span style={{ background: active ? "rgba(255,255,255,0.25)" : "#e53935", color: "#fff", borderRadius: 12, padding: "1px 7px", fontSize: 11, fontWeight: 700 }}>{count}</span>
-    )}
-  </button>
 );
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
@@ -270,7 +262,7 @@ function AdminEvent() {
       .then((res) => {
         const all = Array.isArray(res.data) ? res.data : res.data.results || [];
         setApprovedEvents(all.filter(e => e.isApproved));
-        setMyEvents(all.filter(e => !e.isApproved || e.admin?.adminID === adminID));
+        setMyEvents(all.filter(e => !e.isApproved));
         setError(null);
       })
       .catch(() => setError("Failed to load events."))
@@ -286,15 +278,21 @@ function AdminEvent() {
     formData.append("admin_id", adminID);
     if (form.posterFile) formData.append("posterPath", form.posterFile);
     const res = await axios.post(API_URL, formData, { headers: { "Content-Type": "multipart/form-data" } });
-    const newEvent = { ...res.data, posterUrl: form.posterFile ? URL.createObjectURL(form.posterFile) : null, postedBy: officeName, isPending: true };
+    const newEvent = { ...res.data, posterUrl: form.posterFile ? URL.createObjectURL(form.posterFile) : null, postedBy: officeName };
     setMyEvents(prev => [newEvent, ...prev]);
     setActiveTab("PENDING");
   };
 
   const enrich = (e) => ({ ...e, posterUrl: e.posterUrl || e.posterPath || null, postedBy: e.admin?.officeName || officeName || "Surigao PIO" });
 
-  // For PENDING tab: all events this admin posted that are not yet approved, plus declined ones
-  const pendingEvents = myEvents.filter(e => !e.isApproved).map(enrich);
+  const now = new Date();
+
+  // Approved events split by date
+  const upcomingApproved = approvedEvents.filter(e => e.eventDate && new Date(e.eventDate) >= now).map(enrich);
+  const pastApproved = approvedEvents.filter(e => e.eventDate && new Date(e.eventDate) < now).map(enrich);
+
+  // Pending = not yet approved (includes declined)
+  const pendingEvents = myEvents.map(enrich);
   const pendingCount = pendingEvents.filter(e => !e.declineReason).length;
 
   return (
@@ -304,30 +302,51 @@ function AdminEvent() {
       {/* Title + Tabs */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#1a1a1a", fontFamily: "'Segoe UI', sans-serif", letterSpacing: -0.5 }}>Upcoming Events</h2>
-          <p style={{ margin: "4px 0 0", fontSize: 13, color: "#888", fontFamily: "'Segoe UI', sans-serif" }}>Community Gathering, Holidays, Official Schedules</p>
+          <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#1a1a1a", fontFamily: "'Segoe UI', sans-serif", letterSpacing: -0.5 }}>
+            {activeTab === "EVENT" ? "Upcoming Events" : activeTab === "PAST" ? "Past Events" : "Pending Events"}
+          </h2>
+          <p style={{ margin: "4px 0 0", fontSize: 13, color: "#888", fontFamily: "'Segoe UI', sans-serif" }}>
+            {activeTab === "EVENT" ? "Community Gathering, Holidays, Official Schedules" : activeTab === "PAST" ? "Events that have already taken place" : "Your submitted events awaiting approval"}
+          </p>
           {officeName && <p style={{ margin: "4px 0 0", fontSize: 12, color: "#1976d2", fontFamily: "'Segoe UI', sans-serif", fontWeight: 600 }}>Logged in as: {officeName}</p>}
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <TabButton label="EVENT" active={activeTab === "EVENT"} onClick={() => setActiveTab("EVENT")} />
+          <TabButton label="PAST EVENTS" active={activeTab === "PAST"} onClick={() => setActiveTab("PAST")} count={pastApproved.length} />
           <TabButton label="PENDING EVENT" active={activeTab === "PENDING"} onClick={() => setActiveTab("PENDING")} count={pendingCount} />
         </div>
       </div>
 
       {error && <div style={{ background: "#fff3f3", border: "1.5px solid #ffcdd2", borderRadius: 8, padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#c62828", fontFamily: "'Segoe UI', sans-serif" }}>⚠️ {error}</div>}
 
-      {/* ── EVENT TAB ── */}
+      {/* ── EVENT TAB (upcoming approved) ── */}
       {activeTab === "EVENT" && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
           <AddEventCard onClick={() => setShowAddModal(true)} />
           {loading && [1, 2, 3].map(i => <EventSkeleton key={i} />)}
-          {!loading && approvedEvents.map(e => enrich(e)).map(event => (
+          {!loading && upcomingApproved.map(event => (
             <EventCard key={event.eventID || event.id} event={event} onClick={setSelectedEvent} />
           ))}
-          {!loading && approvedEvents.length === 0 && (
+          {!loading && upcomingApproved.length === 0 && (
             <div style={{ gridColumn: "2 / -1", background: "#fff", borderRadius: 10, padding: "48px 20px", textAlign: "center", color: "#aaa", fontSize: 14, fontFamily: "'Segoe UI', sans-serif", boxShadow: "0 2px 10px rgba(0,0,0,0.07)", display: "flex", flexDirection: "column", alignItems: "center" }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>🗓️</div>
-              No approved events yet.
+              No upcoming approved events yet.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── PAST EVENTS TAB ── */}
+      {activeTab === "PAST" && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+          {loading && [1, 2, 3].map(i => <EventSkeleton key={i} />)}
+          {!loading && pastApproved.map(event => (
+            <EventCard key={event.eventID || event.id} event={event} onClick={setSelectedEvent} isPast />
+          ))}
+          {!loading && pastApproved.length === 0 && (
+            <div style={{ gridColumn: "1 / -1", background: "#fff", borderRadius: 10, padding: "48px 20px", textAlign: "center", color: "#aaa", fontSize: 14, fontFamily: "'Segoe UI', sans-serif", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
+              <div style={{ fontSize: 36, marginBottom: 12 }}>📅</div>
+              No past events yet.
             </div>
           )}
         </div>
@@ -335,18 +354,16 @@ function AdminEvent() {
 
       {/* ── PENDING TAB ── */}
       {activeTab === "PENDING" && (
-        <>
-          {pendingEvents.length === 0 && !loading ? (
-            <div style={{ background: "#fff", borderRadius: 10, padding: "48px 20px", textAlign: "center", color: "#aaa", fontSize: 14, fontFamily: "'Segoe UI', sans-serif", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
-              No pending events. Click <strong>ADD EVENT</strong> in the Event tab to submit one.
-            </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
-              {pendingEvents.map(event => <PendingEventCard key={event.eventID || event.id} event={event} />)}
-            </div>
-          )}
-        </>
+        pendingEvents.length === 0 && !loading ? (
+          <div style={{ background: "#fff", borderRadius: 10, padding: "48px 20px", textAlign: "center", color: "#aaa", fontSize: 14, fontFamily: "'Segoe UI', sans-serif", boxShadow: "0 2px 10px rgba(0,0,0,0.07)" }}>
+            <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+            No pending events. Click <strong>ADD EVENT</strong> in the Event tab to submit one.
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+            {pendingEvents.map(event => <PendingEventCard key={event.eventID || event.id} event={event} />)}
+          </div>
+        )
       )}
 
       {showAddModal && <AddEventModal onClose={() => setShowAddModal(false)} onSubmit={handleSubmitEvent} adminOfficeName={officeName} />}

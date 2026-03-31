@@ -219,7 +219,7 @@ export const SurigaoNavBar = ({
 
   const tabRoutes = {
     "ANNOUNCEMENT":   "/announcements",
-    "PINNED":         "/pinnedAnnouncememnts",
+    "PINNED":         "/pinnedAnnouncements",
     "EVENT":          "/events",
     "REPORT PROBLEM": "/report-problem",
     "HOTLINES":       "/hotlines",
@@ -227,7 +227,8 @@ export const SurigaoNavBar = ({
 
   const routeToTab = {
     "/announcements":      "ANNOUNCEMENT",
-    "/pinnedAnnouncements": "PINNED",       // ✅ fixed typo (was pinnedAnnouncememnts)
+    "/pinnedAnnouncements": "PINNED",
+    "/report-problem":       "REPORT PROBLEM",       // ✅ fixed typo (was pinnedAnnouncememnts)
     "/events":             "EVENT",
     "/report-problem":     "REPORT PROBLEM",
     "/hotlines":           "HOTLINES",
@@ -333,16 +334,19 @@ export const SuperAdminNavBar = ({ onSearch = () => {}, superAdminName = "" }) =
     "ANNOUNCEMENT":     "/superadmin/announcements",
     "PINNED":           "/superadmin/pinned",
     "EVENT":            "/superadmin/events",
+    "REPORT PROBLEM":   "/superadmin/reports",
+    "HOTLINES":          "/superadmin/hotlines",
   };
 
   const routeToTab = {
     "/superadmin/announcements": "ANNOUNCEMENT",
     "/superadmin/pinned":        "PINNED",
     "/superadmin/events":        "EVENT",
+    "/superadmin/reports":       "REPORT PROBLEM",
   };
 
   const activeTab = routeToTab[location.pathname] || "ANNOUNCEMENT";
-  const tabs = ["ANNOUNCEMENT", "PINNED", "EVENT"];
+  const tabs = ["ANNOUNCEMENT", "PINNED", "EVENT", "REPORT PROBLEM", "HOTLINES"];
 
   const handleLogout = () => {
     sessionStorage.removeItem("superAdminID");
