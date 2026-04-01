@@ -1,5 +1,6 @@
 // src/components/admin/adminForm.js
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { createAdmin } from "../../services/adminService";
 
@@ -12,9 +13,18 @@ function AdminForm() {
     email: "",
     contactNumber: "",
   });
+  const [profilePic, setProfilePic] = useState(null);
+  const [picPreview, setPicPreview] = useState(null);
+  const picRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const handlePic = (file) => {
+    if (!file || !file.type.startsWith("image/")) return;
+    setProfilePic(file);
+    setPicPreview(URL.createObjectURL(file));
+  };
 
   const handleChange = (e) => {
     setAdmin({ ...admin, [e.target.name]: e.target.value });
@@ -26,14 +36,18 @@ function AdminForm() {
     setLoading(true);
     setError("");
 
-    createAdmin(admin)
+    const fd = new FormData();
+    Object.entries(admin).forEach(([k,v]) => fd.append(k,v));
+    if (profilePic) fd.append("profilePic", profilePic);
+
+    axios.post("http://127.0.0.1:8000/api/admins/", fd, { headers: { "Content-Type": "multipart/form-data" } })
       .then(() => {
         setSuccess(true);
         setAdmin({ officeName: "", username: "", password: "", email: "", contactNumber: "" });
-        setTimeout(() => navigate("/"), 2000); // redirect to login after 2s
+        setProfilePic(null); setPicPreview(null);
+        setTimeout(() => navigate("/"), 2000);
       })
       .catch((error) => {
-        console.log("Backend error:", error.response?.data);
         const errData = error.response?.data;
         if (typeof errData === "object") {
           const messages = Object.entries(errData)
@@ -269,6 +283,20 @@ function AdminForm() {
               {/* Office Name — full width */}
               <div className="reg-field">
                 <label className="reg-label">Office Name</label>
+                {/* Profile Picture */}
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center",marginBottom:16}}>
+                  <div onClick={()=>picRef.current?.click()}
+                    style={{width:80,height:80,borderRadius:"50%",border:"2px dashed #cbd5e0",background:"#f8fafc",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",overflow:"hidden",marginBottom:6,transition:"border-color 0.2s"}}
+                    onMouseEnter={e=>e.currentTarget.style.borderColor="#2B6CB0"} onMouseLeave={e=>e.currentTarget.style.borderColor="#cbd5e0"}>
+                    {picPreview
+                      ? <img src={picPreview} alt="profile" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                      : <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    }
+                  </div>
+                  <input ref={picRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handlePic(e.target.files[0])}/>
+                  <span style={{fontSize:11,color:"#94a3b8",fontFamily:"'Segoe UI',sans-serif"}}>Profile photo (optional)</span>
+                </div>
+
                 <input
                   className="reg-input"
                   type="text" name="officeName"

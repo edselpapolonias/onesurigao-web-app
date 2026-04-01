@@ -10,6 +10,7 @@ from .serializers import AdminSerializer, AnnouncementSerializer, EventSerialize
 class AdminViewSet(viewsets.ModelViewSet):
     queryset = Admin.objects.all()
     serializer_class = AdminSerializer
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
 
 @api_view(['POST'])
@@ -24,7 +25,7 @@ def admin_login(request):
             "message": "Login successful",
             "adminID": admin.adminID,
             "username": admin.username,
-            "officeName": admin.officeName
+            "profilePic": request.build_absolute_uri(admin.profilePic.url) if admin.profilePic else None,
         })
     except Admin.DoesNotExist:
         return Response({

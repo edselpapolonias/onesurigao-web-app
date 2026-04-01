@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "../ReusableBar/PublicLayout";
 import MediaGallery from "../ReusableBar/MediaGallery";
+import { useOfficeFilter } from "../ReusableBar/PublicLayout";
 
 const API_URL = "http://127.0.0.1:8000/public/announcements/";
 
@@ -216,6 +217,11 @@ function PublicAnnouncement() {
       .catch(() => setError("Failed to load announcements."))
       .finally(() => setLoading(false));
   }, []);
+
+  const officeFilter = useOfficeFilter();
+  const displayAnnouncements = officeFilter
+    ? announcements.filter(a => a.admin?.adminID === officeFilter)
+    : announcements;
 
   return (
     <Layout>

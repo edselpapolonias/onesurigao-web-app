@@ -11,6 +11,7 @@ class PublicUser(models.Model):
     email            = models.EmailField(unique=True)
     registrationDate = models.DateTimeField(auto_now_add=True)
     isRegistered     = models.BooleanField(default=True)
+    profilePic       = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
 
     def __str__(self):
         return self.username

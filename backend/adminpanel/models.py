@@ -11,6 +11,7 @@ class Admin(models.Model):
     contactNumber = models.CharField(max_length=20)
     createdDate = models.DateTimeField(auto_now_add=True)
     isActive = models.BooleanField(default=True)
+    profilePic = models.ImageField(upload_to='admin_profiles/', null=True, blank=True)
 
     def __str__(self):
         return self.officeName

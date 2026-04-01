@@ -7,7 +7,7 @@ class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
         fields = ["adminID", "officeName", "username", "password",
-                  "email", "contactNumber", "createdDate", "isActive"]
+                  "email", "contactNumber", "createdDate", "isActive", "profilePic"]
         extra_kwargs = {
             "password": {"write_only": False},
             "createdDate": {"read_only": True},
