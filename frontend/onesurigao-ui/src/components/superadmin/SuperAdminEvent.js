@@ -216,6 +216,7 @@ function SuperAdminEvent() {
   const superAdminID = location.state?.superAdminID || Number(sessionStorage.getItem("superAdminID")) || null;
 
   const [activeTab, setActiveTab]         = useState("EVENT");
+  const now = new Date();
   const [approvedEvents, setApprovedEvents] = useState([]);
   const [pendingEvents, setPendingEvents]   = useState([]);
   const [loading, setLoading]             = useState(true);
@@ -229,7 +230,8 @@ function SuperAdminEvent() {
       axios.get(EVENTS_URL),
       axios.get(EVENTS_URL,{params:{status:"pending"}}),
     ]).then(([aRes,pRes])=>{
-      setApprovedEvents(Array.isArray(aRes.data)?aRes.data:aRes.data.results||[]);
+      const allApproved = Array.isArray(aRes.data)?aRes.data:aRes.data.results||[];
+      setApprovedEvents(allApproved);
       setPendingEvents(Array.isArray(pRes.data)?pRes.data:pRes.data.results||[]);
       setError(null);
     }).catch(()=>setError("Failed to load events.")).finally(()=>setLoading(false));
@@ -251,6 +253,7 @@ function SuperAdminEvent() {
         </div>
         <div style={{display:"flex",gap:8}}>
           <TabButton label="Events" active={activeTab==="EVENT"} onClick={()=>setActiveTab("EVENT")}/>
+          <TabButton label="Past Events" active={activeTab==="PAST"} onClick={()=>setActiveTab("PAST")}/>
           <TabButton label="Validation" active={activeTab==="VALIDATION"} onClick={()=>setActiveTab("VALIDATION")} count={pendingEvents.length}/>
         </div>
       </div>
@@ -261,11 +264,47 @@ function SuperAdminEvent() {
       {activeTab==="EVENT"&&(
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
           {loading&&[1,2,3].map(i=><EventSkeleton key={i}/>)}
-          {!loading&&approvedEvents.map(e=><ApprovedEventCard key={e.eventID} event={e} onClick={setSelectedEvent}/>)}
-          {!loading&&approvedEvents.length===0&&(
+          {!loading&&approvedEvents.filter(e=>e.eventDate&&new Date(e.eventDate)>=new Date()).map(e=><ApprovedEventCard key={e.eventID} event={e} onClick={setSelectedEvent}/>)}
+          {!loading&&approvedEvents.filter(e=>e.eventDate&&new Date(e.eventDate)>=new Date()).length===0&&(
             <div style={{gridColumn:"1 / -1",background:DS.card,borderRadius:12,padding:"48px 20px",textAlign:"center",color:DS.textMuted,fontSize:14,fontFamily:DS.font,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
               <div style={{marginBottom:10,display:"flex",justifyContent:"center",color:DS.textMuted}}><CalendarIcon/></div>
               No approved events yet. Go to <strong>Validation</strong> to approve events.
+            </div>
+          )}
+        </div>
+      )}
+
+
+      {/* PAST EVENTS TAB */}
+      {activeTab==="PAST"&&(
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14}}>
+          {loading&&[1,2,3].map(i=><EventSkeleton key={i}/>)}
+          {!loading&&approvedEvents.filter(e=>e.eventDate&&new Date(e.eventDate)<new Date()).map(e=>{
+            const ev = {...e, posterUrl:e.posterPath||null, postedBy:e.admin?.officeName||"Surigao PIO"};
+            const [hovered,setHovered] = [false,()=>{}];
+            const dateStr = e.eventDate?new Date(e.eventDate).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"";
+            return (
+              <div key={e.eventID} style={{background:DS.card,borderRadius:12,overflow:"hidden",boxShadow:DS.shadow,border:`1px solid ${DS.border}`,opacity:0.85}}>
+                <div style={{height:140,background:"linear-gradient(135deg,#4A5568,#2D3748)",overflow:"hidden",position:"relative"}}>
+                  {e.posterPath?<img src={e.posterPath} alt={e.title} style={{width:"100%",height:"100%",objectFit:"cover",filter:"grayscale(40%)"}}/>:
+                    <div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><ImageIcon/></div>}
+                  <div style={{position:"absolute",top:10,left:10,background:"rgba(0,0,0,0.7)",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:20,fontFamily:DS.font}}>EVENT DONE</div>
+                </div>
+                <div style={{padding:"12px 14px"}}>
+                  <div style={{fontWeight:700,fontSize:12,color:DS.textMuted,marginBottom:8,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.4,lineHeight:1.35}}>{e.title}</div>
+                  <div style={{display:"flex",flexDirection:"column",gap:5}}>
+                    <InfoRow icon={<MapPinIcon/>} label="Location" value={e.location?.length>22?e.location.slice(0,22)+"…":e.location}/>
+                    <InfoRow icon={<CalendarIcon/>} label="Date" value={dateStr}/>
+                    <InfoRow icon={<UserIcon/>} label="By" value={e.admin?.officeName||"Surigao PIO"}/>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          {!loading&&approvedEvents.filter(e=>e.eventDate&&new Date(e.eventDate)<new Date()).length===0&&(
+            <div style={{gridColumn:"1 / -1",background:DS.card,borderRadius:12,padding:"48px 20px",textAlign:"center",color:DS.textMuted,fontSize:14,fontFamily:DS.font,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
+              <div style={{marginBottom:10,display:"flex",justifyContent:"center",color:DS.textMuted}}><CalendarIcon/></div>
+              No past events yet.
             </div>
           )}
         </div>
