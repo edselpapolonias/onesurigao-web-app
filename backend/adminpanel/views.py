@@ -7,24 +7,30 @@ from django.db.models import Q
 
 from .models import Admin, Announcement, AnnouncementMedia, Event
 from .serializers import AdminSerializer, AnnouncementSerializer, EventSerializer
-from shared.permissions import IsAdminUser, IsSuperAdminUser, get_verified_admin
+from shared.permissions import IsAdminUser, get_verified_admin
 
 
 # ── Admin Account Management ──────────────────────────────────────────────────
 
 class AdminViewSet(viewsets.ModelViewSet):
-    queryset         = Admin.objects.all()
+    queryset         = Admin.objects.filter(isActive=True)
     serializer_class = AdminSerializer
     parser_classes   = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def get_permissions(self):
-        # Registration (create) is open — all other actions require admin auth.
-        if self.action == "create":
+        # Safe methods (GET list/retrieve) are open — the sidebar and department
+        # pages need to read admin info without any auth headers.
+        # create is open for registration.
+        # All mutations (update, partial_update, destroy) require admin auth.
+        if self.request.method in ("GET", "HEAD", "OPTIONS") or self.action == "create":
             return [AllowAny()]
         return [IsAdminUser()]
 
+    def get_queryset(self):
+        # Only return active admins to public callers.
+        return Admin.objects.filter(isActive=True)
+
     def update(self, request, *args, **kwargs):
-        # Admins can only update their own record.
         target    = self.get_object()
         requester = get_verified_admin(request)
         if requester is None or requester.adminID != target.adminID:
@@ -35,7 +41,6 @@ class AdminViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        # Deletion is managed through the superadmin panel only.
         return Response({"error": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
 
 
@@ -56,7 +61,6 @@ def admin_login(request):
     try:
         admin = Admin.objects.get(username=username, isActive=True)
     except Admin.DoesNotExist:
-        # Generic message — never reveal which field was wrong.
         return Response(
             {"success": False, "message": "Invalid username or password."},
             status=status.HTTP_401_UNAUTHORIZED,
@@ -77,10 +81,8 @@ def admin_login(request):
             request.build_absolute_uri(admin.profilePic.url)
             if admin.profilePic else None
         ),
-        # Frontend stores adminID and sends it back as:
-        #   X-Role: admin
-        #   X-User-ID: <adminID>
-        # on every subsequent protected request.
+        # Frontend: store adminID, then send X-Role: admin + X-User-ID: <adminID>
+        # on every protected request.
     })
 
 
@@ -91,13 +93,12 @@ def admin_login(request):
 def change_admin_password(request, pk):
     """
     Allows an admin to change their own password.
-    - Requires IsAdminUser (X-Role + X-User-ID headers).
+    - Requires valid X-Role / X-User-ID headers (IsAdminUser).
     - Verifies the current password server-side before accepting the new one.
-    - pk must match the authenticated admin's own ID (no privilege escalation).
+    - pk in the URL must match the authenticated admin's own ID.
     """
     requester = get_verified_admin(request)
 
-    # Double-check: the authenticated admin must be the same as the target pk.
     if requester is None or requester.adminID != pk:
         return Response(
             {"error": "You can only change your own password."},
@@ -119,7 +120,6 @@ def change_admin_password(request, pk):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Server-side verification of the current password — never trust the client.
     if not requester.check_password(current_password):
         return Response(
             {"error": "Current password is incorrect."},
@@ -139,8 +139,7 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
     parser_classes   = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def get_permissions(self):
-        from rest_framework.permissions import SAFE_METHODS
-        if self.request.method in SAFE_METHODS:
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
             return [AllowAny()]
         return [IsAdminUser()]
 
@@ -154,12 +153,10 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         admin = get_verified_admin(self.request)
-        # Always attach the authenticated admin — client cannot spoof this.
         announcement = serializer.save(admin=admin, isActive=True)
         self._save_media(announcement)
 
     def perform_update(self, serializer):
-        # Only the original author may edit their announcement.
         announcement = self.get_object()
         requester    = get_verified_admin(self.request)
         if requester is None or announcement.admin_id != requester.adminID:
@@ -179,7 +176,7 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
         from .serializers import _validate_media_file
         files = self.request.FILES.getlist("mediaFiles")
         for f in files:
-            _validate_media_file(f)   # raises ValidationError on bad type / size
+            _validate_media_file(f)
             media_type = "video" if f.content_type.startswith("video") else "image"
             AnnouncementMedia.objects.create(
                 announcement=announcement, file=f, mediaType=media_type
@@ -193,16 +190,13 @@ class EventViewSet(viewsets.ModelViewSet):
     parser_classes   = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def get_permissions(self):
-        from rest_framework.permissions import SAFE_METHODS
-        if self.request.method in SAFE_METHODS:
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
             return [AllowAny()]
         return [IsAdminUser()]
 
     def get_queryset(self):
         admin_id = self.request.query_params.get("adminID")
         if admin_id:
-            # The admin sees their own events regardless of approval status,
-            # plus all other approved events.
             return Event.objects.filter(
                 Q(isApproved=True) | Q(admin__adminID=admin_id)
             ).order_by("-createdDate")
@@ -217,7 +211,6 @@ class EventViewSet(viewsets.ModelViewSet):
             if poster.content_type not in ALLOWED_IMAGE_TYPES:
                 from rest_framework.exceptions import ValidationError
                 raise ValidationError("Event poster must be an image file.")
-        # New events are always pending — superadmin must approve.
         serializer.save(admin=admin, isApproved=False)
 
     def perform_update(self, serializer):
