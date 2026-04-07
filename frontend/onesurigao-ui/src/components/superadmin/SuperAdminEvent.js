@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import { apiClient } from "../../services/authService";
 
 const EVENTS_URL  = "http://127.0.0.1:8000/superadmin/events/";
 const APPROVE_URL = id => `http://127.0.0.1:8000/superadmin/events/${id}/approve/`;
@@ -227,8 +228,8 @@ function SuperAdminEvent() {
   const fetchEvents = () => {
     setLoading(true);
     Promise.all([
-      axios.get(EVENTS_URL),
-      axios.get(EVENTS_URL,{params:{status:"pending"}}),
+      apiClient.get("/superadmin/events/"),
+      apiClient.get("/superadmin/events/", { params: { status: "pending" } }),
     ]).then(([aRes,pRes])=>{
       const allApproved = Array.isArray(aRes.data)?aRes.data:aRes.data.results||[];
       setApprovedEvents(allApproved);
@@ -239,8 +240,8 @@ function SuperAdminEvent() {
 
   useEffect(()=>{fetchEvents();},[]);
 
-  const handleApprove = async eventID => { await axios.patch(APPROVE_URL(eventID),{superAdminID}); fetchEvents(); };
-  const handleDecline = async (eventID,reason) => { await axios.patch(DECLINE_URL(eventID),{declineReason:reason}); fetchEvents(); };
+  const handleApprove = async eventID => { await apiClient.patch(`/superadmin/events/${eventID}/approve/`, { superAdminID }); fetchEvents(); };
+  const handleDecline = async (eventID,reason) => { await apiClient.patch(`/superadmin/events/${eventID}/decline/`, { declineReason: reason }); fetchEvents(); };
 
   return (
     <SuperAdminLayout>

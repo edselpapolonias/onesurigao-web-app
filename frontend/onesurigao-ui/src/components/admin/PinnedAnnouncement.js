@@ -4,6 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
 import MediaGallery from "../ReusableBar/MediaGallery";
+import { apiClient } from "../../services/authService";
 
 const API_URL = "http://127.0.0.1:8000/api/announcements/";
 
@@ -250,7 +251,7 @@ function PinnedAnnouncement() {
   },[]);
 
   const handleUnpin = ann => {
-    axios.patch(`${API_URL}${ann.id}/`,{isPinned:false})
+    apiClient.patch(`/api/announcements/${ann.id}/`, { isPinned: false })
       .then(()=>setPinned(pinned.filter(a=>a.id!==ann.id)))
       .catch(err=>alert(`Failed to unpin: ${JSON.stringify(err.response?.data||err.message)}`));
   };

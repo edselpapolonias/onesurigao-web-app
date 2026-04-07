@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { loginPublicUser, logoutAll } from "../../services/authService";
 
 // ─── Public Auth Context (shared across app) ──────────────────────────────────
 export const PublicAuthContext = createContext(null);
@@ -16,9 +17,11 @@ export const PublicAuthProvider = ({ children }) => {
   });
 
   const login  = (u) => {
+    logoutAll();
     sessionStorage.setItem("publicUserID",  u.publicUserID);
     sessionStorage.setItem("publicUserName", u.name);
     if (u.pic) sessionStorage.setItem("publicUserPic", u.pic);
+    else sessionStorage.removeItem("publicUserPic");
     setUser(u);
   };
   const logout = () => {
@@ -124,7 +127,7 @@ const AuthModal = ({ onClose, onLoggedIn }) => {
     if (!lf.username || !lf.password) { setError("Please fill in all fields."); return; }
     setLoading(true); setError("");
     try {
-      const res = await axios.post("http://127.0.0.1:8000/public/login/", lf);
+      const res = await loginPublicUser(lf);
       if (res.data.success) {
         onLoggedIn({ publicUserID: res.data.publicUserID, name: `${res.data.name} ${res.data.lastName}`, pic: res.data.profilePic || null });
         onClose();
@@ -141,6 +144,7 @@ const AuthModal = ({ onClose, onLoggedIn }) => {
       Object.entries(rf).forEach(([k, v]) => { if (v && k !== "profilePic") fd.append(k, v); });
       if (rf.profilePic) fd.append("profilePic", rf.profilePic);
       const res = await axios.post("http://127.0.0.1:8000/public/users/", fd, { headers: { "Content-Type": "multipart/form-data" } });
+      logoutAll();
       onLoggedIn({ publicUserID: res.data.publicUserID, name: `${res.data.name} ${res.data.lastName}`, pic: res.data.profilePic || null });
       onClose();
     } catch (err) {

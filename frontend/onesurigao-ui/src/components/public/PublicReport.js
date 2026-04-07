@@ -1,7 +1,9 @@
 // src/components/public/PublicReport.js
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { apiClient, loginPublicUser, logoutAll } from "../../services/authService";
 import Layout from "../ReusableBar/PublicLayout";
+import { usePublicAuth } from "../ReusableBar/SurigaoHeader";
 
 const BASE = "http://127.0.0.1:8000/public";
 
@@ -398,10 +400,8 @@ const Step2Auth = ({ onLoggedIn, onBack }) => {
     if(!loginForm.username||!loginForm.password){setError("Please fill in all fields.");return;}
     setLoading(true);setError("");
     try {
-      const res=await axios.post(`${BASE}/login/`,loginForm);
+      const res = await loginPublicUser(loginForm);
       if(res.data.success){
-        sessionStorage.setItem("publicUserID",res.data.publicUserID);
-        sessionStorage.setItem("publicUserName",`${res.data.name} ${res.data.lastName}`);
         onLoggedIn({publicUserID:res.data.publicUserID,name:`${res.data.name} ${res.data.lastName}`});
       } else setError(res.data.message||"Invalid credentials.");
     }catch{setError("Server error. Please try again.");}
@@ -413,7 +413,8 @@ const Step2Auth = ({ onLoggedIn, onBack }) => {
     setLoading(true);setError("");
     try {
       const res=await axios.post(`${BASE}/users/`,regForm);
-      sessionStorage.setItem("publicUserID",res.data.publicUserID);
+      logoutAll();
+      sessionStorage.setItem("publicUserID", String(res.data.publicUserID));
       sessionStorage.setItem("publicUserName",`${res.data.name} ${res.data.lastName}`);
       onLoggedIn({publicUserID:res.data.publicUserID,name:`${res.data.name} ${res.data.lastName}`});
     }catch(err){
@@ -475,12 +476,14 @@ const SubmissionModal = ({ onClose, user, form, mediaFiles, setUser, onSubmitted
       const fd = new FormData();
       fd.append("barangay",formData.barangay); fd.append("location",formData.location);
       fd.append("report",formData.report); fd.append("description",formData.description);
-      fd.append("publicUser_id",user.publicUserID);
+      // publicUser is set server-side from X-User-ID header — no need to send it
       mediaFiles2.forEach(f=>fd.append("mediaFiles",f));
-      const res = await axios.post(`${BASE}/reports/`,fd,{headers:{"Content-Type":"multipart/form-data"}});
+      const res = await apiClient.post(`${BASE}/reports/`,fd);
       onSubmitted(res.data);
       onClose();
-    }catch{alert("Failed to submit. Please try again.");}
+    }catch(err){
+      alert(err.response?.data?.detail || err.response?.data?.error || "Failed to submit. Please try again.");
+    }
     finally{setSubmitting(false);}
   };
 
@@ -526,14 +529,15 @@ function PublicReport() {
   const [showModal, setShowModal]     = useState(false);
   const [form, setForm]               = useState({barangay:"",location:"",category:"",report:"",description:""});
   const [mediaFiles, setMediaFiles]   = useState([]);
-  const [user, setUser]               = useState(()=>{const id=sessionStorage.getItem("publicUserID");const name=sessionStorage.getItem("publicUserName");return id?{publicUserID:Number(id),name}:null;});
+  const { user, login: authLogin, logout: authLogout } = usePublicAuth();
+  const setUser = (u) => { if (u) authLogin(u); else authLogout(); };
   const [reports, setReports]         = useState([]);
   const [loadingReports, setLoading]  = useState(false);
   const [selectedReport, setSelected] = useState(null);
 
   const fetchReports = uid => {
     setLoading(true);
-    axios.get(`${BASE}/reports/?publicUserID=${uid}`)
+    apiClient.get(`${BASE}/reports/`)
       .then(res=>setReports(Array.isArray(res.data)?res.data:res.data.results||[]))
       .finally(()=>setLoading(false));
   };

@@ -4,6 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
 import MediaGallery from "../ReusableBar/MediaGallery";
+import { apiClient } from "../../services/authService";
 
 const BASE = "http://127.0.0.1:8000/public";
 
@@ -275,18 +276,18 @@ function AdminReport() {
 
   const fetchReports = () => {
     setLoading(true);
-    axios.get(`${BASE}/reports/`)
+    apiClient.get("/public/reports/")
       .then(res=>{const all=Array.isArray(res.data)?res.data:res.data.results||[];setReports(all.filter(r=>r.assignedTo?.adminID===adminID));})
       .finally(()=>setLoading(false));
   };
 
   useEffect(()=>{fetchReports();},[adminID]);
 
-  const handleRespond = async (reportID,response) => { await axios.patch(`${BASE}/reports/${reportID}/respond/`,{adminResponse:response}); };
-  const handleResolve = async reportID => { await axios.patch(`${BASE}/reports/${reportID}/resolve/`); };
+  const handleRespond = async (reportID,response) => { await apiClient.patch(`/public/reports/${reportID}/respond/`, { adminResponse: response }); };
+  const handleResolve = async reportID => { await apiClient.patch(`/public/reports/${reportID}/resolve/`); };
   const handleRefresh = () => {
     fetchReports();
-    if(selectedReport) { axios.get(`${BASE}/reports/${selectedReport.reportID}/`).then(res=>setSelectedReport(res.data)).catch(()=>{}); }
+    if(selectedReport) { apiClient.get(`/public/reports/${selectedReport.reportID}/`).then(res=>setSelectedReport(res.data)).catch(()=>{}); }
   };
 
   const filtered = filter==="all"?reports:filter==="active"?reports.filter(r=>r.status==="approved"||r.status==="responded"):reports.filter(r=>r.status==="resolved");

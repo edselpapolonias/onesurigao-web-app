@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import { apiClient } from "../../services/authService";
 
 const BASE       = "http://127.0.0.1:8000/public";
 const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
@@ -221,15 +222,15 @@ function SuperAdminReport() {
 
   const fetchAll = () => {
     setLoading(true);
-    Promise.all([axios.get(`${BASE}/reports/`),axios.get(ADMINS_URL)])
+    Promise.all([apiClient.get("/public/reports/"), axios.get(ADMINS_URL)])
       .then(([rr,ar])=>{setReports(Array.isArray(rr.data)?rr.data:rr.data.results||[]);setAdmins(Array.isArray(ar.data)?ar.data:ar.data.results||[]);})
       .finally(()=>setLoading(false));
   };
 
   useEffect(()=>{fetchAll();},[]);
 
-  const handleApprove = async (reportID,assignedToID,superAdminID) => { await axios.patch(`${BASE}/reports/${reportID}/approve/`,{assignedTo_id:assignedToID,superAdminID}); fetchAll(); };
-  const handleDecline = async (reportID,reason,superAdminID) => { await axios.patch(`${BASE}/reports/${reportID}/decline/`,{rejectionReason:reason,superAdminID}); fetchAll(); };
+  const handleApprove = async (reportID,assignedToID,superAdminID) => { await apiClient.patch(`/public/reports/${reportID}/approve/`,{assignedTo_id:assignedToID,superAdminID}); fetchAll(); };
+  const handleDecline = async (reportID,reason,superAdminID) => { await apiClient.patch(`/public/reports/${reportID}/decline/`,{rejectionReason:reason,superAdminID}); fetchAll(); };
 
   const filtered      = filter==="all"?reports:reports.filter(r=>r.status===filter);
   const pendingCount  = reports.filter(r=>r.status==="pending").length;

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import { apiClient } from "../../services/authService";
 
 const CAT_URL = "http://127.0.0.1:8000/public/hotline-categories/";
 const HOT_URL = "http://127.0.0.1:8000/public/hotlines/";
@@ -36,7 +37,7 @@ const HotlineModal = ({ categoryID, hotline, onClose, onSave }) => {
   const handleSave = async () => {
     if(!form.name.trim()||!form.contactNumber.trim()){alert("Please fill in all fields.");return;}
     setSaving(true);
-    try{if(hotline){await axios.patch(`${HOT_URL}${hotline.id}/`,form);}else{await axios.post(HOT_URL,form);}onSave();onClose();}
+    try{if(hotline){await apiClient.patch(`/public/hotlines/${hotline.id}/`,form);}else{await apiClient.post("/public/hotlines/",form);}onSave();onClose();}
     catch{alert("Failed to save hotline.");}finally{setSaving(false);}
   };
   return (
@@ -68,7 +69,7 @@ const CategoryModal = ({ category, onClose, onSave }) => {
   const handleSave = async () => {
     if(!form.name.trim()){alert("Please enter a category name.");return;}
     setSaving(true);
-    try{if(category){await axios.patch(`${CAT_URL}${category.id}/`,form);}else{await axios.post(CAT_URL,form);}onSave();onClose();}
+    try{if(category){await apiClient.patch(`/public/hotline-categories/${category.id}/`,form);}else{await apiClient.post("/public/hotline-categories/",form);}onSave();onClose();}
     catch{alert("Failed to save category.");}finally{setSaving(false);}
   };
   return (
@@ -110,7 +111,7 @@ const CategorySection = ({ category, onEdit, onDelete, onRefresh }) => {
 
   const handleDeleteHotline = async id => {
     if(!window.confirm("Delete this hotline?")) return;
-    await axios.delete(`${HOT_URL}${id}/`); onRefresh();
+    await apiClient.delete(`/public/hotlines/${id}/`); onRefresh();
   };
 
   return (
@@ -180,7 +181,7 @@ function SuperAdminHotlines() {
 
   const handleDeleteCategory = async id => {
     if(!window.confirm("Delete this category and all its hotlines?")) return;
-    await axios.delete(`${CAT_URL}${id}/`); fetchCategories();
+    await apiClient.delete(`/public/hotline-categories/${id}/`); fetchCategories();
   };
 
   return (

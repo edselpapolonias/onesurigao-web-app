@@ -1,10 +1,8 @@
 // src/components/public/PublicAnnouncement.js
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
 import MediaGallery from "../ReusableBar/MediaGallery";
-
-const API_URL = "http://127.0.0.1:8000/superadmin/announcements/";
+import { apiClient } from "../../services/authService";
 
 // ─── Design System ────────────────────────────────────────────────────────────
 const DS = {
@@ -211,9 +209,13 @@ function SuperAdminAnnouncement() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(API_URL)
+    apiClient.get("/superadmin/announcements/")
       .then(res => { setAnnouncements(Array.isArray(res.data)?res.data:res.data.results||[]); setError(null); })
-      .catch(() => setError("Failed to load announcements."))
+      .catch(err => {
+        setError(err.response?.status === 403
+          ? "Failed to load announcements. Please sign in again as super admin."
+          : "Failed to load announcements.");
+      })
       .finally(() => setLoading(false));
   }, []);
 

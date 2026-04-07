@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
 import MediaGallery from "../ReusableBar/MediaGallery";
+import { apiClient, changeAdminPassword } from "../../services/authService";
 
 const DS = {
   primary:       "#2B6CB0",
@@ -94,7 +95,7 @@ const EditProfileModal = ({ admin, onClose, onSaved }) => {
   const handleSaveInfo = async () => {
     setSaving(true); setError(""); setSuccess("");
     try {
-      await axios.patch(`http://127.0.0.1:8000/api/admins/${admin.adminID}/`, form);
+      await apiClient.patch(`/api/admins/${admin.adminID}/`, form);
       setSuccess("Profile updated successfully.");
       onSaved({ ...admin, ...form });
     } catch { setError("Failed to save changes."); }
@@ -108,7 +109,7 @@ const EditProfileModal = ({ admin, onClose, onSaved }) => {
     setSaving(true); setError(""); setSuccess("");
     try {
       // Verify current password and update
-      await axios.patch(`http://127.0.0.1:8000/api/admins/${admin.adminID}/`, { password: pwForm.next });
+      await changeAdminPassword({ adminID: admin.adminID, currentPassword: pwForm.current, newPassword: pwForm.next });
       setSuccess("Password changed successfully."); setPwForm({ current:"", next:"", confirm:"" });
     } catch { setError("Failed to change password."); }
     finally { setSaving(false); }
@@ -196,7 +197,7 @@ function AdminProfilePage() {
     setProfilePic(preview);
     // Upload
     const fd = new FormData(); fd.append("profilePic", file);
-    try { await axios.patch(`http://127.0.0.1:8000/api/admins/${adminID}/`, fd, { headers:{"Content-Type":"multipart/form-data"} }); }
+    try { await apiClient.patch(`/api/admins/${adminID}/`, fd); }
     catch { console.error("Failed to upload profile pic"); }
   };
 

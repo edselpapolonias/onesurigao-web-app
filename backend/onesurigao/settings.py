@@ -6,6 +6,7 @@ Development fallbacks are provided so the app still runs locally without a .env 
 
 import os
 from pathlib import Path
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -146,6 +147,11 @@ else:
         "http://localhost:3000,http://127.0.0.1:3000",
     )
     CORS_ALLOWED_ORIGINS = [o.strip() for o in _raw_cors.split(",") if o.strip()]
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-role",
+    "x-user-id",
+]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # DJANGO REST FRAMEWORK

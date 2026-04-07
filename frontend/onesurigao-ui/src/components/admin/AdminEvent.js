@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
+import { apiClient } from "../../services/authService";
 
 const API_URL = "http://127.0.0.1:8000/api/events/";
 
@@ -314,7 +315,7 @@ function AdminEvent() {
     fd.append("eventDate",form.eventDate); fd.append("location",form.location);
     fd.append("admin_id",adminID);
     if(form.posterFile) fd.append("posterPath",form.posterFile);
-    const res = await axios.post(API_URL,fd,{headers:{"Content-Type":"multipart/form-data"}});
+    const res = await apiClient.post("/api/events/", fd);
     setMyEvents(prev=>[{...res.data,posterUrl:form.posterFile?URL.createObjectURL(form.posterFile):null,postedBy:officeName},...prev]);
     setActiveTab("PENDING");
   };

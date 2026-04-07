@@ -4,6 +4,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
 import MediaGallery from "../ReusableBar/MediaGallery";
+import { apiClient } from "../../services/authService";
 
 const API_URL = "http://127.0.0.1:8000/api/announcements/";
 
@@ -433,7 +434,7 @@ function AdminAnnouncement() {
     fd.append("title",form.title); fd.append("content",form.content);
     if(adminID) fd.append("admin_id",adminID);
     (form.mediaFiles||[]).forEach(f=>fd.append("mediaFiles",f));
-    axios.post(API_URL,fd,{headers:{"Content-Type":"multipart/form-data"}})
+    apiClient.post("/api/announcements/", fd)
       .then(res=>{ setAnnouncements([res.data,...announcements]); setShowModal(false); setEditingDraft(null); if(editingDraft) persistDrafts(drafts.filter(d=>d.id!==editingDraft.id)); })
       .catch(err=>alert(`Failed to post: ${JSON.stringify(err.response?.data||err.message)}`));
   };
@@ -445,7 +446,7 @@ function AdminAnnouncement() {
   };
 
   const handlePin = ann => {
-    axios.patch(`${API_URL}${ann.id}/`,{isPinned:!ann.isPinned})
+    apiClient.patch(`/api/announcements/${ann.id}/`, { isPinned: !ann.isPinned })
       .then(res=>setAnnouncements(announcements.map(a=>a.id===ann.id?res.data:a)))
       .catch(err=>alert(`Failed: ${JSON.stringify(err.response?.data||err.message)}`));
   };
