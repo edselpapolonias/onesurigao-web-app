@@ -55,7 +55,7 @@ const getDeptPath = (role, adminID) => {
   return `/department/${adminID}`;
 };
 
-export const DepartmentSidebar = () => {
+export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = null }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const role      = detectRole(location.pathname);
@@ -66,10 +66,11 @@ export const DepartmentSidebar = () => {
   const [hoveredID, setHoveredID] = useState(null);
 
   // Detect active department from URL
-  const activeAdminID = (() => {
+  const routeAdminID = (() => {
     const m = location.pathname.match(/\/department\/(\d+)/);
     return m ? Number(m[1]) : null;
   })();
+  const activeAdminID = role === "public" && !routeAdminID ? selectedAdminID : routeAdminID;
 
   const fetchAdmins = () => {
     setLoading(true); setError(null);
@@ -82,9 +83,24 @@ export const DepartmentSidebar = () => {
   useEffect(() => { fetchAdmins(); }, []);
 
   const goHome = () => {
+    if (role==="public") {
+      onOfficeFilter?.(null);
+      navigate("/home");
+      return;
+    }
+
     if (role==="superadmin") navigate("/superadmin/announcements");
-    else if (role==="public") navigate("/home");
     else navigate("/announcements");
+  };
+
+  const handleOfficeClick = (adminID) => {
+    if (role === "public") {
+      onOfficeFilter?.(adminID);
+      navigate(`/home?office=${adminID}`);
+      return;
+    }
+
+    navigate(getDeptPath(role, adminID));
   };
 
   return (
@@ -126,7 +142,7 @@ export const DepartmentSidebar = () => {
           const isHovered = hoveredID === admin.adminID;
           return (
             <div key={admin.adminID}
-              onClick={()=>navigate(getDeptPath(role, admin.adminID))}
+              onClick={()=>handleOfficeClick(admin.adminID)}
               onMouseEnter={()=>setHoveredID(admin.adminID)}
               onMouseLeave={()=>setHoveredID(null)}
               style={{display:"flex",alignItems:"center",gap:10,padding:"10px 14px",borderBottom:`1px solid ${DS.border}`,borderLeft:`3px solid ${isActive?DS.primary:"transparent"}`,background:isActive?"#F7FAFF":isHovered?"#F7FAFF":DS.card,cursor:"pointer",transition:"all 0.15s"}}>

@@ -4,8 +4,10 @@ import axios from "axios";
 import Layout from "../ReusableBar/PublicLayout";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { useOfficeFilter } from "../ReusableBar/PublicLayout";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const API_URL = "http://127.0.0.1:8000/public/announcements/";
+const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
 
 // ─── Design System ────────────────────────────────────────────────────────────
 const DS = {
@@ -37,6 +39,7 @@ const ClockIcon  = () => (<svg width="11" height="11" viewBox="0 0 24 24" fill="
 const BuildingIcon = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1"/></svg>);
 const SendIcon   = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>);
 const XIcon      = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const SearchIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>);
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 const Avatar = ({ officeName }) => {
@@ -47,6 +50,54 @@ const Avatar = ({ officeName }) => {
     </div>
   );
 };
+
+const OfficeResultCard = ({ office, onOpen }) => (
+  <button
+    type="button"
+    onClick={() => onOpen(office.adminID)}
+    style={{ width:"100%", background:DS.card, border:`1px solid ${DS.border}`, borderRadius:14, padding:"14px 16px", display:"flex", alignItems:"center", gap:14, cursor:"pointer", boxShadow:DS.shadow, transition:"transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign:"left" }}
+    onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=DS.shadowHover;e.currentTarget.style.borderColor=DS.primary;}}
+    onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=DS.shadow;e.currentTarget.style.borderColor=DS.border;}}
+  >
+    <Avatar officeName={office.officeName} />
+    <div style={{ minWidth:0, flex:1 }}>
+      <div style={{ fontSize:14, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+        {office.officeName}
+      </div>
+      <div style={{ fontSize:12, color:DS.textMuted, fontFamily:DS.font, marginTop:3 }}>
+        City Government Office
+      </div>
+      {office.email && (
+        <div style={{ fontSize:12, color:DS.textSecondary, fontFamily:DS.font, marginTop:6, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+          {office.email}
+        </div>
+      )}
+    </div>
+  </button>
+);
+
+const SearchSectionHeader = ({ title, count }) => (
+  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+    <h3 style={{ margin:0, fontSize:16, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font }}>{title}</h3>
+    <span style={{ fontSize:12, fontWeight:700, color:DS.primary, fontFamily:DS.font, background:DS.primaryLight, borderRadius:999, padding:"4px 10px" }}>
+      {count}
+    </span>
+  </div>
+);
+
+const EmptySearchCard = ({ query }) => (
+  <div style={{ background:DS.card, border:`1px solid ${DS.border}`, borderRadius:14, padding:"42px 20px", textAlign:"center", boxShadow:DS.shadow }}>
+    <div style={{ display:"flex", justifyContent:"center", color:DS.primary, marginBottom:14 }}>
+      <SearchIcon />
+    </div>
+    <div style={{ fontSize:16, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, marginBottom:6 }}>
+      No results for "{query}"
+    </div>
+    <div style={{ fontSize:13, color:DS.textMuted, fontFamily:DS.font }}>
+      Try a different office name or keyword from the announcement post.
+    </div>
+  </div>
+);
 
 // ─── Comment Modal ────────────────────────────────────────────────────────────
 const CommentModal = ({ announcement, onClose }) => {

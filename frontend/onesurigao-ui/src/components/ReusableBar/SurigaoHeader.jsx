@@ -345,14 +345,23 @@ const PublicProfileDropdown = () => {
 };
 
 // ─── Search Bar ────────────────────────────────────────────────────────────────
-const SearchBar = ({ placeholder, onSearch }) => {
-  const [val, setVal] = useState("");
+const SearchBar = ({ placeholder, onSearch, value = "" }) => {
+  const [val, setVal] = useState(value);
   const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    setVal(value);
+  }, [value]);
+
+  const handleSubmit = () => onSearch(val.trim());
+
   return (
     <div style={{display:"flex",alignItems:"center",background:focused?"#fff":DS.bg,border:`1.5px solid ${focused?DS.primary:DS.border}`,borderRadius:22,padding:"0 14px",height:36,minWidth:260,maxWidth:360,transition:"all 0.2s",boxSizing:"border-box"}}>
-      <span style={{color:focused?DS.primary:DS.textMuted,marginRight:8,display:"flex",transition:"color 0.2s"}}><SearchIcon/></span>
+      <button onClick={handleSubmit} type="button" style={{display:"flex",alignItems:"center",justifyContent:"center",background:"none",border:"none",padding:0,marginRight:8,color:focused?DS.primary:DS.textMuted,cursor:"pointer",transition:"color 0.2s"}}>
+        <SearchIcon/>
+      </button>
       <input type="text" placeholder={placeholder} value={val} onChange={e=>setVal(e.target.value)}
-        onKeyDown={e=>e.key==="Enter"&&onSearch(val)}
+        onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
         onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
         style={{border:"none",background:"transparent",outline:"none",fontSize:13,color:DS.textPrimary,width:"100%",fontFamily:DS.font}}/>
     </div>
@@ -386,12 +395,22 @@ export const SurigaoNavBar = ({ onSearch=()=>{}, officeName="" }) => {
   const ROUTES    = { "ANNOUNCEMENT":"/announcements","PINNED":"/pinnedAnnouncements","EVENT":"/events","REPORT PROBLEM":"/report-problem","HOTLINES":"/hotlines" };
   const R2T       = { "/announcements":"ANNOUNCEMENT","/pinnedAnnouncements":"PINNED","/events":"EVENT","/report-problem":"REPORT PROBLEM","/hotlines":"HOTLINES" };
   const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
+  const currentSearch = new URLSearchParams(location.search).get("search") || "";
   const handleLogout = () => { sessionStorage.removeItem("adminID"); sessionStorage.removeItem("officeName"); sessionStorage.removeItem("announcement_drafts"); navigate("/"); };
+  const handleSearch = (query) => {
+    onSearch(query);
+    if (location.pathname !== "/announcements") {
+      navigate(query ? `/announcements?search=${encodeURIComponent(query)}` : "/announcements");
+      return;
+    }
+
+    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
+  };
   return (
     <NavBar left={<AdminProfileDropdown name={officeName||"Admin"} grad={DS.primaryGrad} role="Office Account" onLogout={handleLogout}/>}
       tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={DS.primaryGrad}
-      search={<SearchBar placeholder="Search announcements, reports..." onSearch={onSearch}/>}/>
+      search={<SearchBar placeholder="Search announcements..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
   );
 };
 
@@ -403,12 +422,22 @@ export const SuperAdminNavBar = ({ onSearch=()=>{}, superAdminName="" }) => {
   const ROUTES    = { "ANNOUNCEMENT":"/superadmin/announcements","PINNED":"/superadmin/pinned","EVENT":"/superadmin/events","REPORT PROBLEM":"/superadmin/reports","HOTLINES":"/superadmin/hotlines" };
   const R2T       = { "/superadmin/announcements":"ANNOUNCEMENT","/superadmin/pinned":"PINNED","/superadmin/events":"EVENT","/superadmin/reports":"REPORT PROBLEM","/superadmin/hotlines":"HOTLINES" };
   const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
+  const currentSearch = new URLSearchParams(location.search).get("search") || "";
   const handleLogout = () => { sessionStorage.removeItem("superAdminID"); sessionStorage.removeItem("superAdminName"); navigate("/superadmin"); };
+  const handleSearch = (query) => {
+    onSearch(query);
+    if (location.pathname !== "/superadmin/announcements") {
+      navigate(query ? `/superadmin/announcements?search=${encodeURIComponent(query)}` : "/superadmin/announcements");
+      return;
+    }
+
+    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
+  };
   return (
     <NavBar left={<AdminProfileDropdown name={superAdminName||"Super Admin"} grad={GRAD} role="Super Admin Account" onLogout={handleLogout}/>}
       tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={GRAD}
-      search={<SearchBar placeholder="Search announcements, reports..." onSearch={onSearch}/>}/>
+      search={<SearchBar placeholder="Search announcements..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
   );
 };
 
@@ -419,11 +448,23 @@ export const PublicNavBar = ({ onSearch=()=>{} }) => {
   const ROUTES    = { "ANNOUNCEMENT":"/home","PINNED":"/home/pinned","EVENT":"/home/events","REPORT PROBLEM":"/home/report","HOTLINES":"/home/hotlines" };
   const R2T       = { "/home":"ANNOUNCEMENT","/home/pinned":"PINNED","/home/events":"EVENT","/home/report":"REPORT PROBLEM","/home/hotlines":"HOTLINES" };
   const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
+  const currentSearch = new URLSearchParams(location.search).get("search") || "";
+
+  const handleSearch = (query) => {
+    onSearch(query);
+    if (location.pathname !== "/home") {
+      navigate(query ? `/home?search=${encodeURIComponent(query)}` : "/home");
+      return;
+    }
+
+    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
+  };
+
   return (
     <NavBar left={<PublicProfileDropdown/>}
       tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={DS.primaryGrad}
-      search={<SearchBar placeholder="Search announcements, events..." onSearch={onSearch}/>}/>
+      search={<SearchBar placeholder="Search announcements, offices..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
   );
 };
 

@@ -197,7 +197,7 @@ function DepartmentPage({ Layout: LayoutComponent, backPath = -1 }) {
       .catch(() => setOffice(null))
       .finally(() => setLoadingOffice(false));
     // Fetch announcements for this admin
-    axios.get(`http://127.0.0.1:8000/api/announcements/?admin_id=${adminID}`)
+    axios.get(`http://127.0.0.1:8000/api/announcements/?adminID=${adminID}`)
       .then(res => setAnnouncements(Array.isArray(res.data) ? res.data : res.data.results || []))
       .catch(() => setAnnouncements([]))
       .finally(() => setLoadingAnn(false));

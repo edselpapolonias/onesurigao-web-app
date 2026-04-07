@@ -1,5 +1,6 @@
 // src/components/ReusableBar/PublicLayout.js
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { SurigaoHeader, PublicNavBar } from "./SurigaoHeader";
 import DepartmentSidebar from "./DepartmentSidebar";
 
@@ -9,7 +10,14 @@ export const OfficeFilterContext = createContext(null);
 export const useOfficeFilter = () => useContext(OfficeFilterContext);
 
 const PublicLayout = ({ children }) => {
+  const location = useLocation();
   const [selectedAdminID, setSelectedAdminID] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const officeParam = params.get("office");
+    setSelectedAdminID(officeParam ? Number(officeParam) : null);
+  }, [location.pathname, location.search]);
 
   return (
     <OfficeFilterContext.Provider value={selectedAdminID}>
@@ -17,7 +25,7 @@ const PublicLayout = ({ children }) => {
         <SurigaoHeader />
         <PublicNavBar onSearch={q => console.log("Search:", q)} />
         <div style={{ display:"flex", gap:20, padding:"20px 24px", maxWidth:1200, margin:"0 auto", alignItems:"flex-start" }}>
-          <DepartmentSidebar onOfficeFilter={setSelectedAdminID} />
+          <DepartmentSidebar selectedAdminID={selectedAdminID} onOfficeFilter={setSelectedAdminID} />
           <div style={{ flex:1 }}>{children}</div>
         </div>
       </div>

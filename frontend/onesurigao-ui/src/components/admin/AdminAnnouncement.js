@@ -1,7 +1,7 @@
 // src/components/admin/AdminAnnouncement.js
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import Layout from "../ReusableBar/Layout";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient } from "../../services/authService";
@@ -400,8 +400,11 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 function AdminAnnouncement() {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const adminID  = location.state?.adminID || Number(sessionStorage.getItem("adminID")) || null;
   const officeName = location.state?.officeName || sessionStorage.getItem("officeName") || "";
+  const searchQuery = (searchParams.get("search") || "").trim();
+  const normalizedQuery = searchQuery.toLowerCase();
 
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -450,6 +453,15 @@ function AdminAnnouncement() {
       .then(res=>setAnnouncements(announcements.map(a=>a.id===ann.id?res.data:a)))
       .catch(err=>alert(`Failed: ${JSON.stringify(err.response?.data||err.message)}`));
   };
+  const filteredAnnouncements = normalizedQuery
+    ? announcements.filter(announcement =>
+        [announcement.title, announcement.content, announcement.admin?.officeName]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery)
+      )
+    : announcements;
 
   return (
     <Layout>
@@ -458,7 +470,9 @@ function AdminAnnouncement() {
       <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:20,flexWrap:"wrap",gap:10}}>
         <div>
           <h2 style={{margin:0,fontSize:22,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5}}>Announcements</h2>
-          <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>Oversee and publish official public advisories.</p>
+          <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>
+            {normalizedQuery ? `Search results for "${searchQuery}"` : "Oversee and publish official public advisories."}
+          </p>
           {officeName&&<p style={{margin:"4px 0 0",fontSize:12,color:DS.primary,fontFamily:DS.font,fontWeight:600}}>Logged in as: {officeName}</p>}
         </div>
         <div style={{display:"flex",gap:10}}>
@@ -474,13 +488,13 @@ function AdminAnnouncement() {
 
       {error&&<div style={{background:"#FFF5F5",border:"1.5px solid #FEB2B2",borderRadius:8,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#C53030",fontFamily:DS.font}}>⚠️ {error}</div>}
       {loading&&[1,2].map(i=><CardSkeleton key={i}/>)}
-      {!loading&&!error&&announcements.length===0&&(
+      {!loading&&!error&&filteredAnnouncements.length===0&&(
         <div style={{background:DS.card,borderRadius:12,padding:"48px 20px",textAlign:"center",color:DS.textMuted,fontSize:14,fontFamily:DS.font,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
           <div style={{marginBottom:12,display:"flex",justifyContent:"center",color:DS.textMuted}}><BuildingIcon/></div>
-          No announcements yet. Click <strong>Post Announcement</strong> to add one.
+          {normalizedQuery ? "No announcements matched your search." : <>No announcements yet. Click <strong>Post Announcement</strong> to add one.</>}
         </div>
       )}
-      {!loading&&announcements.map(a=><AnnouncementCard key={a.id} announcement={a} currentAdminID={adminID} onPin={handlePin}/>)}
+      {!loading&&filteredAnnouncements.map(a=><AnnouncementCard key={a.id} announcement={a} currentAdminID={adminID} onPin={handlePin}/>)}
 
       {showModal&&<PostModal onClose={()=>{setShowModal(false);setEditingDraft(null);}} onPost={handlePost} onSaveDraft={handleSaveDraft} editDraft={editingDraft}/>}
       {showDrafts&&<DraftsPanel drafts={drafts} onEdit={d=>{setEditingDraft(d);setShowDrafts(false);setShowModal(true);}} onDelete={id=>persistDrafts(drafts.filter(d=>d.id!==id))} onPost={d=>{setEditingDraft(d);handlePost(d);setShowDrafts(false);}} onClose={()=>setShowDrafts(false)}/>}

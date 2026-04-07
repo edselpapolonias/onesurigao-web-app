@@ -1,5 +1,6 @@
 // src/components/public/PublicAnnouncement.js
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient } from "../../services/authService";
@@ -204,9 +205,12 @@ const AnnouncementCard = ({ announcement }) => {
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 function SuperAdminAnnouncement() {
+  const [searchParams] = useSearchParams();
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const searchQuery = (searchParams.get("search") || "").trim();
+  const normalizedQuery = searchQuery.toLowerCase();
 
   useEffect(() => {
     apiClient.get("/superadmin/announcements/")
@@ -218,21 +222,32 @@ function SuperAdminAnnouncement() {
       })
       .finally(() => setLoading(false));
   }, []);
+  const filteredAnnouncements = normalizedQuery
+    ? announcements.filter(announcement =>
+        [announcement.title, announcement.content, announcement.admin?.officeName]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery)
+      )
+    : announcements;
 
   return (
     <SuperAdminLayout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
       <div style={{ marginBottom:20 }}>
         <h2 style={{ margin:0, fontSize:22, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, letterSpacing:-0.5 }}>Announcements</h2>
-        <p style={{ margin:"4px 0 0", fontSize:13, color:DS.textMuted, fontFamily:DS.font }}>All active announcements from city offices</p>
+        <p style={{ margin:"4px 0 0", fontSize:13, color:DS.textMuted, fontFamily:DS.font }}>
+          {normalizedQuery ? `Search results for "${searchQuery}"` : "All active announcements from city offices"}
+        </p>
       </div>
       {error&&<div style={{ background:"#FFF5F5", border:"1.5px solid #FEB2B2", borderRadius:8, padding:"12px 16px", marginBottom:14, fontSize:13, color:"#C53030", fontFamily:DS.font }}>⚠️ {error}</div>}
       {loading&&[1,2,3].map(i=><CardSkeleton key={i}/>)}
-      {!loading&&announcements.map(a=><AnnouncementCard key={a.id} announcement={a}/>)}
-      {!loading&&!error&&announcements.length===0&&(
+      {!loading&&filteredAnnouncements.map(a=><AnnouncementCard key={a.id} announcement={a}/>)}
+      {!loading&&!error&&filteredAnnouncements.length===0&&(
         <div style={{ background:DS.card, borderRadius:12, padding:"48px 20px", textAlign:"center", color:DS.textMuted, fontSize:14, fontFamily:DS.font, boxShadow:DS.shadow, border:`1px solid ${DS.border}` }}>
           <div style={{ marginBottom:12, color:DS.textMuted }}><BuildingIcon/></div>
-          No announcements yet.
+          {normalizedQuery ? "No announcements matched your search." : "No announcements yet."}
         </div>
       )}
     </SuperAdminLayout>

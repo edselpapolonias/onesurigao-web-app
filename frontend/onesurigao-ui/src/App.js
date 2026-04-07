@@ -23,7 +23,7 @@ import SuperAdminReport       from "./components/superadmin/SuperAdminReport";
 import SuperAdminHotlines     from "./components/superadmin/SuperAdminHotlines";
 
 // Public
-import PublicAnnouncement from "./components/public/PublicAnnouncement";
+import PublicAnnouncement from "./components/public/PublicAnnouncementSearch";
 import PublicPinned       from "./components/public/PublicPinned";
 import PublicEvent        from "./components/public/PublicEvent";
 import PublicReport       from "./components/public/PublicReport";
