@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useLocation, useSearchParams } from "react-router-dom";
-import Layout from "../ReusableBar/Layout";
+import Layout from "../ReusableBar/LayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient } from "../../services/authService";
 

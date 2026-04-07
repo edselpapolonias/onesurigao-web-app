@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { loginPublicUser, logoutAll } from "../../services/authService";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
 
 // ─── Public Auth Context (shared across app) ──────────────────────────────────
 export const PublicAuthContext = createContext(null);
@@ -44,6 +45,8 @@ const DS = {
   primaryDark:"#1E4E8C",
   primaryLight:"#EBF4FF",
   primaryGrad:"linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
+  accent:     "#B8FF62",
+  accentSoft: "#EFFFD4",
   bg:         "#F5F7FA",
   card:       "#FFFFFF",
   border:     "#E2E8F0",
@@ -56,6 +59,11 @@ const DS = {
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const SearchIcon   = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>);
+const FeedTabIcon  = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="18" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>);
+const PinTabIcon   = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 17v5"/><path d="M5 3h14"/><path d="M7 3c0 5 2 7 5 8-3 1-5 3-5 8"/><path d="M17 3c0 5-2 7-5 8 3 1 5 3 5 8"/></svg>);
+const CalendarTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>);
+const ReportTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/></svg>);
+const HotlineTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 8.9a16 16 0 0 0 6 6l.8-.8a2 2 0 0 1 2.12-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.92z"/></svg>);
 const UserIcon     = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
 const SettingsIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>);
 const LogoutIcon   = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>);
@@ -90,14 +98,27 @@ const SurigaoSeal = () => (
 
 // ─── Header ───────────────────────────────────────────────────────────────────
 export const SurigaoHeader = () => (
-  <header style={{background:"linear-gradient(135deg,#1E4E8C 0%,#2B6CB0 60%,#3182CE 100%)",padding:"14px 32px",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 16px rgba(0,0,0,0.25)",minHeight:92,width:"100%",boxSizing:"border-box",gap:20,position:"sticky",top:0,zIndex:100}}>
-    <CipSeal/>
-    <div style={{textAlign:"center",padding:"0 12px"}}>
-      <p style={{color:"rgba(201,224,255,0.85)",fontSize:10,letterSpacing:3.5,textTransform:"uppercase",margin:"0 0 3px",fontFamily:DS.font,fontWeight:400}}>Republic of the Philippines</p>
-      <h1 style={{color:"#fff",fontSize:30,fontWeight:900,fontStyle:"italic",letterSpacing:2.5,fontFamily:"'Georgia','Times New Roman',serif",margin:"0 0 5px",textShadow:"0 2px 8px rgba(0,0,0,0.25)",lineHeight:1.1}}>CITY OF SURIGAO</h1>
-      <p style={{color:"rgba(201,224,255,0.75)",fontSize:10,letterSpacing:1.5,textTransform:"uppercase",margin:0,fontFamily:DS.font,fontWeight:400}}>Community Information &amp; Public Service Platform</p>
+  <header style={{position:"relative",overflow:"hidden",background:"linear-gradient(135deg,#123b72 0%,#1f5da8 48%,#6dd3ff 130%)",padding:"22px 28px",display:"flex",alignItems:"center",justifyContent:"space-between",borderRadius:28,boxShadow:"0 24px 50px rgba(16,54,97,0.18)",minHeight:138,width:"100%",boxSizing:"border-box",gap:18,border:"1px solid rgba(255,255,255,0.22)"}}>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(circle at top left, rgba(255,255,255,0.22), transparent 34%), radial-gradient(circle at bottom right, rgba(255,255,255,0.16), transparent 28%)",pointerEvents:"none"}} />
+    <div style={{position:"absolute",top:-8,right:48,width:190,height:190,borderRadius:"50%",border:"1px solid rgba(255,255,255,0.16)",pointerEvents:"none"}} />
+    <div style={{position:"absolute",bottom:-52,left:120,width:220,height:220,borderRadius:"50%",border:"1px solid rgba(255,255,255,0.12)",pointerEvents:"none"}} />
+
+    <div style={{display:"flex",alignItems:"center",gap:18,position:"relative",zIndex:1}}>
+      <CipSeal/>
+      <div style={{paddingRight:8}}>
+        <p style={{color:"rgba(226,244,255,0.88)",fontSize:10,letterSpacing:3,textTransform:"uppercase",margin:"0 0 6px",fontFamily:DS.font,fontWeight:600}}>Republic of the Philippines</p>
+        <h1 style={{color:"#fff",fontSize:33,fontWeight:900,letterSpacing:1.4,fontFamily:"'Georgia','Times New Roman',serif",margin:"0 0 6px",textShadow:"0 10px 24px rgba(7,22,44,0.28)",lineHeight:1}}>CITY OF SURIGAO</h1>
+        <p style={{color:"rgba(224,242,255,0.78)",fontSize:11,letterSpacing:1.4,margin:0,fontFamily:DS.font,fontWeight:500,maxWidth:420,lineHeight:1.6}}>Community information, office updates, public reports, and service access in one unified city platform.</p>
+      </div>
     </div>
-    <SurigaoSeal/>
+
+    <div style={{display:"flex",alignItems:"center",gap:14,position:"relative",zIndex:1}}>
+      <div style={{background:"rgba(255,255,255,0.14)",backdropFilter:"blur(10px)",border:"1px solid rgba(255,255,255,0.18)",padding:"14px 16px",borderRadius:22,minWidth:180}}>
+        <div style={{color:"#fff",fontSize:12,fontWeight:800,fontFamily:DS.font,marginBottom:3}}>Daily Civic Feed</div>
+        <div style={{color:"rgba(230,245,255,0.78)",fontSize:11,lineHeight:1.5,fontFamily:DS.font}}>A cleaner dashboard for announcements, events, reports, and local office directories.</div>
+      </div>
+      <SurigaoSeal/>
+    </div>
   </header>
 );
 
@@ -345,126 +366,103 @@ const PublicProfileDropdown = () => {
 };
 
 // ─── Search Bar ────────────────────────────────────────────────────────────────
-const SearchBar = ({ placeholder, onSearch, value = "" }) => {
-  const [val, setVal] = useState(value);
-  const [focused, setFocused] = useState(false);
-
-  useEffect(() => {
-    setVal(value);
-  }, [value]);
-
-  const handleSubmit = () => onSearch(val.trim());
-
-  return (
-    <div style={{display:"flex",alignItems:"center",background:focused?"#fff":DS.bg,border:`1.5px solid ${focused?DS.primary:DS.border}`,borderRadius:22,padding:"0 14px",height:36,minWidth:260,maxWidth:360,transition:"all 0.2s",boxSizing:"border-box"}}>
-      <button onClick={handleSubmit} type="button" style={{display:"flex",alignItems:"center",justifyContent:"center",background:"none",border:"none",padding:0,marginRight:8,color:focused?DS.primary:DS.textMuted,cursor:"pointer",transition:"color 0.2s"}}>
-        <SearchIcon/>
-      </button>
-      <input type="text" placeholder={placeholder} value={val} onChange={e=>setVal(e.target.value)}
-        onKeyDown={e=>e.key==="Enter"&&handleSubmit()}
-        onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
-        style={{border:"none",background:"transparent",outline:"none",fontSize:13,color:DS.textPrimary,width:"100%",fontFamily:DS.font}}/>
-    </div>
-  );
-};
 
 // ─── Tab ──────────────────────────────────────────────────────────────────────
-const NavTab = ({ label, active, onClick, grad }) => (
-  <button onClick={onClick} style={{height:34,padding:"0 18px",border:"none",background:active?grad:"transparent",color:active?"#fff":"#4A5568",fontWeight:active?700:500,fontSize:12,letterSpacing:0.7,cursor:"pointer",borderRadius:8,textTransform:"uppercase",fontFamily:DS.font,transition:"all 0.2s",whiteSpace:"nowrap",boxShadow:active?"0 2px 8px rgba(0,0,0,0.2)":"none"}}
-    onMouseEnter={e=>{if(!active){e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}}
-    onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="#4A5568";}}}>
-    {label}
+const NavTab = ({ label, icon, active, onClick, grad }) => (
+  <button onClick={onClick} style={{width:"100%",minHeight:46,padding:"0 14px",border:`1px solid ${active?"#DCEAB7":"transparent"}`,background:active?DS.accentSoft:"transparent",color:active?"#17212f":"#475467",fontWeight:active?800:600,fontSize:12.5,letterSpacing:0.1,cursor:"pointer",borderRadius:16,textTransform:"none",fontFamily:DS.font,transition:"all 0.2s",whiteSpace:"nowrap",boxShadow:active?"0 8px 18px rgba(184,255,98,0.18)":"none",display:"flex",alignItems:"center",justifyContent:"flex-start",gap:12}}
+    onMouseEnter={e=>{if(!active){e.currentTarget.style.background="#F8FAFC";e.currentTarget.style.color="#17212f";e.currentTarget.style.transform="translateX(2px)";}}}
+    onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="#475467";e.currentTarget.style.transform="translateX(0)";}}}>
+    <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:10,background:active?"#DDF3A8":"#F4F6F8",color:"inherit",flexShrink:0}}>{icon}</span>
+    <span>{label}</span>
   </button>
 );
 
 // ─── NavBar shell ─────────────────────────────────────────────────────────────
-const NavBar = ({ left, tabs, activeTab, onTabClick, grad, search }) => (
-  <nav style={{background:DS.card,borderBottom:`1px solid ${DS.border}`,padding:"0 24px",display:"flex",alignItems:"center",justifyContent:"center",height:52,boxShadow:"0 1px 4px rgba(0,0,0,0.07)",width:"100%",boxSizing:"border-box",gap:20,position:"sticky",top:92,zIndex:99}}>
-    {left}
-    <div style={{display:"flex",alignItems:"center",gap:4,height:"100%"}}>
-      {tabs.map(t=><NavTab key={t} label={t} active={activeTab===t} onClick={()=>onTabClick(t)} grad={grad}/>)}
+const NavBar = ({ left, tabs, activeTab, onTabClick, grad, tone = "public" }) => (
+  <nav style={{width:244,position:"fixed",top:0,left:0,bottom:0,background:"#FFFFFF",borderTop:"none",borderRight:`1px solid #E9EEF5`,borderBottom:"none",borderLeft:"none",borderRadius:"0 28px 28px 0",padding:"18px 12px 16px",display:"flex",flexDirection:"column",height:"100vh",boxShadow:"0 18px 40px rgba(15,40,74,0.06)",boxSizing:"border-box",overflow:"hidden",zIndex:100}}>
+    <div style={{position:"absolute",top:-56,right:-40,width:160,height:160,borderRadius:"50%",background:tone==="superadmin"?"rgba(26,54,93,0.04)":"rgba(49,130,206,0.04)",pointerEvents:"none"}} />
+    <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",gap:20,height:"100%"}}>
+      <div style={{padding:"4px 8px 6px",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
+        <img src={oneSurigaoLogo} alt="One Surigao" style={{width:40,height:40,objectFit:"contain",flexShrink:0}} />
+        <div style={{fontSize:16,fontWeight:900,color:"#2B6CB0",background:"linear-gradient(135deg, #1E4E8C 0%, #4FAEEA 100%)",WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent",fontFamily:"'Georgia','Times New Roman',serif",lineHeight:1.1,textTransform:"uppercase",textAlign:"center"}}>ONE SURIGAO</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {tabs.map(tab=><NavTab key={tab.label} label={tab.label} icon={tab.icon} active={activeTab===tab.label} onClick={()=>onTabClick(tab.label)} grad={grad}/>)}
+      </div>
+      <div style={{marginTop:"auto",paddingTop:14,borderTop:`1px solid ${DS.border}`,display:"flex",justifyContent:"flex-end",alignItems:"center",gap:12}}>
+        {left}
+      </div>
     </div>
-    {search}
   </nav>
 );
 
 // ─── Admin NavBar ──────────────────────────────────────────────────────────────
-export const SurigaoNavBar = ({ onSearch=()=>{}, officeName="" }) => {
+export const SurigaoNavBar = ({ officeName="" }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const ROUTES    = { "ANNOUNCEMENT":"/announcements","PINNED":"/pinnedAnnouncements","EVENT":"/events","REPORT PROBLEM":"/report-problem","HOTLINES":"/hotlines" };
-  const R2T       = { "/announcements":"ANNOUNCEMENT","/pinnedAnnouncements":"PINNED","/events":"EVENT","/report-problem":"REPORT PROBLEM","/hotlines":"HOTLINES" };
-  const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
-  const currentSearch = new URLSearchParams(location.search).get("search") || "";
+  const ROUTES    = { "Announcement":"/announcements","Pinned":"/pinnedAnnouncements","Event":"/events","Report Problem":"/report-problem","Hotlines":"/hotlines","Search":"/search" };
+  const R2T       = { "/announcements":"Announcement","/pinnedAnnouncements":"Pinned","/events":"Event","/report-problem":"Report Problem","/hotlines":"Hotlines","/search":"Search" };
+  const activeTab = R2T[location.pathname]||"Announcement";
   const handleLogout = () => { sessionStorage.removeItem("adminID"); sessionStorage.removeItem("officeName"); sessionStorage.removeItem("announcement_drafts"); navigate("/"); };
-  const handleSearch = (query) => {
-    onSearch(query);
-    if (location.pathname !== "/announcements") {
-      navigate(query ? `/announcements?search=${encodeURIComponent(query)}` : "/announcements");
-      return;
-    }
-
-    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
-  };
   return (
     <NavBar left={<AdminProfileDropdown name={officeName||"Admin"} grad={DS.primaryGrad} role="Office Account" onLogout={handleLogout}/>}
-      tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
+      tabs={[
+        { label:"Announcement", icon:<FeedTabIcon/> },
+        { label:"Pinned", icon:<PinTabIcon/> },
+        { label:"Event", icon:<CalendarTabIcon/> },
+        { label:"Report Problem", icon:<ReportTabIcon/> },
+        { label:"Hotlines", icon:<HotlineTabIcon/> },
+        { label:"Search", icon:<SearchIcon/> },
+      ]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={DS.primaryGrad}
-      search={<SearchBar placeholder="Search announcements..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
+      tone="admin"/>
   );
 };
 
 // ─── Super Admin NavBar ────────────────────────────────────────────────────────
-export const SuperAdminNavBar = ({ onSearch=()=>{}, superAdminName="" }) => {
+export const SuperAdminNavBar = ({ superAdminName="" }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
   const GRAD      = "linear-gradient(135deg, #1A365D 0%, #2C5282 100%)";
-  const ROUTES    = { "ANNOUNCEMENT":"/superadmin/announcements","PINNED":"/superadmin/pinned","EVENT":"/superadmin/events","REPORT PROBLEM":"/superadmin/reports","HOTLINES":"/superadmin/hotlines" };
-  const R2T       = { "/superadmin/announcements":"ANNOUNCEMENT","/superadmin/pinned":"PINNED","/superadmin/events":"EVENT","/superadmin/reports":"REPORT PROBLEM","/superadmin/hotlines":"HOTLINES" };
-  const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
-  const currentSearch = new URLSearchParams(location.search).get("search") || "";
+  const ROUTES    = { "Announcement":"/superadmin/announcements","Pinned":"/superadmin/pinned","Event":"/superadmin/events","Report Problem":"/superadmin/reports","Hotlines":"/superadmin/hotlines","Search":"/superadmin/search" };
+  const R2T       = { "/superadmin/announcements":"Announcement","/superadmin/pinned":"Pinned","/superadmin/events":"Event","/superadmin/reports":"Report Problem","/superadmin/hotlines":"Hotlines","/superadmin/search":"Search" };
+  const activeTab = R2T[location.pathname]||"Announcement";
   const handleLogout = () => { sessionStorage.removeItem("superAdminID"); sessionStorage.removeItem("superAdminName"); navigate("/superadmin"); };
-  const handleSearch = (query) => {
-    onSearch(query);
-    if (location.pathname !== "/superadmin/announcements") {
-      navigate(query ? `/superadmin/announcements?search=${encodeURIComponent(query)}` : "/superadmin/announcements");
-      return;
-    }
-
-    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
-  };
   return (
     <NavBar left={<AdminProfileDropdown name={superAdminName||"Super Admin"} grad={GRAD} role="Super Admin Account" onLogout={handleLogout}/>}
-      tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
+      tabs={[
+        { label:"Announcement", icon:<FeedTabIcon/> },
+        { label:"Pinned", icon:<PinTabIcon/> },
+        { label:"Event", icon:<CalendarTabIcon/> },
+        { label:"Report Problem", icon:<ReportTabIcon/> },
+        { label:"Hotlines", icon:<HotlineTabIcon/> },
+        { label:"Search", icon:<SearchIcon/> },
+      ]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={GRAD}
-      search={<SearchBar placeholder="Search announcements..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
+      tone="superadmin"/>
   );
 };
 
 // ─── Public NavBar (now with profile dropdown) ────────────────────────────────
-export const PublicNavBar = ({ onSearch=()=>{} }) => {
+export const PublicNavBar = () => {
   const navigate  = useNavigate();
   const location  = useLocation();
-  const ROUTES    = { "ANNOUNCEMENT":"/home","PINNED":"/home/pinned","EVENT":"/home/events","REPORT PROBLEM":"/home/report","HOTLINES":"/home/hotlines" };
-  const R2T       = { "/home":"ANNOUNCEMENT","/home/pinned":"PINNED","/home/events":"EVENT","/home/report":"REPORT PROBLEM","/home/hotlines":"HOTLINES" };
-  const activeTab = R2T[location.pathname]||"ANNOUNCEMENT";
-  const currentSearch = new URLSearchParams(location.search).get("search") || "";
-
-  const handleSearch = (query) => {
-    onSearch(query);
-    if (location.pathname !== "/home") {
-      navigate(query ? `/home?search=${encodeURIComponent(query)}` : "/home");
-      return;
-    }
-
-    navigate(query ? `${location.pathname}?search=${encodeURIComponent(query)}` : location.pathname);
-  };
+  const ROUTES    = { "Announcement":"/home","Pinned":"/home/pinned","Event":"/home/events","Report Problem":"/home/report","Hotlines":"/home/hotlines","Search":"/home/search" };
+  const R2T       = { "/home":"Announcement","/home/pinned":"Pinned","/home/events":"Event","/home/report":"Report Problem","/home/hotlines":"Hotlines","/home/search":"Search" };
+  const activeTab = R2T[location.pathname]||"Announcement";
 
   return (
     <NavBar left={<PublicProfileDropdown/>}
-      tabs={["ANNOUNCEMENT","PINNED","EVENT","REPORT PROBLEM","HOTLINES"]}
+      tabs={[
+        { label:"Announcement", icon:<FeedTabIcon/> },
+        { label:"Pinned", icon:<PinTabIcon/> },
+        { label:"Event", icon:<CalendarTabIcon/> },
+        { label:"Report Problem", icon:<ReportTabIcon/> },
+        { label:"Hotlines", icon:<HotlineTabIcon/> },
+        { label:"Search", icon:<SearchIcon/> },
+      ]}
       activeTab={activeTab} onTabClick={t=>navigate(ROUTES[t])} grad={DS.primaryGrad}
-      search={<SearchBar placeholder="Search announcements, offices..." onSearch={handleSearch} value={activeTab==="ANNOUNCEMENT" ? currentSearch : ""}/>}/>
+      tone="public"/>
   );
 };
 

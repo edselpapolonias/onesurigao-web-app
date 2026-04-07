@@ -1,7 +1,7 @@
 // src/components/public/PublicAnnouncement.js
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import SuperAdminLayout from "../ReusableBar/SuperAdminLayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient } from "../../services/authService";
 

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import Layout from "../ReusableBar/Layout";
+import Layout from "../ReusableBar/LayoutModern";
 import { apiClient } from "../../services/authService";
 
 const API_URL = "http://127.0.0.1:8000/api/events/";

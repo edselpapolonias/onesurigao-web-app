@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Layout from "../ReusableBar/PublicLayout";
+import Layout from "../ReusableBar/PublicLayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
-import { useOfficeFilter } from "../ReusableBar/PublicLayout";
+import { useOfficeFilter } from "../ReusableBar/PublicLayoutModern";
 
 const API_URL = "http://127.0.0.1:8000/public/announcements/";
 const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
@@ -12,15 +12,17 @@ const DS = {
   primary: "#2B6CB0",
   primaryLight: "#EBF4FF",
   primaryGrad: "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
+  accent: "#B8FF62",
+  accentSoft: "#F2FFD8",
   bg: "#F5F7FA",
   card: "#FFFFFF",
   border: "#E2E8F0",
   textPrimary: "#1A202C",
   textSecondary: "#4A5568",
   textMuted: "#718096",
-  pinned: "#D97706",
-  shadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-  shadowHover: "0 4px 16px rgba(0,0,0,0.10)",
+  pinned: "#6FAE27",
+  shadow: "0 10px 30px rgba(15,23,42,0.05)",
+  shadowHover: "0 16px 36px rgba(15,23,42,0.08)",
   shadowModal: "0 20px 60px rgba(0,0,0,0.25)",
   font: "'Segoe UI', system-ui, sans-serif",
 };
@@ -83,6 +85,33 @@ const SearchIcon = () => (
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
+const GlobeIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
+const MoreIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="5" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="19" cy="12" r="2" />
+  </svg>
+);
+const ShareIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+  </svg>
+);
+const BookmarkIcon = ({ filled }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
 
 const Avatar = ({ officeName }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(word => word[0]).slice(0, 2).join("").toUpperCase() || "SG";
@@ -93,8 +122,7 @@ const Avatar = ({ officeName }) => {
   );
 };
 
-const CommentModal = ({ announcement, onClose }) => {
-  const [comments, setComments] = useState([]);
+const CommentModal = ({ announcement, comments, setComments, onClose }) => {
   const [text, setText] = useState("");
 
   const handlePost = () => {
@@ -145,16 +173,20 @@ const CommentModal = ({ announcement, onClose }) => {
             </button>
           </div>
         </div>
+        <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
+          <MoreIcon />
+        </button>
       </div>
     </div>
   );
 };
 
-const ReactionBar = ({ announcement }) => {
+const ReactionBar = ({ announcement, comments, setComments }) => {
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [likes, setLikes] = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+  const [saved, setSaved] = useState(false);
+  const [likes, setLikes] = useState(12);
+  const [dislikes, setDislikes] = useState(1);
   const [showComments, setShowComments] = useState(false);
 
   const handleLike = () => {
@@ -189,38 +221,51 @@ const ReactionBar = ({ announcement }) => {
     display: "flex",
     alignItems: "center",
     gap: 6,
-    background: "none",
+    background: active ? "#F8FAFC" : "transparent",
     border: "none",
     cursor: "pointer",
-    fontSize: 13,
+    fontSize: 12.5,
     fontFamily: DS.font,
     fontWeight: active ? 700 : 500,
     color: active ? activeColor : DS.textMuted,
-    padding: "7px 14px",
-    borderRadius: 8,
+    padding: "8px 12px",
+    borderRadius: 12,
     transition: "all 0.15s",
   });
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", padding: "2px 8px" }}>
-        <button style={btn(liked, DS.primary)} onClick={handleLike} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingTop: 14, borderTop: `1px solid ${DS.border}`, marginTop: 16, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+        <button style={btn(liked, DS.primary)} onClick={handleLike} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = liked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
           <ThumbsUpIcon filled={liked} /> Like{likes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{likes}</span>}
         </button>
-        <button style={btn(disliked, "#C53030")} onClick={handleDislike} onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }} onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
+        <button style={btn(disliked, "#C53030")} onClick={handleDislike} onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }} onMouseLeave={e => { e.currentTarget.style.background = disliked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
           <ThumbsDownIcon filled={disliked} /> Dislike{dislikes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{dislikes}</span>}
         </button>
-        <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = DS.textMuted; }}>
-          <MessageCircleIcon /> Comment
+        <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
+          <MessageCircleIcon /> Comment{comments.length > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{comments.length}</span>}
+        </button>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <button style={btn(false, DS.primary)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
+            <ShareIcon /> Share
+          </button>
+          <button style={btn(saved, DS.primary)} onClick={() => setSaved(prev => !prev)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = saved ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = saved ? DS.primary : DS.textMuted; }}>
+            <BookmarkIcon filled={saved} /> Save
+          </button>
+        </div>
+        <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
+          <MoreIcon />
         </button>
       </div>
-      {showComments && <CommentModal announcement={announcement} onClose={() => setShowComments(false)} />}
+      {showComments && <CommentModal announcement={announcement} comments={comments} setComments={setComments} onClose={() => setShowComments(false)} />}
     </>
   );
 };
 
 const CardSkeleton = () => (
-  <div style={{ background: DS.card, borderRadius: 12, padding: "20px", marginBottom: 14, boxShadow: DS.shadow, border: `1px solid ${DS.border}` }}>
+  <div style={{ background: DS.card, borderRadius: 24, padding: "24px", marginBottom: 22, boxShadow: DS.shadow, border: `1px solid ${DS.border}` }}>
     <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
       <div style={{ width: 42, height: 42, borderRadius: "50%", background: "#EDF2F7", animation: "pulse 1.5s ease-in-out infinite", flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
@@ -234,31 +279,39 @@ const CardSkeleton = () => (
 
 const AnnouncementCard = ({ announcement }) => {
   const [expanded, setExpanded] = useState(false);
+  const [comments, setComments] = useState([]);
   const isLong = announcement.content?.length > 300;
   const displayContent = expanded || !isLong ? announcement.content : `${announcement.content?.slice(0, 300)}...`;
   const officeName = announcement.admin?.officeName || "City of Surigao";
   const createdDate = announcement.createdDate ? new Date(announcement.createdDate) : null;
   const dateStr = createdDate?.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) || "";
   const timeStr = createdDate?.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) || "";
+  const hasMedia = Array.isArray(announcement.media) && announcement.media.length > 0;
 
   return (
-    <div style={{ background: DS.card, borderRadius: 12, boxShadow: DS.shadow, marginBottom: 14, overflow: "hidden", position: "relative", border: `1px solid ${DS.border}`, borderLeft: announcement.isPinned ? `4px solid ${DS.pinned}` : `1px solid ${DS.border}`, transition: "box-shadow 0.2s" }} onMouseEnter={e => { e.currentTarget.style.boxShadow = DS.shadowHover; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = DS.shadow; }}>
+    <div style={{ background: DS.card, borderRadius: 28, boxShadow: DS.shadow, marginBottom: 26, overflow: "hidden", position: "relative", border: `1px solid ${DS.border}`, transition: "box-shadow 0.2s, transform 0.2s", padding: 22 }} onMouseEnter={e => { e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.transform = "translateY(-2px)"; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.transform = "translateY(0)"; }}>
       {announcement.isPinned && (
-        <div style={{ position: "absolute", top: 0, right: 16, background: `linear-gradient(135deg,${DS.pinned},#B45309)`, color: "#fff", fontSize: 10, fontWeight: 700, padding: "4px 10px", borderRadius: "0 0 8px 8px", fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4, boxShadow: "0 2px 6px rgba(180,83,9,0.3)" }}>
+        <div style={{ position: "absolute", top: 18, right: 18, background: DS.accentSoft, color: "#274C0A", fontSize: 10, fontWeight: 800, padding: "6px 10px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4, border: "1px solid #DCEAB7" }}>
           <PinIcon /> PINNED
         </div>
       )}
-      <div style={{ padding: "16px 20px 0", display: "flex", alignItems: "center", gap: 12 }}>
-        <Avatar officeName={officeName} />
-        <div>
-          <div style={{ fontWeight: 700, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font }}>{officeName}</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2, color: DS.textMuted, fontSize: 11, fontFamily: DS.font }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+          <Avatar officeName={officeName} />
+          <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: 15, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
+          <div style={{ fontSize: 12, color: DS.textSecondary, fontFamily: DS.font, marginTop: 3 }}>Public Office Update</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
             <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
           </div>
+          </div>
         </div>
+        <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
+          <MoreIcon />
+        </button>
       </div>
-      <div style={{ padding: "12px 20px 6px", fontWeight: 700, fontSize: 16, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.4 }}>{announcement.title}</div>
-      <div style={{ padding: "0 20px 14px", fontSize: 14, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>
+      <div style={{ paddingTop: 16, fontWeight: 800, fontSize: 20, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.38 }}>{announcement.title}</div>
+      <div style={{ paddingTop: 10, fontSize: 14.5, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.85, whiteSpace: "pre-wrap" }}>
         {displayContent}
         {isLong && (
           <button onClick={() => setExpanded(prev => !prev)} style={{ display: "inline-flex", alignItems: "center", gap: 4, marginLeft: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: DS.primary, fontFamily: DS.font, padding: 0 }}>
@@ -266,18 +319,23 @@ const AnnouncementCard = ({ announcement }) => {
           </button>
         )}
       </div>
-      <MediaGallery media={announcement.media} />
-      <div style={{ padding: "8px 20px", display: "flex", alignItems: "center", gap: 6, borderTop: `1px solid ${DS.border}` }}>
-        <span style={{ color: DS.textMuted, display: "flex" }}><BuildingIcon /></span>
-        <span style={{ fontSize: 12, color: DS.textMuted, fontFamily: DS.font }}>{officeName}</span>
+      {hasMedia && (
+        <div style={{ marginTop: 18, borderRadius: 24, overflow: "hidden", border: `1px solid ${DS.border}`, background: "#F4F7FB" }}>
+          <MediaGallery media={announcement.media} />
+        </div>
+      )}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 999, background: "#F8FAFC", border: `1px solid ${DS.border}`, fontSize: 12, color: DS.textMuted, fontFamily: DS.font }}>
+          <BuildingIcon /> {officeName}
+        </div>
       </div>
-      <ReactionBar announcement={announcement} />
+      <ReactionBar announcement={announcement} comments={comments} setComments={setComments} />
     </div>
   );
 };
 
 const OfficeResultCard = ({ office, onOpen }) => (
-  <button type="button" onClick={() => onOpen(office.adminID)} style={{ width: "100%", background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 14, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", boxShadow: DS.shadow, transition: "transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign: "left" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.borderColor = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.borderColor = DS.border; }}>
+  <button type="button" onClick={() => onOpen(office.adminID)} style={{ width: "100%", background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 20, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", boxShadow: DS.shadow, transition: "transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign: "left" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.borderColor = "#DCEAB7"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.borderColor = DS.border; }}>
     <Avatar officeName={office.officeName} />
     <div style={{ minWidth: 0, flex: 1 }}>
       <div style={{ fontSize: 14, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{office.officeName}</div>
@@ -290,7 +348,7 @@ const OfficeResultCard = ({ office, onOpen }) => (
 const SearchSectionHeader = ({ title, count }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
     <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{title}</h3>
-    <span style={{ fontSize: 12, fontWeight: 700, color: DS.primary, fontFamily: DS.font, background: DS.primaryLight, borderRadius: 999, padding: "4px 10px" }}>{count}</span>
+    <span style={{ fontSize: 12, fontWeight: 700, color: "#274C0A", fontFamily: DS.font, background: DS.accentSoft, border: "1px solid #DCEAB7", borderRadius: 999, padding: "4px 10px" }}>{count}</span>
   </div>
 );
 
@@ -329,20 +387,36 @@ function PublicAnnouncementSearch() {
   const searchedAnnouncements = normalizedQuery ? displayAnnouncements.filter(announcement => [announcement.title, announcement.content, announcement.admin?.officeName].filter(Boolean).join(" ").toLowerCase().includes(normalizedQuery)) : [];
   const hasSearch = Boolean(normalizedQuery);
   const hasSearchResults = filteredOffices.length > 0 || searchedAnnouncements.length > 0;
+  const featuredCount = displayAnnouncements.length;
 
   return (
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
-      <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, letterSpacing: -0.5 }}>Announcements</h2>
-        <p style={{ margin: "4px 0 0", fontSize: 13, color: DS.textMuted, fontFamily: DS.font }}>{hasSearch ? `Search results for "${searchQuery}"` : "Official announcements from the City of Surigao"}</p>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: DS.primary, letterSpacing: 1, textTransform: "uppercase", fontFamily: DS.font }}>Community Feed</div>
+            <h2 style={{ margin: "6px 0 0", fontSize: 30, fontWeight: 900, color: DS.textPrimary, fontFamily: DS.font, letterSpacing: -1 }}>City updates, announcements, and office activity</h2>
+            <p style={{ margin: "8px 0 0", fontSize: 14, color: DS.textMuted, fontFamily: DS.font, lineHeight: 1.8 }}>{hasSearch ? `Search results for "${searchQuery}"` : "A more scrollable public feed for updates from city offices."}</p>
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 18, padding: "12px 14px", minWidth: 120, boxShadow: DS.shadow }}>
+              <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 0.8 }}>Posts</div>
+              <div style={{ marginTop: 4, fontSize: 20, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{featuredCount}</div>
+            </div>
+            <div style={{ background: DS.card, border: `1px solid #DCEAB7`, borderRadius: 18, padding: "12px 14px", minWidth: 120, boxShadow: DS.shadow }}>
+              <div style={{ fontSize: 11, color: "#577A21", fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 0.8 }}>Active Offices</div>
+              <div style={{ marginTop: 4, fontSize: 20, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{offices.length}</div>
+            </div>
+          </div>
+        </div>
       </div>
       {error && <div style={{ background: "#FFF5F5", border: "1.5px solid #FEB2B2", borderRadius: 8, padding: "12px 16px", marginBottom: 14, fontSize: 13, color: "#C53030", fontFamily: DS.font }}>Failed to load announcements.</div>}
       {loading && [1, 2, 3].map(index => <CardSkeleton key={index} />)}
       {!loading && !error && hasSearch && hasSearchResults && (
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <section style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 16, padding: 18, boxShadow: DS.shadow }}>
-            <SearchSectionHeader title="Offices" count={filteredOffices.length} />
+            <SearchSectionHeader title="Suggested Offices" count={filteredOffices.length} />
             {filteredOffices.length > 0 ? (
               <div style={{ display: "grid", gap: 12 }}>
                 {filteredOffices.map(office => <OfficeResultCard key={office.adminID} office={office} onOpen={adminID => navigate(`/home/department/${adminID}`)} />)}
@@ -352,7 +426,7 @@ function PublicAnnouncementSearch() {
             )}
           </section>
           <section>
-            <SearchSectionHeader title="Announcements" count={searchedAnnouncements.length} />
+            <SearchSectionHeader title="Feed Posts" count={searchedAnnouncements.length} />
             {searchedAnnouncements.length > 0 ? (
               searchedAnnouncements.map(announcement => <AnnouncementCard key={announcement.id} announcement={announcement} />)
             ) : (

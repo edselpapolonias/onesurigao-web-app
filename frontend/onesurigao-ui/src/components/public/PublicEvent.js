@@ -1,7 +1,7 @@
 // src/components/public/PublicEvent.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import Layout from "../ReusableBar/PublicLayout";
+import Layout from "../ReusableBar/PublicLayoutModern";
 
 const API_URL = "http://127.0.0.1:8000/public/events/";
 

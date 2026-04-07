@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { apiClient, loginPublicUser, logoutAll } from "../../services/authService";
-import Layout from "../ReusableBar/PublicLayout";
+import Layout from "../ReusableBar/PublicLayoutModern";
 import { usePublicAuth } from "../ReusableBar/SurigaoHeader";
 
 const BASE = "http://127.0.0.1:8000/public";

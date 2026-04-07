@@ -1,7 +1,7 @@
 // src/components/superadmin/SuperAdminHotlines.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import SuperAdminLayout from "../ReusableBar/SuperAdminLayoutModern";
 import { apiClient } from "../../services/authService";
 
 const CAT_URL = "http://127.0.0.1:8000/public/hotline-categories/";

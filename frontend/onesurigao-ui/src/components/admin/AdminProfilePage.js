@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
-import Layout from "../ReusableBar/Layout";
+import Layout from "../ReusableBar/LayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient, changeAdminPassword } from "../../services/authService";
 

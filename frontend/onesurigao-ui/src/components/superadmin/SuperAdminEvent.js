@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-import SuperAdminLayout from "../ReusableBar/SuperAdminLayout";
+import SuperAdminLayout from "../ReusableBar/SuperAdminLayoutModern";
 import { apiClient } from "../../services/authService";
 
 const EVENTS_URL  = "http://127.0.0.1:8000/superadmin/events/";
