@@ -13,8 +13,8 @@ const DS = {
   textPrimary: "#101828",
   textSecondary: "#475467",
   textMuted: "#667085",
-  accent: "#b8ff62",
-  accentText: "#1d2939",
+  accent: "#D7EEFF",
+  accentText: "#1E4E8C",
   shadow: "0 18px 40px rgba(15, 23, 42, 0.06)",
   font: "'Segoe UI', system-ui, sans-serif",
 };
@@ -26,12 +26,41 @@ const SearchIcon = () => (
   </svg>
 );
 
-const BuildingIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2" />
-    <path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1" />
-  </svg>
-);
+const OfficeAvatar = ({ officeName, profilePic, size = 38 }) => {
+  const initials = officeName?.split(" ").filter(Boolean).map((word) => word[0]).slice(0, 2).join("").toUpperCase() || "OF";
+
+  if (profilePic) {
+    return (
+      <img
+        src={profilePic}
+        alt={officeName || "Office"}
+        style={{ width: size, height: size, borderRadius: 12, objectFit: "cover", flexShrink: 0, boxShadow: "0 2px 6px rgba(43,108,176,0.2)" }}
+      />
+    );
+  }
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 12,
+        background: "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
+        color: "#fff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12,
+        fontWeight: 800,
+        fontFamily: DS.font,
+        flexShrink: 0,
+        boxShadow: "0 2px 6px rgba(43,108,176,0.25)",
+      }}
+    >
+      {initials}
+    </div>
+  );
+};
 
 const FileTextIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -205,8 +234,8 @@ const SearchPageContent = ({ mode = "public" }) => {
                   onClick={() => openOffice(office.adminID)}
                   style={{ textAlign: "left", background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 20, padding: 18, cursor: "pointer", boxShadow: DS.shadow }}
                 >
-                  <div style={{ width: 38, height: 38, borderRadius: 12, background: "#eff7de", color: "#335c00", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-                    <BuildingIcon />
+                  <div style={{ marginBottom: 12 }}>
+                    <OfficeAvatar officeName={office.officeName} profilePic={office.profilePic || null} />
                   </div>
                   <div style={{ fontSize: 15, fontWeight: 800, color: DS.textPrimary }}>{office.officeName}</div>
                   <div style={{ marginTop: 8, color: DS.textMuted, fontSize: 13, lineHeight: 1.6 }}>

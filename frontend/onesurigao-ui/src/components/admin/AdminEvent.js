@@ -25,6 +25,17 @@ const DS = {
   shadowModal:  "0 20px 60px rgba(0,0,0,0.25)",
   font:         "'Segoe UI', system-ui, sans-serif",
 };
+const MODAL_OVERLAY = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(15,23,42,0.38)",
+  backdropFilter: "blur(8px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 18,
+};
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const PlusIcon      = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>);
@@ -81,14 +92,14 @@ const AddEventModal = ({ onClose, onSubmit, adminOfficeName }) => {
   const labelSt = {display:"block",marginBottom:6,fontWeight:600,fontSize:11,color:DS.textMuted,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.6};
 
   return (
-    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}}>
-      <div style={{background:DS.card,borderRadius:14,width:"100%",maxWidth:680,maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:DS.shadowModal,overflow:"hidden"}}>
-        <div style={{background:DS.primaryGrad,padding:"18px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={MODAL_OVERLAY}>
+      <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",border:"1px solid rgba(226,232,240,0.9)",borderRadius:30,width:"100%",maxWidth:680,maxHeight:"92vh",display:"flex",flexDirection:"column",boxShadow:"0 28px 70px rgba(15,23,42,0.18)",overflow:"hidden"}}>
+        <div style={{padding:"18px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%)"}}>
           <div>
-            <div style={{color:"#fff",fontWeight:800,fontSize:16,fontFamily:DS.font}}>Add New Event</div>
-            <div style={{color:"rgba(255,255,255,0.7)",fontSize:12,fontFamily:DS.font,marginTop:2}}>Submit for Super Admin approval before publishing</div>
+            <div style={{color:DS.textPrimary,fontWeight:800,fontSize:16,fontFamily:DS.font}}>Add New Event</div>
+            <div style={{color:DS.textMuted,fontSize:12,fontFamily:DS.font,marginTop:2}}>Submit for Super Admin approval before publishing</div>
           </div>
-          <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
+          <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:36,height:36,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
         </div>
         <div style={{overflowY:"auto",flex:1,padding:"22px 26px"}}>
           {/* Notice */}
@@ -151,8 +162,8 @@ const EventDetailsModal = ({ event, onClose }) => {
   const dateStr = event.eventDate ? new Date(event.eventDate).toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"}) : "";
   const timeStr = event.eventDate ? new Date(event.eventDate).toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"}) : "";
   return (
-    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}}>
-      <div style={{background:DS.card,borderRadius:14,width:"100%",maxWidth:560,maxHeight:"88vh",display:"flex",flexDirection:"column",boxShadow:DS.shadowModal,overflow:"hidden"}}>
+    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={MODAL_OVERLAY}>
+      <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",border:"1px solid rgba(226,232,240,0.9)",borderRadius:30,width:"100%",maxWidth:560,maxHeight:"88vh",display:"flex",flexDirection:"column",boxShadow:"0 28px 70px rgba(15,23,42,0.18)",overflow:"hidden"}}>
         {event.posterUrl?(
           <div style={{position:"relative",height:220,flexShrink:0}}>
             <img src={event.posterUrl} alt={event.title} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
@@ -161,9 +172,9 @@ const EventDetailsModal = ({ event, onClose }) => {
             <div style={{position:"absolute",bottom:16,left:20,color:"#fff",fontWeight:800,fontSize:18,fontFamily:DS.font,textTransform:"uppercase",textShadow:"0 2px 8px rgba(0,0,0,0.6)"}}>{event.title}</div>
           </div>
         ):(
-          <div style={{background:DS.primaryGrad,padding:"20px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0}}>
-            <span style={{color:"#fff",fontWeight:700,fontSize:16,fontFamily:DS.font}}>Event Details</span>
-            <button onClick={onClose} style={{background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",borderRadius:8,width:32,height:32,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
+          <div style={{padding:"18px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0,borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%)"}}>
+            <span style={{color:DS.textPrimary,fontWeight:700,fontSize:16,fontFamily:DS.font}}>Event Details</span>
+            <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:34,height:34,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
           </div>
         )}
         <div style={{overflowY:"auto",flex:1,padding:24}}>

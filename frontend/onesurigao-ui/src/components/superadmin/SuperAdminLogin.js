@@ -1,9 +1,7 @@
 // src/components/superadmin/SuperAdminLogin.js
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-
-const API_URL = "http://127.0.0.1:8000/superadmin/login/";
+import { loginSuperAdmin } from "../../services/authService";
 
 function SuperAdminLogin() {
   const navigate = useNavigate();
@@ -18,7 +16,7 @@ function SuperAdminLogin() {
     if (!form.username || !form.password) { setError("Please fill in all fields."); return; }
     setLoading(true); setError("");
     try {
-      const res = await axios.post(API_URL, form);
+      const res = await loginSuperAdmin(form);
       if (res.data.success) {
         sessionStorage.setItem("superAdminID", res.data.superAdminID);
         sessionStorage.setItem("superAdminName", res.data.superAdminName);
@@ -28,8 +26,13 @@ function SuperAdminLogin() {
       } else {
         setError(res.data.message || "Invalid credentials.");
       }
-    } catch {
-      setError("Server error. Please try again.");
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        err.response?.data?.error ||
+        err.message;
+      setError(msg ? String(msg) : "Server error. Please try again.");
     } finally {
       setLoading(false);
     }

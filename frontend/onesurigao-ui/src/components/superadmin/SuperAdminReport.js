@@ -25,6 +25,17 @@ const DS = {
   shadowModal:   "0 24px 80px rgba(0,0,0,0.28)",
   font:          "'Segoe UI', system-ui, sans-serif",
 };
+const MODAL_OVERLAY = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(15,23,42,0.38)",
+  backdropFilter: "blur(8px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 18,
+};
 const STATUS = {
   color: { pending:"#D97706", approved:"#2B6CB0", declined:"#DC2626", responded:"#2B6CB0", resolved:"#16A34A" },
   label: { pending:"Pending", approved:"Approved", declined:"Declined", responded:"Responded", resolved:"Resolved" },
@@ -63,21 +74,21 @@ const ReportDetailModal = ({ report, admins, superAdminID, onClose, onApprove, o
   const inputSt = {width:"100%",padding:"10px 14px",fontSize:13,border:`1.5px solid ${DS.border}`,borderRadius:8,outline:"none",boxSizing:"border-box",fontFamily:DS.font,background:DS.card,color:DS.textPrimary};
 
   return (
-    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20,backdropFilter:"blur(2px)"}}>
-      <div style={{background:DS.card,borderRadius:16,width:"100%",maxWidth:700,maxHeight:"94vh",display:"flex",flexDirection:"column",boxShadow:DS.shadowModal,overflow:"hidden",animation:"slideUp 0.25s ease"}}>
+    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={MODAL_OVERLAY}>
+      <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",border:"1px solid rgba(226,232,240,0.9)",borderRadius:30,width:"100%",maxWidth:700,maxHeight:"94vh",display:"flex",flexDirection:"column",boxShadow:"0 28px 70px rgba(15,23,42,0.18)",overflow:"hidden",animation:"slideUp 0.25s ease"}}>
 
         {/* Header */}
-        <div style={{background:DS.primaryGrad,padding:"20px 26px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexShrink:0}}>
+        <div style={{padding:"20px 26px",display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexShrink:0,borderBottom:`1px solid ${DS.border}`,background:DS.primaryGrad}}>
           <div>
             <div style={{color:"#fff",fontWeight:800,fontSize:17,fontFamily:DS.font}}>Report #{report.reportID}</div>
             <div style={{color:"rgba(255,255,255,0.75)",fontSize:12,fontFamily:DS.font,marginTop:3}}>{report.report} · {report.barangay}</div>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <span style={{background:"rgba(255,255,255,0.2)",color:"#fff",fontSize:11,fontWeight:700,padding:"4px 12px",borderRadius:20,fontFamily:DS.font,border:"1px solid rgba(255,255,255,0.3)"}}>
+            <span style={{background:DS.primaryLight,color:DS.primary,fontSize:11,fontWeight:700,padding:"4px 12px",borderRadius:20,fontFamily:DS.font,border:`1px solid ${DS.border}`}}>
               {STATUS.label[report.status]||report.status}
             </span>
-            <button onClick={onClose} style={{background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",borderRadius:8,width:34,height:34,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s"}}
-              onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,0.3)"} onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,0.2)"}>
+            <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:34,height:34,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background 0.15s"}}
+              onMouseEnter={e=>e.currentTarget.style.background="#EEF4FB"} onMouseLeave={e=>e.currentTarget.style.background="#F5F8FC"}>
               <XIcon/>
             </button>
           </div>

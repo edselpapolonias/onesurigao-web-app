@@ -7,8 +7,6 @@ import { apiClient } from "../../services/authService";
 const CAT_URL = "http://127.0.0.1:8000/public/hotline-categories/";
 const HOT_URL = "http://127.0.0.1:8000/public/hotlines/";
 
-const EMOJI_OPTIONS = ["📞","🚨","🚒","🚑","🚓","💡","🏥","🏫","🌊","🔒","🗑️","🚦","🛡️","⚡","🌐","📝","🧑‍🤝‍🧑"];
-
 const DS = {
   primary:      "#2B6CB0", primaryDark:"#1E4E8C", primaryLight:"#EBF4FF",
   primaryGrad:  "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
@@ -19,6 +17,17 @@ const DS = {
   shadowModal:  "0 24px 80px rgba(0,0,0,0.28)",
   font:         "'Segoe UI', system-ui, sans-serif",
 };
+const MODAL_OVERLAY = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(15,23,42,0.38)",
+  backdropFilter: "blur(8px)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1000,
+  padding: 18,
+};
 
 const PlusIcon  = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>);
 const TrashIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>);
@@ -26,6 +35,41 @@ const EditIcon  = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="n
 const PhoneIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 8.91a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>);
 const ChevronIcon = ({ open }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{transition:"transform 0.25s",transform:open?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>);
 const XIcon     = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const CategoryPhoneIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11l-.8.87a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>);
+const CategoryAlertIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>);
+const CategoryBuildingIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1"/></svg>);
+const CategoryShieldIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 4 7v5c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V7l-8-4Z"/></svg>);
+const CategoryBoltIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>);
+const CategoryGlobeIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>);
+const CategoryUsersIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>);
+
+const CATEGORY_ICON_OPTIONS = [
+  { value: "\uD83D\uDCDE", label: "Phone", Icon: CategoryPhoneIcon },
+  { value: "\uD83D\uDEA8", label: "Emergency", Icon: CategoryAlertIcon },
+  { value: "\uD83C\uDFE5", label: "Health", Icon: CategoryBuildingIcon },
+  { value: "\uD83D\uDD12", label: "Safety", Icon: CategoryShieldIcon },
+  { value: "\u26A1", label: "Utilities", Icon: CategoryBoltIcon },
+  { value: "\uD83C\uDF10", label: "Internet", Icon: CategoryGlobeIcon },
+  { value: "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1", label: "Community", Icon: CategoryUsersIcon },
+];
+
+const CATEGORY_ICON_ALIASES = {
+  "\uD83D\uDE92": CategoryAlertIcon,
+  "\uD83D\uDE91": CategoryAlertIcon,
+  "\uD83D\uDE93": CategoryAlertIcon,
+  "\uD83D\uDCA1": CategoryBoltIcon,
+  "\uD83C\uDFEB": CategoryBuildingIcon,
+  "\uD83C\uDF0A": CategoryAlertIcon,
+  "\uD83D\uDDD1\uFE0F": CategoryBuildingIcon,
+  "\uD83D\uDEA6": CategoryAlertIcon,
+  "\uD83D\uDEE1\uFE0F": CategoryShieldIcon,
+  "\uD83D\uDCDD": CategoryBuildingIcon,
+};
+
+const resolveCategoryIcon = iconValue =>
+  CATEGORY_ICON_ALIASES[iconValue] ||
+  CATEGORY_ICON_OPTIONS.find(opt => opt.value === iconValue)?.Icon ||
+  CategoryPhoneIcon;
 
 const inputSt = {width:"100%",padding:"10px 14px",fontSize:13,border:`1.5px solid ${DS.border}`,borderRadius:8,outline:"none",boxSizing:"border-box",fontFamily:DS.font,background:DS.card,transition:"border-color 0.2s",color:DS.textPrimary};
 const labelSt = {display:"block",marginBottom:6,fontWeight:600,fontSize:11,color:DS.textMuted,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.6};
@@ -41,11 +85,11 @@ const HotlineModal = ({ categoryID, hotline, onClose, onSave }) => {
     catch{alert("Failed to save hotline.");}finally{setSaving(false);}
   };
   return (
-    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20,backdropFilter:"blur(2px)"}}>
-      <div style={{background:DS.card,borderRadius:14,width:"100%",maxWidth:460,boxShadow:DS.shadowModal,overflow:"hidden",animation:"slideUp 0.22s ease"}}>
-        <div style={{background:DS.primaryGrad,padding:"16px 22px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{color:"#fff",fontWeight:800,fontSize:15,fontFamily:DS.font}}>{hotline?"Edit Hotline":"Add Hotline"}</div>
-          <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",borderRadius:8,width:30,height:30,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
+    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={MODAL_OVERLAY}>
+      <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",border:"1px solid rgba(226,232,240,0.9)",borderRadius:30,width:"100%",maxWidth:460,boxShadow:"0 28px 70px rgba(15,23,42,0.18)",overflow:"hidden",animation:"slideUp 0.22s ease"}}>
+        <div style={{padding:"16px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%)"}}>
+          <div style={{color:DS.textPrimary,fontWeight:800,fontSize:15,fontFamily:DS.font}}>{hotline?"Edit Hotline":"Add Hotline"}</div>
+          <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:34,height:34,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
         </div>
         <div style={{padding:"22px"}}>
           <div style={{marginBottom:14}}><label style={labelSt}>Office / Service Name *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="e.g. Emergency Response Service" style={inputSt} onFocus={e=>e.target.style.borderColor=DS.primary} onBlur={e=>e.target.style.borderColor=DS.border}/></div>
@@ -64,7 +108,7 @@ const HotlineModal = ({ categoryID, hotline, onClose, onSave }) => {
 
 // ─── Category Modal ────────────────────────────────────────────────────────────
 const CategoryModal = ({ category, onClose, onSave }) => {
-  const [form, setForm] = useState({name:category?.name||"",icon:category?.icon||"📞"});
+  const [form, setForm] = useState({name:category?.name||"",icon:category?.icon||CATEGORY_ICON_OPTIONS[0].value});
   const [saving, setSaving] = useState(false);
   const handleSave = async () => {
     if(!form.name.trim()){alert("Please enter a category name.");return;}
@@ -73,20 +117,20 @@ const CategoryModal = ({ category, onClose, onSave }) => {
     catch{alert("Failed to save category.");}finally{setSaving(false);}
   };
   return (
-    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20,backdropFilter:"blur(2px)"}}>
-      <div style={{background:DS.card,borderRadius:14,width:"100%",maxWidth:480,boxShadow:DS.shadowModal,overflow:"hidden",animation:"slideUp 0.22s ease"}}>
-        <div style={{background:DS.primaryGrad,padding:"16px 22px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div style={{color:"#fff",fontWeight:800,fontSize:15,fontFamily:DS.font}}>{category?"Edit Category":"Add Category"}</div>
-          <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",borderRadius:8,width:30,height:30,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
+    <div onClick={e=>e.target===e.currentTarget&&onClose()} style={MODAL_OVERLAY}>
+      <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",border:"1px solid rgba(226,232,240,0.9)",borderRadius:30,width:"100%",maxWidth:480,boxShadow:"0 28px 70px rgba(15,23,42,0.18)",overflow:"hidden",animation:"slideUp 0.22s ease"}}>
+        <div style={{padding:"16px 22px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%)"}}>
+          <div style={{color:DS.textPrimary,fontWeight:800,fontSize:15,fontFamily:DS.font}}>{category?"Edit Category":"Add Category"}</div>
+          <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:34,height:34,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
         </div>
         <div style={{padding:"22px"}}>
           <div style={{marginBottom:14}}><label style={labelSt}>Category Name *</label><input value={form.name} onChange={e=>setForm({...form,name:e.target.value})} placeholder="e.g. Emergency Services Hotlines" style={inputSt} onFocus={e=>e.target.style.borderColor=DS.primary} onBlur={e=>e.target.style.borderColor=DS.border}/></div>
           <div style={{marginBottom:20}}>
             <label style={labelSt}>Icon</label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-              {EMOJI_OPTIONS.map(em=>(
-                <button key={em} onClick={()=>setForm(f=>({...f,icon:em}))} style={{width:40,height:40,fontSize:20,border:`2px solid ${form.icon===em?DS.primary:DS.border}`,borderRadius:8,background:form.icon===em?DS.primaryLight:DS.card,cursor:"pointer",transition:"all 0.15s"}}>
-                  {em}
+              {CATEGORY_ICON_OPTIONS.map(({ value, label, Icon })=>(
+                <button key={value} type="button" title={label} onClick={()=>setForm(f=>({...f,icon:value}))} style={{width:40,height:40,border:`2px solid ${form.icon===value?DS.primary:DS.border}`,borderRadius:8,background:form.icon===value?DS.primaryLight:DS.card,cursor:"pointer",transition:"all 0.15s",display:"flex",alignItems:"center",justifyContent:"center",color:form.icon===value?DS.primary:DS.textSecondary}}>
+                  <Icon size={18}/>
                 </button>
               ))}
             </div>
@@ -108,6 +152,7 @@ const CategorySection = ({ category, onEdit, onDelete, onRefresh }) => {
   const [open, setOpen]               = useState(true);
   const [addingHotline, setAdding]    = useState(false);
   const [editingHotline, setEditing]  = useState(null);
+  const CategoryIcon = resolveCategoryIcon(category.icon);
 
   const handleDeleteHotline = async id => {
     if(!window.confirm("Delete this hotline?")) return;
@@ -122,7 +167,9 @@ const CategorySection = ({ category, onEdit, onDelete, onRefresh }) => {
       {/* Header */}
       <div style={{padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"#F7FAFF",borderBottom:open?`1px solid ${DS.border}`:"none"}}>
         <div onClick={()=>setOpen(!open)} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",flex:1}}>
-          <div style={{width:34,height:34,borderRadius:"50%",background:DS.primaryLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>{category.icon}</div>
+          <div style={{width:34,height:34,borderRadius:"50%",background:DS.primaryLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0,color:DS.primary}}>
+            <CategoryIcon size={17}/>
+          </div>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.4}}>{category.name}</span>
             <span style={{fontSize:11,background:DS.primaryLight,color:DS.primary,borderRadius:10,padding:"2px 8px",fontWeight:700,fontFamily:DS.font}}>{category.hotlines.length} hotlines</span>

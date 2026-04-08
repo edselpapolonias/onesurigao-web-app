@@ -387,30 +387,10 @@ function PublicAnnouncementSearch() {
   const searchedAnnouncements = normalizedQuery ? displayAnnouncements.filter(announcement => [announcement.title, announcement.content, announcement.admin?.officeName].filter(Boolean).join(" ").toLowerCase().includes(normalizedQuery)) : [];
   const hasSearch = Boolean(normalizedQuery);
   const hasSearchResults = filteredOffices.length > 0 || searchedAnnouncements.length > 0;
-  const featuredCount = displayAnnouncements.length;
 
   return (
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 800, color: DS.primary, letterSpacing: 1, textTransform: "uppercase", fontFamily: DS.font }}>Community Feed</div>
-            <h2 style={{ margin: "6px 0 0", fontSize: 30, fontWeight: 900, color: DS.textPrimary, fontFamily: DS.font, letterSpacing: -1 }}>City updates, announcements, and office activity</h2>
-            <p style={{ margin: "8px 0 0", fontSize: 14, color: DS.textMuted, fontFamily: DS.font, lineHeight: 1.8 }}>{hasSearch ? `Search results for "${searchQuery}"` : "A more scrollable public feed for updates from city offices."}</p>
-          </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 18, padding: "12px 14px", minWidth: 120, boxShadow: DS.shadow }}>
-              <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 0.8 }}>Posts</div>
-              <div style={{ marginTop: 4, fontSize: 20, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{featuredCount}</div>
-            </div>
-            <div style={{ background: DS.card, border: `1px solid #DCEAB7`, borderRadius: 18, padding: "12px 14px", minWidth: 120, boxShadow: DS.shadow }}>
-              <div style={{ fontSize: 11, color: "#577A21", fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 0.8 }}>Active Offices</div>
-              <div style={{ marginTop: 4, fontSize: 20, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{offices.length}</div>
-            </div>
-          </div>
-        </div>
-      </div>
       {error && <div style={{ background: "#FFF5F5", border: "1.5px solid #FEB2B2", borderRadius: 8, padding: "12px 16px", marginBottom: 14, fontSize: 13, color: "#C53030", fontFamily: DS.font }}>Failed to load announcements.</div>}
       {loading && [1, 2, 3].map(index => <CardSkeleton key={index} />)}
       {!loading && !error && hasSearch && hasSearchResults && (

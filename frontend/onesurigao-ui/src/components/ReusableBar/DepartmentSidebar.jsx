@@ -10,7 +10,7 @@ const DS = {
   primary:      "#2B6CB0",
   primaryLight: "#EBF4FF",
   primaryGrad:  "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
-  accent:       "#B8FF62",
+  accent:       "#D7EEFF",
   bg:           "#F5F7FA",
   card:         "#FFFFFF",
   border:       "#E2E8F0",
@@ -124,7 +124,7 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
       </div>
 
       <div onClick={goHome} onMouseEnter={()=>setHoveredID("all")} onMouseLeave={()=>setHoveredID(null)}
-        style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",margin:"0 14px 10px",border:`1px solid ${!activeAdminID?"#DCEAB7":isDark?"#223046":DS.border}`,borderRadius:20,background:!activeAdminID?"#F2FFD8":hoveredID==="all"?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
+        style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",margin:"0 14px 10px",border:`1px solid ${!activeAdminID?"#CFE7FA":isDark?"#223046":DS.border}`,borderRadius:20,background:!activeAdminID?"#EBF4FF":hoveredID==="all"?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
         <div style={{width:42,height:42,borderRadius:14,background:!activeAdminID?DS.accent:(isDark?"#182435":"#f4f6f9"),display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s",color:!activeAdminID?DS.textPrimary:(isDark?"#8FA1B9":DS.textMuted)}}>
           <GridIcon/>
         </div>
@@ -157,7 +157,7 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
               onClick={()=>handleOfficeClick(admin.adminID)}
               onMouseEnter={()=>setHoveredID(admin.adminID)}
               onMouseLeave={()=>setHoveredID(null)}
-              style={{display:"flex",alignItems:"center",gap:12,padding:"14px 14px",marginBottom:10,border:`1px solid ${isActive?"#DCEAB7":isDark?"#223046":DS.border}`,borderRadius:20,background:isActive?"#F2FFD8":isHovered?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
+              style={{display:"flex",alignItems:"center",gap:12,padding:"14px 14px",marginBottom:10,border:`1px solid ${isActive?"#CFE7FA":isDark?"#223046":DS.border}`,borderRadius:20,background:isActive?"#EBF4FF":isHovered?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
               <OfficeAvatar officeName={admin.officeName} profilePic={admin.profilePic||null}/>
               <div style={{overflow:"hidden",flex:1}}>
                 <div style={{fontSize:12,fontWeight:800,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.35,transition:"color 0.15s",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
