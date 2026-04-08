@@ -5,6 +5,7 @@ from .views import (
     PublicUserViewSet, PublicAnnouncementViewSet, PublicEventViewSet,
     ReportViewSet, HotlineCategoryViewSet, HotlineViewSet,
     public_login, approve_report, decline_report, respond_report, resolve_report,
+    chatbot_query,
 )
 
 router = DefaultRouter()
@@ -22,4 +23,5 @@ urlpatterns = [
     path("reports/<int:report_id>/decline/",  decline_report),
     path("reports/<int:report_id>/respond/",  respond_report),
     path("reports/<int:report_id>/resolve/",  resolve_report),
+    path("chatbot/",                          chatbot_query),
 ]

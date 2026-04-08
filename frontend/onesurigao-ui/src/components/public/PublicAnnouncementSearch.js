@@ -12,17 +12,17 @@ const DS = {
   primary: "#2B6CB0",
   primaryLight: "#EBF4FF",
   primaryGrad: "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
-  accent: "#B8FF62",
-  accentSoft: "#F2FFD8",
+  accent: "#66B7F0",
+  accentSoft: "#E7F2FF",
   bg: "#F5F7FA",
   card: "#FFFFFF",
   border: "#E2E8F0",
   textPrimary: "#1A202C",
   textSecondary: "#4A5568",
   textMuted: "#718096",
-  pinned: "#6FAE27",
-  shadow: "0 10px 30px rgba(15,23,42,0.05)",
-  shadowHover: "0 16px 36px rgba(15,23,42,0.08)",
+  pinned: "#2B6CB0",
+  shadow: "0 10px 26px rgba(15,23,42,0.07)",
+  shadowHover: "0 16px 34px rgba(15,23,42,0.11)",
   shadowModal: "0 20px 60px rgba(0,0,0,0.25)",
   font: "'Segoe UI', system-ui, sans-serif",
 };
@@ -113,8 +113,11 @@ const BookmarkIcon = ({ filled }) => (
   </svg>
 );
 
-const Avatar = ({ officeName }) => {
+const Avatar = ({ officeName, profilePic }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(word => word[0]).slice(0, 2).join("").toUpperCase() || "SG";
+  if (profilePic) {
+    return <img src={profilePic} alt={officeName} style={{ width: 42, height: 42, borderRadius: "50%", objectFit: "cover", flexShrink: 0, boxShadow: "0 2px 6px rgba(43,108,176,0.22)" }} />;
+  }
   return (
     <div style={{ width: 42, height: 42, borderRadius: "50%", background: DS.primaryGrad, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: DS.font, flexShrink: 0, boxShadow: "0 2px 6px rgba(43,108,176,0.25)" }}>
       {initials}
@@ -237,15 +240,15 @@ const ReactionBar = ({ announcement, comments, setComments }) => {
     <>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingTop: 14, borderTop: `1px solid ${DS.border}`, marginTop: 16, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-        <button style={btn(liked, DS.primary)} onClick={handleLike} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = liked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
-          <ThumbsUpIcon filled={liked} /> Like{likes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{likes}</span>}
-        </button>
-        <button style={btn(disliked, "#C53030")} onClick={handleDislike} onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }} onMouseLeave={e => { e.currentTarget.style.background = disliked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
-          <ThumbsDownIcon filled={disliked} /> Dislike{dislikes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{dislikes}</span>}
-        </button>
-        <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
-          <MessageCircleIcon /> Comment{comments.length > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{comments.length}</span>}
-        </button>
+          <button style={btn(liked, DS.primary)} onClick={handleLike} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = liked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
+            <ThumbsUpIcon filled={liked} /> Like{likes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{likes}</span>}
+          </button>
+          <button style={btn(disliked, "#C53030")} onClick={handleDislike} onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }} onMouseLeave={e => { e.currentTarget.style.background = disliked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
+            <ThumbsDownIcon filled={disliked} /> Dislike{dislikes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{dislikes}</span>}
+          </button>
+          <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
+            <MessageCircleIcon /> Comment{comments.length > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{comments.length}</span>}
+          </button>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <button style={btn(false, DS.primary)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
@@ -291,7 +294,7 @@ const AnnouncementCard = ({ announcement }) => {
   return (
     <div style={{ background: DS.card, borderRadius: 28, boxShadow: DS.shadow, marginBottom: 26, overflow: "hidden", position: "relative", border: `1px solid ${DS.border}`, transition: "box-shadow 0.2s, transform 0.2s", padding: 22 }} onMouseEnter={e => { e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.transform = "translateY(-2px)"; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.transform = "translateY(0)"; }}>
       {announcement.isPinned && (
-        <div style={{ position: "absolute", top: 18, right: 18, background: DS.accentSoft, color: "#274C0A", fontSize: 10, fontWeight: 800, padding: "6px 10px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4, border: "1px solid #DCEAB7" }}>
+        <div style={{ position: "absolute", top: 18, right: 18, background: DS.accentSoft, color: DS.primary, fontSize: 10, fontWeight: 800, padding: "6px 10px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4 }}>
           <PinIcon /> PINNED
         </div>
       )}
@@ -299,11 +302,11 @@ const AnnouncementCard = ({ announcement }) => {
         <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
           <Avatar officeName={officeName} />
           <div style={{ minWidth: 0 }}>
-          <div style={{ fontWeight: 800, fontSize: 15, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
-          <div style={{ fontSize: 12, color: DS.textSecondary, fontFamily: DS.font, marginTop: 3 }}>Public Office Update</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
-            <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
-          </div>
+            <div style={{ fontWeight: 800, fontSize: 15, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
+            <div style={{ fontSize: 12, color: DS.textSecondary, fontFamily: DS.font, marginTop: 3 }}>Public Office Update</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
+              <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
+            </div>
           </div>
         </div>
         <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
@@ -335,8 +338,8 @@ const AnnouncementCard = ({ announcement }) => {
 };
 
 const OfficeResultCard = ({ office, onOpen }) => (
-  <button type="button" onClick={() => onOpen(office.adminID)} style={{ width: "100%", background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 20, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", boxShadow: DS.shadow, transition: "transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign: "left" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.borderColor = "#DCEAB7"; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.borderColor = DS.border; }}>
-    <Avatar officeName={office.officeName} />
+  <button type="button" onClick={() => onOpen(office.adminID)} style={{ width: "100%", background: DS.card, border: "none", borderRadius: 20, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", boxShadow: DS.shadow, transition: "transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign: "left" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = DS.shadowHover; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = DS.shadow; }}>
+    <Avatar officeName={office.officeName} profilePic={office.profilePic} />
     <div style={{ minWidth: 0, flex: 1 }}>
       <div style={{ fontSize: 14, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{office.officeName}</div>
       <div style={{ fontSize: 12, color: DS.textMuted, fontFamily: DS.font, marginTop: 3 }}>City Government Office</div>
@@ -348,7 +351,7 @@ const OfficeResultCard = ({ office, onOpen }) => (
 const SearchSectionHeader = ({ title, count }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
     <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font }}>{title}</h3>
-    <span style={{ fontSize: 12, fontWeight: 700, color: "#274C0A", fontFamily: DS.font, background: DS.accentSoft, border: "1px solid #DCEAB7", borderRadius: 999, padding: "4px 10px" }}>{count}</span>
+    <span style={{ fontSize: 12, fontWeight: 700, color: DS.primary, fontFamily: DS.font, background: DS.accentSoft, borderRadius: 999, padding: "4px 10px" }}>{count}</span>
   </div>
 );
 

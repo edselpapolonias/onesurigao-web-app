@@ -28,6 +28,7 @@ import PublicPinned       from "./components/public/PublicPinned";
 import PublicEvent        from "./components/public/PublicEvent";
 import PublicReport       from "./components/public/PublicReport";
 import PublicHotlines     from "./components/public/PublicHotlines";
+import PublicChat         from "./components/public/PublicChat";
 
 // Shared Department Page (wraps with the correct Layout based on role)
 import DepartmentPage from "./components/shared/DepartmentPage";
@@ -81,6 +82,7 @@ function App() {
                   <Route path="events"    element={<PublicEvent />} />
                   <Route path="report"    element={<PublicReport />} />
                   <Route path="hotlines"  element={<PublicHotlines />} />
+                  <Route path="chat"      element={<PublicChat />} />
                   <Route path="search"    element={<SearchPage mode="public" Layout={PublicLayout} />} />
                   {/* Public view of a department page */}
                   <Route path="department/:adminID" element={<DepartmentPage Layout={PublicLayout} backPath="/home"/>} />

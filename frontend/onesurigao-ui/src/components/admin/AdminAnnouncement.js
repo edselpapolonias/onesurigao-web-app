@@ -23,8 +23,8 @@ const DS = {
   textMuted:     "#718096",
   pinned:        "#2B6CB0",
   pinnedBg:      "#EFF6FF",
-  shadow:        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
-  shadowHover:   "0 4px 16px rgba(0,0,0,0.10)",
+  shadow:        "0 10px 26px rgba(15,23,42,0.07)",
+  shadowHover:   "0 16px 34px rgba(15,23,42,0.11)",
   shadowModal:   "0 20px 60px rgba(0,0,0,0.25)",
   font:          "'Segoe UI', system-ui, sans-serif",
 };
@@ -117,30 +117,32 @@ const ReactionBar = ({ announcement }) => {
 
   const btn = (active, activeColor) => ({
     display:"flex", alignItems:"center", gap:6,
-    background:"none", border:"none", cursor:"pointer",
-    fontSize:13, fontFamily:DS.font, fontWeight:active?700:500,
+    background:active ? "#F8FBFF" : "transparent", border:"none", cursor:"pointer",
+    fontSize:12.5, fontFamily:DS.font, fontWeight:active?700:600,
     color:active?activeColor:DS.textMuted,
-    padding:"7px 14px", borderRadius:8, transition:"all 0.15s",
+    padding:"7px 12px", borderRadius:12, transition:"all 0.15s",
   });
 
   return (
     <>
-      <div style={{ display:"flex", alignItems:"center", padding:"2px 8px" }}>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"6px 12px 10px", borderTop:`1px solid ${DS.border}` }}>
+        <div style={{display:"flex", alignItems:"center", gap:4, flexWrap:"wrap"}}>
         <button style={btn(liked,DS.primary)} onClick={handleLike}
           onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=liked?DS.primary:DS.textMuted;}}>
+          onMouseLeave={e=>{e.currentTarget.style.background=liked?"#F8FBFF":"transparent";e.currentTarget.style.color=liked?DS.primary:DS.textMuted;}}>
           <ThumbsUpIcon filled={liked}/> Like{likes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{likes}</span>}
         </button>
         <button style={btn(disliked,"#C53030")} onClick={handleDislike}
           onMouseEnter={e=>{e.currentTarget.style.background="#FFF5F5";e.currentTarget.style.color="#C53030";}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=disliked?"#C53030":DS.textMuted;}}>
+          onMouseLeave={e=>{e.currentTarget.style.background=disliked?"#F8FBFF":"transparent";e.currentTarget.style.color=disliked?"#C53030":DS.textMuted;}}>
           <ThumbsDownIcon filled={disliked}/> Dislike{dislikes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{dislikes}</span>}
         </button>
         <button style={btn(false,DS.primary)} onClick={()=>setShowComments(true)}
           onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=DS.textMuted;}}>
+          onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color=DS.textMuted;}}>
           <MessageCircleIcon/> Comment
         </button>
+        </div>
       </div>
       {showComments&&<CommentModal announcement={announcement} onClose={()=>setShowComments(false)}/>}
     </>
@@ -149,7 +151,7 @@ const ReactionBar = ({ announcement }) => {
 
 // ─── Card Skeleton ────────────────────────────────────────────────────────────
 const CardSkeleton = () => (
-  <div style={{ background:DS.card, borderRadius:12, padding:"20px", marginBottom:14, boxShadow:DS.shadow, border:`1px solid ${DS.border}` }}>
+  <div style={{ background:DS.card, borderRadius:18, padding:"18px", marginBottom:14, boxShadow:DS.shadow, border:"none" }}>
     <div style={{ display:"flex", gap:12, marginBottom:14 }}>
       <div style={{ width:42, height:42, borderRadius:"50%", background:"#EDF2F7", animation:"pulse 1.5s ease-in-out infinite", flexShrink:0 }}/>
       <div style={{ flex:1 }}>
@@ -339,30 +341,30 @@ const DraftsPanel = ({ drafts, onEdit, onDelete, onPost, onClose }) => (
 
 // ─── Announcement Card (Admin — with pin menu) ────────────────────────────────
 const ComposerCard = ({ officeName, draftsCount, onOpenComposer, onOpenDrafts }) => (
-  <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #FBFDFF 100%)",border:`1px solid ${DS.border}`,borderRadius:28,padding:"18px 20px",boxShadow:"0 16px 34px rgba(15,23,42,0.06)",marginBottom:26}}>
-    <div style={{display:"flex",alignItems:"center",gap:14}}>
+  <div style={{background:"#FFFFFF",border:"none",borderRadius:18,padding:"14px 16px",boxShadow:DS.shadow,marginBottom:18}}>
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
       <Avatar officeName={officeName || "Admin"} size={44}/>
-      <button onClick={onOpenComposer} style={{flex:1,height:50,background:"#F6FAFF",border:"1px solid #D7E8FA",borderRadius:999,cursor:"pointer",padding:"0 18px",textAlign:"left",fontSize:13,color:DS.textMuted,fontFamily:DS.font,boxShadow:"inset 0 1px 2px rgba(15,23,42,0.03)"}}>
+      <button onClick={onOpenComposer} style={{flex:1,height:44,background:"#F8FAFC",border:"none",borderRadius:999,cursor:"pointer",padding:"0 14px",textAlign:"left",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>
         Share an update with your community...
       </button>
-      <button onClick={onOpenComposer} style={{width:42,height:42,borderRadius:"50%",border:"1px solid #D7E8FA",background:"#EFF7FF",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}>
+      <button onClick={onOpenComposer} style={{width:38,height:38,borderRadius:"50%",border:"none",background:"#E7F2FF",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}>
         <PlusIcon/>
       </button>
     </div>
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginTop:16,paddingTop:14,borderTop:`1px solid ${DS.border}`,flexWrap:"wrap"}}>
-      <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginTop:12,paddingTop:10,borderTop:`1px solid ${DS.border}`,flexWrap:"wrap"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:6,background:"#F8FAFC",border:"none",cursor:"pointer",padding:"8px 11px",borderRadius:11,fontSize:12,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FAFC"}>
           <ImageIcon/> Image
         </button>
-        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:6,background:"#F8FAFC",border:"none",cursor:"pointer",padding:"8px 11px",borderRadius:11,fontSize:12,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FAFC"}>
           <VideoIcon/> Video
         </button>
-        <button onClick={onOpenDrafts} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+        <button onClick={onOpenDrafts} style={{display:"flex",alignItems:"center",gap:6,background:"#F8FAFC",border:"none",cursor:"pointer",padding:"8px 11px",borderRadius:11,fontSize:12,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FAFC"}>
           <FileTextIcon/> Draft
           {draftsCount>0&&<span style={{background:DS.primary,color:"#fff",borderRadius:999,padding:"1px 6px",fontSize:10,fontWeight:700}}>{draftsCount}</span>}
         </button>
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:8,fontSize:12,color:DS.primary,fontWeight:700,fontFamily:DS.font,background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:999,padding:"9px 12px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,fontSize:11.5,color:DS.primary,fontWeight:700,fontFamily:DS.font,background:"#E7F2FF",border:"none",borderRadius:999,padding:"7px 10px"}}>
         <BuildingIcon/> Public
       </div>
     </div>
@@ -386,17 +388,17 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
   const timeStr     = createdDate?.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"})||"";
 
   return (
-    <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,marginBottom:14,overflow:"hidden",position:"relative",border:`1px solid ${DS.border}`,borderLeft:isPinned?`4px solid ${DS.pinned}`:`1px solid ${DS.border}`,transition:"box-shadow 0.2s"}}
+    <div style={{background:DS.card,borderRadius:18,boxShadow:DS.shadow,marginBottom:18,overflow:"hidden",position:"relative",border:"none",transition:"box-shadow 0.2s, transform 0.2s"}}
       onMouseEnter={e=>e.currentTarget.style.boxShadow=DS.shadowHover}
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
       {isPinned&&(
-        <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
+        <div style={{position:"absolute",top:14,right:14,background:"#E7F2FF",color:DS.primary,fontSize:10,fontWeight:800,padding:"5px 10px",borderRadius:999,fontFamily:DS.font,display:"flex",alignItems:"center",gap:4}}>
           <PinBadgeIcon/> PINNED
         </div>
       )}
 
-      <div style={{padding:"16px 20px 0",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+      <div style={{padding:"16px 18px 0",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <Avatar officeName={officeName}/>
           <div>
@@ -427,16 +429,22 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
         )}
       </div>
 
-      <div style={{padding:"12px 20px 6px",fontWeight:700,fontSize:16,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.4}}>{announcement.title}</div>
+      <div style={{padding:"12px 18px 6px",fontWeight:800,fontSize:17,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.35}}>{announcement.title}</div>
 
-      <div style={{padding:"0 20px 14px",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.75,whiteSpace:"pre-wrap"}}>
+      <div style={{padding:"0 18px 14px",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.72,whiteSpace:"pre-wrap"}}>
         {displayContent}
         {isLong&&<button onClick={()=>setExpanded(!expanded)} style={{display:"inline-flex",alignItems:"center",gap:4,marginLeft:6,background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:DS.primary,fontFamily:DS.font,padding:0}}>{expanded?"Show less":"Read more"}<ChevronDownIcon open={expanded}/></button>}
       </div>
 
-      <MediaGallery media={announcement.media}/>
+      {Array.isArray(announcement.media) && announcement.media.length > 0 && (
+        <div style={{padding:"0 18px"}}>
+          <div style={{borderRadius:16,overflow:"hidden",background:"#F4F7FB"}}>
+            <MediaGallery media={announcement.media}/>
+          </div>
+        </div>
+      )}
 
-      <div style={{padding:"8px 20px",display:"flex",alignItems:"center",gap:6,borderTop:`1px solid ${DS.border}`}}>
+      <div style={{padding:"10px 18px 0",display:"flex",alignItems:"center",gap:6}}>
         <span style={{color:DS.textMuted,display:"flex"}}><BuildingIcon/></span>
         <span style={{fontSize:12,color:DS.textMuted,fontFamily:DS.font}}>{officeName}</span>
       </div>

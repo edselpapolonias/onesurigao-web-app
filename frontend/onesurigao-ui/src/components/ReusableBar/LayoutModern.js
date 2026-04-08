@@ -9,11 +9,11 @@ const LayoutModern = ({ children }) => {
   const officeName = location.state?.officeName || sessionStorage.getItem("officeName") || "";
 
   return (
-    <div style={{ margin: 0, padding: 0, minHeight: "100vh", background: isDark ? "#0B1220" : "#f7f8fb" }}>
-      <div style={{ width: "100%", padding: "18px 24px 24px 264px", display: "flex", gap: 22, alignItems: "flex-start", boxSizing: "border-box" }}>
+    <div style={{ margin: 0, padding: 0, minHeight: "100vh", background: isDark ? "#0B1220" : "#F3F6FB" }}>
+      <div style={{ width: "100%", padding: "14px 18px 18px 254px", display: "flex", gap: 16, alignItems: "flex-start", boxSizing: "border-box" }}>
         <SurigaoNavBar officeName={officeName} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ background: isDark ? "#101927" : "#FCFDFE", border: `1px solid ${isDark ? "#223046" : "#E9EEF5"}`, borderRadius: 30, padding: "28px", boxShadow: isDark ? "0 18px 40px rgba(0,0,0,0.22)" : "0 18px 40px rgba(15,23,42,0.05)" }}>
+          <div style={{ background: isDark ? "#101927" : "#FFFFFF", border: "none", borderRadius: 22, padding: "20px", boxShadow: isDark ? "0 16px 34px rgba(0,0,0,0.24)" : "0 12px 30px rgba(15,23,42,0.07)" }}>
             {children}
           </div>
         </div>

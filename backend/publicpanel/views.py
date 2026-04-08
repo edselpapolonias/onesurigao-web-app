@@ -273,3 +273,91 @@ class HotlineViewSet(viewsets.ModelViewSet):
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         return [IsSuperAdminUser()]
+
+
+# ── AI Chatbot (Real-Time RAG) ────────────────────────────────────────────────
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def chatbot_query(request):
+    import os
+    from google import genai
+
+    query = request.data.get("query", "").strip()
+    if not query:
+        return Response({"error": "Query cannot be empty."}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 1. REAL-TIME RAG FETCHING (Announcements, Events, Hotlines)
+    from adminpanel.models import Announcement, Event
+    from .models import Hotline
+
+    # Fetch top 30 active announcements
+    announcements = Announcement.objects.select_related('admin').filter(isActive=True).order_by("-createdDate")[:30]
+    ann_content = []
+    for a in announcements:
+        office = a.admin.officeName if a.admin else "City Admin"
+        date_str = a.createdDate.strftime("%Y-%m-%d %I:%M %p")
+        ann_content.append(f"[{date_str}] Posted by {office}: {a.title}\n{a.content}")
+    ann_info = "\n\n".join(ann_content)
+
+    # Fetch top 15 approved events
+    events = Event.objects.filter(isApproved=True).order_by("-createdDate")[:15]
+    event_content = []
+    for e in events:
+        date_str = e.eventDate.strftime("%Y-%m-%d %I:%M %p")
+        event_content.append(f"Event: {e.title}\nDate: {date_str}\nLocation: {e.location}\nDetails: {e.description}")
+    event_info = "\n\n".join(event_content)
+
+    # Fetch all hotlines
+    hotlines = Hotline.objects.select_related('category').all()
+    hotline_info = "\n".join([f"- {h.category.name if h.category else 'General'} - {h.name}: {h.contactNumber}" for h in hotlines])
+
+    # 2. PROMPT CONSTRUCTION
+    system_prompt = f"""You are the OneSurigao Virtual Assistant. You help citizens of Surigao City by providing real-time, accurate information based strictly on the following data pulled directly from the OneSurigao database.
+
+=== RECENT ANNOUNCEMENTS (RAG Context) ===
+{ann_info if ann_info else "No recent announcements."}
+
+=== UPCOMING/RECENT EVENTS ===
+{event_info if event_info else "No recent events."}
+
+=== EMERGENCY HOTLINES ===
+{hotline_info if hotline_info else "No hotlines available."}
+
+=== GUIDELINES ===
+1. Respond in a natural, conversational, and explanatory tone. Avoid boring lists; instead, explain the information as a helpful human assistant would.
+2. If asked about an announcement or event, summarize the details and offer context.
+3. Be precise: Use ONLY the context provided above.
+4. If the question is outside the scope of announcements, events, or hotlines, politely explain what you CAN help with.
+5. NO CONVERSATION HISTORY: Treat every query as a fresh question.
+6. Keep formatting clean using Markdown highlights where necessary.
+
+Always act as a helpful government assistant."""
+
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
+        return Response({
+            "text": "The AI is currently resting (API Key not configured in `.env`). But you can still explore the dashboard!"
+        })
+
+    try:
+        from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
+
+        @retry(
+            stop=stop_after_attempt(3), 
+            wait=wait_fixed(2),
+            retry=retry_if_exception_type(Exception) # We'll retry on any exception for maximum resilience against 503s
+        )
+        def call_gemini():
+            client = genai.Client(api_key=gemini_key)
+            # Using gemini-2.0-flash as it is confirmed available for this key
+            return client.models.generate_content(
+                model="gemini-flash-latest",
+                contents=f"{system_prompt}\n\nUSER QUESTION: {query}"
+            )
+        
+        response = call_gemini()
+        return Response({"text": response.text})
+    except Exception as e:
+        print(f"!!! CHATBOT ERROR: {str(e)}")
+        return Response({"error": f"AI Error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
