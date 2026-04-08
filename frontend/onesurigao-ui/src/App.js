@@ -1,7 +1,7 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { PublicAuthProvider } from "./components/ReusableBar/SurigaoHeader";
+import { PublicAuthProvider, ThemeProvider } from "./components/ReusableBar/SurigaoHeader";
 
 // Admin
 import AdminLogin        from "./components/admin/AdminLogin";
@@ -40,9 +40,10 @@ import SuperAdminLayout from "./components/ReusableBar/SuperAdminLayoutModern";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div style={{ margin: 0, padding: 0 }}>
-        <Routes>
+    <ThemeProvider>
+      <BrowserRouter>
+        <div style={{ margin: 0, padding: 0 }}>
+          <Routes>
 
           {/* ── ADMIN ROUTES ── */}
           <Route path="/"                   element={<AdminLogin />} />
@@ -88,9 +89,10 @@ function App() {
             }
           />
 
-        </Routes>
-      </div>
-    </BrowserRouter>
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

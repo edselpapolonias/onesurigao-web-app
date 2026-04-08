@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTheme } from "./SurigaoHeader";
 
 const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
 
@@ -60,6 +61,7 @@ const getDeptPath = (role, adminID) => {
 export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = null }) => {
   const navigate  = useNavigate();
   const location  = useLocation();
+  const { isDark } = useTheme();
   const role      = detectRole(location.pathname);
 
   const [admins, setAdmins]   = useState([]);
@@ -106,41 +108,41 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
   };
 
   return (
-    <div style={{width:288,flexShrink:0,background:DS.card,borderRadius:28,boxShadow:"0 18px 40px rgba(15,40,74,0.06)",border:`1px solid ${DS.border}`,overflow:"hidden",alignSelf:"flex-start",position:"sticky",top:20}}>
+    <div style={{width:288,flexShrink:0,background:isDark?"#0F1724":DS.card,borderRadius:28,boxShadow:isDark?"0 18px 40px rgba(0,0,0,0.26)":"0 18px 40px rgba(15,40,74,0.06)",border:`1px solid ${isDark?"#223046":DS.border}`,overflow:"hidden",alignSelf:"flex-start",position:"sticky",top:20}}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
 
       <div style={{padding:"18px 20px 14px",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
         <div style={{flex:1}}>
-          <div style={{color:DS.textPrimary,fontWeight:800,fontSize:18,fontFamily:DS.font}}>Suggested Offices</div>
-          <div style={{color:DS.textMuted,fontSize:12,fontFamily:DS.font,marginTop:4,lineHeight:1.6}}>Who to follow and browse next</div>
+          <div style={{color:isDark?"#F8FBFF":DS.textPrimary,fontWeight:800,fontSize:18,fontFamily:DS.font}}>Suggested Offices</div>
+          <div style={{color:isDark?"#8FA1B9":DS.textMuted,fontSize:12,fontFamily:DS.font,marginTop:4,lineHeight:1.6}}>Who to follow and browse next</div>
         </div>
-        <div style={{background:"#f4f6f9",border:`1px solid ${DS.border}`,borderRadius:14,width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:DS.textSecondary}}><GridIcon/></div>
+        <div style={{background:isDark?"#182435":"#f4f6f9",border:`1px solid ${isDark?"#223046":DS.border}`,borderRadius:14,width:40,height:40,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:isDark?"#A7B4C7":DS.textSecondary}}><GridIcon/></div>
       </div>
 
       <div style={{padding:"0 20px 14px"}}>
-        <div style={{height:1,background:DS.border}} />
+        <div style={{height:1,background:isDark?"#223046":DS.border}} />
       </div>
 
       <div onClick={goHome} onMouseEnter={()=>setHoveredID("all")} onMouseLeave={()=>setHoveredID(null)}
-        style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",margin:"0 14px 10px",border:`1px solid ${!activeAdminID?"#DCEAB7":DS.border}`,borderRadius:20,background:!activeAdminID?"#F2FFD8":hoveredID==="all"?"#F8FAFC":"transparent",cursor:"pointer",transition:"all 0.15s"}}>
-        <div style={{width:42,height:42,borderRadius:14,background:!activeAdminID?DS.accent:"#f4f6f9",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s",color:!activeAdminID?DS.textPrimary:DS.textMuted}}>
+        style={{display:"flex",alignItems:"center",gap:12,padding:"14px 18px",margin:"0 14px 10px",border:`1px solid ${!activeAdminID?"#DCEAB7":isDark?"#223046":DS.border}`,borderRadius:20,background:!activeAdminID?"#F2FFD8":hoveredID==="all"?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
+        <div style={{width:42,height:42,borderRadius:14,background:!activeAdminID?DS.accent:(isDark?"#182435":"#f4f6f9"),display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s",color:!activeAdminID?DS.textPrimary:(isDark?"#8FA1B9":DS.textMuted)}}>
           <GridIcon/>
         </div>
         <div style={{flex:1}}>
-          <div style={{fontSize:13,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,transition:"color 0.15s"}}>Explore All Offices</div>
-          <div style={{fontSize:11,color:DS.textMuted,fontFamily:DS.font,marginTop:3}}>{admins.length} available suggestions</div>
+          <div style={{fontSize:13,fontWeight:800,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,transition:"color 0.15s"}}>Explore All Offices</div>
+          <div style={{fontSize:11,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:3}}>{admins.length} available suggestions</div>
         </div>
-        {!activeAdminID&&<span style={{color:DS.textPrimary,display:"flex"}}><ChevronRightIcon/></span>}
+        {!activeAdminID&&<span style={{color:isDark?"#F8FBFF":DS.textPrimary,display:"flex"}}><ChevronRightIcon/></span>}
       </div>
 
-      <div style={{padding:"2px 20px 10px",fontSize:11,fontWeight:700,letterSpacing:1,textTransform:"uppercase",color:DS.textMuted,fontFamily:DS.font}}>
+      <div style={{padding:"2px 20px 10px",fontSize:11,fontWeight:700,letterSpacing:1,textTransform:"uppercase",color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font}}>
         Trending Now
       </div>
 
       <div style={{maxHeight:"calc(100vh - 276px)",overflowY:"auto",scrollbarWidth:"thin",scrollbarColor:"#CBD5E0 #F5F7FA",padding:"0 14px 14px"}}>
         {loading && [1,2,3,4,5].map(i=><Skel key={i}/>)}
         {error && (
-          <div style={{padding:"16px 14px",textAlign:"center",fontSize:12,color:DS.textMuted,fontFamily:DS.font,background:"#f8fafc",border:`1px solid ${DS.border}`,borderRadius:18}}>
+          <div style={{padding:"16px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:`1px solid ${isDark?"#223046":DS.border}`,borderRadius:18}}>
             <div style={{marginBottom:8}}>{error}</div>
             <button onClick={fetchAdmins} style={{display:"inline-flex",alignItems:"center",gap:5,background:"none",border:`1px solid ${DS.border}`,borderRadius:6,padding:"5px 10px",cursor:"pointer",fontSize:11,color:DS.primary,fontFamily:DS.font}}>
               <RefreshIcon/> Retry
@@ -155,20 +157,20 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
               onClick={()=>handleOfficeClick(admin.adminID)}
               onMouseEnter={()=>setHoveredID(admin.adminID)}
               onMouseLeave={()=>setHoveredID(null)}
-              style={{display:"flex",alignItems:"center",gap:12,padding:"14px 14px",marginBottom:10,border:`1px solid ${isActive?"#DCEAB7":DS.border}`,borderRadius:20,background:isActive?"#F2FFD8":isHovered?"#F8FAFC":"transparent",cursor:"pointer",transition:"all 0.15s"}}>
+              style={{display:"flex",alignItems:"center",gap:12,padding:"14px 14px",marginBottom:10,border:`1px solid ${isActive?"#DCEAB7":isDark?"#223046":DS.border}`,borderRadius:20,background:isActive?"#F2FFD8":isHovered?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s"}}>
               <OfficeAvatar officeName={admin.officeName} profilePic={admin.profilePic||null}/>
               <div style={{overflow:"hidden",flex:1}}>
-                <div style={{fontSize:12,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.35,transition:"color 0.15s",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                <div style={{fontSize:12,fontWeight:800,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.35,transition:"color 0.15s",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                   {admin.officeName}
                 </div>
-                <div style={{fontSize:11,color:DS.textMuted,fontFamily:DS.font,marginTop:3}}>{index < 3 ? "Suggested office" : "Recently active department"}</div>
+                <div style={{fontSize:11,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:3}}>{index < 3 ? "Suggested office" : "Recently active department"}</div>
               </div>
-              <span style={{color:isActive?DS.textPrimary:DS.textMuted,display:"flex",flexShrink:0}}><ChevronRightIcon/></span>
+              <span style={{color:isActive?(isDark?"#F8FBFF":DS.textPrimary):(isDark?"#8FA1B9":DS.textMuted),display:"flex",flexShrink:0}}><ChevronRightIcon/></span>
             </div>
           );
         })}
         {!loading && !error && admins.length===0 && (
-          <div style={{padding:"28px 14px",textAlign:"center",fontSize:12,color:DS.textMuted,fontFamily:DS.font,background:"#f8fafc",border:`1px solid ${DS.border}`,borderRadius:18}}>No offices found.</div>
+          <div style={{padding:"28px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:`1px solid ${isDark?"#223046":DS.border}`,borderRadius:18}}>No offices found.</div>
         )}
       </div>
     </div>

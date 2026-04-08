@@ -21,8 +21,8 @@ const DS = {
   textPrimary:   "#1A202C",
   textSecondary: "#4A5568",
   textMuted:     "#718096",
-  pinned:        "#D97706",
-  pinnedBg:      "#FFFBEB",
+  pinned:        "#2B6CB0",
+  pinnedBg:      "#EFF6FF",
   shadow:        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
   shadowHover:   "0 4px 16px rgba(0,0,0,0.10)",
   shadowModal:   "0 20px 60px rgba(0,0,0,0.25)",
@@ -178,57 +178,61 @@ const AnnouncementForm = ({ initial={title:"",content:"",mediaFiles:[],scheduleE
   };
   const removeMedia = idx => { setPreviews(p=>p.filter((_,i)=>i!==idx)); setForm(p=>({...p,mediaFiles:p.mediaFiles.filter((_,i)=>i!==idx)})); };
   const handleDrop  = e => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); };
+  const openMediaPicker = accept => {
+    if (!fileRef.current) return;
+    fileRef.current.accept = accept;
+    fileRef.current.click();
+  };
   const minDT       = () => new Date(Date.now()+5*60000).toISOString().slice(0,16);
 
-  const inputSt = { width:"100%", padding:"10px 14px", fontSize:13, border:`1.5px solid ${DS.border}`, borderRadius:8, outline:"none", boxSizing:"border-box", fontFamily:DS.font, background:DS.card, transition:"border-color 0.2s", color:DS.textPrimary };
-  const labelSt = { display:"block", marginBottom:6, fontWeight:600, fontSize:11, color:DS.textMuted, fontFamily:DS.font, textTransform:"uppercase", letterSpacing:0.6 };
+  const inputSt = { width:"100%", padding:"14px 16px", fontSize:13, border:`1px solid ${DS.border}`, borderRadius:16, outline:"none", boxSizing:"border-box", fontFamily:DS.font, background:"#F8FBFF", transition:"border-color 0.2s, box-shadow 0.2s, background 0.2s", color:DS.textPrimary, boxShadow:"inset 0 1px 2px rgba(15,23,42,0.03)" };
+  const labelSt = { display:"block", marginBottom:8, fontWeight:700, fontSize:11, color:DS.textMuted, fontFamily:DS.font, textTransform:"uppercase", letterSpacing:0.7 };
 
   return (
-    <div style={{ padding:"24px 28px", overflowY:"auto", maxHeight:"calc(90vh - 70px)" }}>
-      <div style={{ marginBottom:16 }}>
+    <div style={{ padding:"26px 28px 30px", background:"linear-gradient(180deg,#FCFEFF 0%, #F7FAFD 100%)" }}>
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"flex-end",gap:18,marginBottom:24,flexWrap:"wrap"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+          <button onClick={()=>openMediaPicker("image/*,video/*")} style={{display:"flex",alignItems:"center",gap:8,background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:999,padding:"9px 14px",fontSize:12,fontWeight:700,color:DS.primary,fontFamily:DS.font,cursor:"pointer"}}>
+            <ImageIcon/> <VideoIcon/> Images and Videos
+          </button>
+        </div>
+      </div>
+      <div style={{ marginBottom:18 }}>
         <label style={labelSt}>Title <span style={{color:"#DC2626"}}>*</span></label>
         <input name="title" value={form.title} onChange={handleChange} placeholder="Enter announcement title..." style={inputSt}
-          onFocus={e=>e.target.style.borderColor=DS.borderFocus} onBlur={e=>e.target.style.borderColor=DS.border}/>
+          onFocus={e=>{e.target.style.borderColor=DS.borderFocus;e.target.style.boxShadow="0 0 0 4px rgba(43,108,176,0.10)";e.target.style.background="#FFFFFF";}} onBlur={e=>{e.target.style.borderColor=DS.border;e.target.style.boxShadow="inset 0 1px 2px rgba(15,23,42,0.03)";e.target.style.background="#F8FBFF";}}/>
       </div>
-      <div style={{ marginBottom:16 }}>
+      <div style={{ marginBottom:18 }}>
         <label style={labelSt}>Content <span style={{color:"#DC2626"}}>*</span></label>
         <textarea name="content" value={form.content} onChange={handleChange} rows={6} placeholder="Write the announcement content here..."
-          style={{...inputSt,resize:"vertical",minHeight:120}}
-          onFocus={e=>e.target.style.borderColor=DS.borderFocus} onBlur={e=>e.target.style.borderColor=DS.border}/>
+          style={{...inputSt,resize:"vertical",minHeight:160,lineHeight:1.7}}
+          onFocus={e=>{e.target.style.borderColor=DS.borderFocus;e.target.style.boxShadow="0 0 0 4px rgba(43,108,176,0.10)";e.target.style.background="#FFFFFF";}} onBlur={e=>{e.target.style.borderColor=DS.border;e.target.style.boxShadow="inset 0 1px 2px rgba(15,23,42,0.03)";e.target.style.background="#F8FBFF";}}/>
       </div>
 
-      {/* Media Upload */}
-      <div style={{ marginBottom:16 }}>
-        <label style={labelSt}>Attach Photo / Video <span style={{fontSize:11,color:"#A0AEC0",fontWeight:400,textTransform:"none"}}>(optional)</span></label>
-        <div onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)} onDrop={handleDrop} onClick={()=>fileRef.current?.click()}
-          style={{ border:`2px dashed ${dragOver?DS.primary:DS.border}`, borderRadius:10, padding:"20px 16px", textAlign:"center", cursor:"pointer", background:dragOver?DS.primaryLight:DS.bg, transition:"all 0.2s" }}>
-          <input ref={fileRef} type="file" accept="image/*,video/*" multiple style={{display:"none"}} onChange={e=>handleFiles(e.target.files)}/>
-          <div style={{ display:"flex", justifyContent:"center", gap:12, marginBottom:6, color:DS.primary }}><ImageIcon/> <VideoIcon/></div>
-          <p style={{ margin:0, fontSize:13, color:DS.textSecondary, fontFamily:DS.font }}><span style={{color:DS.primary,fontWeight:600}}>Click to upload</span> or drag & drop</p>
-          <p style={{ margin:"3px 0 0", fontSize:11, color:DS.textMuted, fontFamily:DS.font }}>PNG, JPG, MP4, MOV supported</p>
-        </div>
-        {previews.length>0&&(
-          <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:10 }}>
+      <input ref={fileRef} type="file" accept="image/*,video/*" multiple style={{display:"none"}} onChange={e=>handleFiles(e.target.files)}/>
+      {previews.length>0&&(
+        <div style={{ marginBottom:18 }}>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:10 }}>
             {previews.map((m,i)=>(
-              <div key={i} style={{ position:"relative", borderRadius:8, overflow:"hidden", border:`1.5px solid ${DS.border}` }}>
-                {m.type.startsWith("image/")?<img src={m.url} alt={m.name} style={{width:80,height:64,objectFit:"cover",display:"block"}}/>:
-                  <div style={{width:80,height:64,background:"#1A202C",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}><VideoIcon/></div>}
-                <button onClick={e=>{e.stopPropagation();removeMedia(i);}} style={{position:"absolute",top:3,right:3,background:"rgba(0,0,0,0.6)",border:"none",color:"#fff",borderRadius:"50%",width:18,height:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
+              <div key={i} style={{ position:"relative", borderRadius:16, overflow:"hidden", border:`1px solid ${DS.border}`, background:"#fff", boxShadow:"0 8px 18px rgba(15,23,42,0.06)" }}>
+                {m.type.startsWith("image/")?<img src={m.url} alt={m.name} style={{width:110,height:82,objectFit:"cover",display:"block"}}/>:
+                  <div style={{width:110,height:82,background:"#1A202C",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}><VideoIcon/></div>}
+                <button onClick={e=>{e.stopPropagation();removeMedia(i);}} style={{position:"absolute",top:6,right:6,background:"rgba(15,23,42,0.7)",border:"none",color:"#fff",borderRadius:"50%",width:22,height:22,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Schedule */}
-      <div style={{ marginBottom:24 }}>
-        <div style={{ background:form.scheduleEnabled?DS.primaryLight:DS.bg, border:`1.5px solid ${form.scheduleEnabled?DS.primary:DS.border}`, borderRadius:10, padding:"14px 16px", transition:"all 0.2s" }}>
+      <div style={{ marginBottom:28 }}>
+        <div style={{ background:form.scheduleEnabled?"#EFF7FF":"#F8FBFF", border:`1px solid ${form.scheduleEnabled?DS.primary:DS.border}`, borderRadius:22, padding:"18px 18px", transition:"all 0.2s", boxShadow:form.scheduleEnabled?"0 10px 24px rgba(43,108,176,0.08)":"none" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer" }} onClick={()=>setForm(f=>({...f,scheduleEnabled:!f.scheduleEnabled,scheduledAt:""}))}>
             <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <span style={{color:form.scheduleEnabled?DS.primary:DS.textMuted,display:"flex"}}><ClockIcon/></span>
+              <span style={{color:form.scheduleEnabled?DS.primary:DS.textMuted,display:"flex",width:34,height:34,borderRadius:"50%",background:form.scheduleEnabled?"rgba(43,108,176,0.12)":"#EEF2F7",alignItems:"center",justifyContent:"center"}}><ClockIcon/></span>
               <div>
-                <div style={{fontSize:13,fontWeight:700,color:form.scheduleEnabled?DS.primaryDark:DS.textSecondary,fontFamily:DS.font}}>Schedule Post</div>
-                <div style={{fontSize:11,color:DS.textMuted,fontFamily:DS.font}}>Choose when to publish this announcement</div>
+                <div style={{fontSize:14,fontWeight:700,color:form.scheduleEnabled?DS.primaryDark:DS.textPrimary,fontFamily:DS.font}}>Schedule Post</div>
+                <div style={{fontSize:12,color:DS.textMuted,fontFamily:DS.font}}>Choose when to publish this announcement</div>
               </div>
             </div>
             <div style={{ width:40, height:22, borderRadius:11, background:form.scheduleEnabled?DS.primary:"#CBD5E0", position:"relative", transition:"background 0.2s", flexShrink:0 }}>
@@ -239,8 +243,8 @@ const AnnouncementForm = ({ initial={title:"",content:"",mediaFiles:[],scheduleE
             <div style={{ marginTop:12 }}>
               <label style={{...{display:"block",marginBottom:6,fontWeight:600,fontSize:11,color:DS.textMuted,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.6}, display:"flex", alignItems:"center", gap:5}}><CalendarIcon/> Select Date & Time</label>
               <input type="datetime-local" name="scheduledAt" value={form.scheduledAt} min={minDT()} onChange={handleChange}
-                style={{...inputSt,border:`1.5px solid ${DS.primary}`,fontSize:13}}
-                onFocus={e=>e.target.style.borderColor=DS.primaryDark} onBlur={e=>e.target.style.borderColor=DS.primary}/>
+                style={{...inputSt,border:`1px solid ${DS.primary}`,fontSize:13,background:"#FFFFFF"}}
+                onFocus={e=>{e.target.style.borderColor=DS.primaryDark;e.target.style.boxShadow="0 0 0 4px rgba(43,108,176,0.10)";}} onBlur={e=>{e.target.style.borderColor=DS.primary;e.target.style.boxShadow="none";}}/>
               {form.scheduledAt&&<p style={{margin:"6px 0 0",fontSize:12,color:DS.primary,fontFamily:DS.font,display:"flex",alignItems:"center",gap:5}}><ClockIcon/> Will post: <strong style={{marginLeft:4}}>{new Date(form.scheduledAt).toLocaleString("en-US",{month:"short",day:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}</strong></p>}
             </div>
           )}
@@ -248,11 +252,11 @@ const AnnouncementForm = ({ initial={title:"",content:"",mediaFiles:[],scheduleE
       </div>
 
       {/* Buttons */}
-      <div style={{ display:"flex", gap:10, justifyContent:"flex-end", borderTop:`1px solid ${DS.border}`, paddingTop:16 }}>
-        <button onClick={onCancel} style={{background:DS.bg,border:`1.5px solid ${DS.border}`,padding:"9px 20px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,color:DS.textSecondary,fontFamily:DS.font}}>Cancel</button>
-        {onSaveDraft&&<button onClick={()=>form.title&&onSaveDraft(form)} style={{background:DS.card,border:`1.5px solid ${DS.primary}`,padding:"9px 20px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,color:DS.primary,fontFamily:DS.font}}>Save Draft</button>}
+      <div style={{ display:"flex", gap:10, justifyContent:"flex-end", borderTop:`1px solid ${DS.border}`, paddingTop:18, flexWrap:"wrap" }}>
+        <button onClick={onCancel} style={{background:"#F6F8FB",border:`1px solid ${DS.border}`,padding:"11px 20px",borderRadius:14,cursor:"pointer",fontSize:13,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}}>Cancel</button>
+        {onSaveDraft&&<button onClick={()=>form.title&&onSaveDraft(form)} style={{background:"#EFF7FF",border:"1px solid #CFE0F3",padding:"11px 20px",borderRadius:14,cursor:"pointer",fontSize:13,fontWeight:700,color:DS.primary,fontFamily:DS.font}}>Save Draft</button>}
         <button onClick={()=>form.title&&form.content&&onPost(form)}
-          style={{background:form.scheduleEnabled&&form.scheduledAt?"linear-gradient(135deg,#276749,#38A169)":DS.primaryGrad,color:"#fff",border:"none",padding:"9px 22px",fontSize:13,fontWeight:700,borderRadius:8,cursor:"pointer",fontFamily:DS.font,display:"flex",alignItems:"center",gap:6,boxShadow:`0 2px 8px ${form.scheduleEnabled&&form.scheduledAt?"rgba(56,161,105,0.3)":"rgba(43,108,176,0.3)"}`}}>
+          style={{background:form.scheduleEnabled&&form.scheduledAt?"linear-gradient(135deg,#276749,#38A169)":DS.primaryGrad,color:"#fff",border:"none",padding:"11px 22px",fontSize:13,fontWeight:700,borderRadius:14,cursor:"pointer",fontFamily:DS.font,display:"flex",alignItems:"center",gap:6,boxShadow:`0 10px 22px ${form.scheduleEnabled&&form.scheduledAt?"rgba(56,161,105,0.22)":"rgba(43,108,176,0.22)"}`}}>
           {form.scheduleEnabled&&form.scheduledAt?<><CalendarIcon/> Schedule Post</>:<><PlusIcon/> Post Announcement</>}
         </button>
       </div>
@@ -262,19 +266,19 @@ const AnnouncementForm = ({ initial={title:"",content:"",mediaFiles:[],scheduleE
 
 // ─── Post Modal ───────────────────────────────────────────────────────────────
 const PostModal = ({ onClose, onPost, onSaveDraft, editDraft=null }) => (
-  <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}}>
-    <div style={{background:DS.card,borderRadius:14,width:"100%",maxWidth:700,boxShadow:DS.shadowModal,overflow:"hidden",maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
-      <div style={{background:DS.primaryGrad,padding:"18px 26px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <div style={{background:"rgba(255,255,255,0.18)",borderRadius:8,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff"}}>
+  <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(15,23,42,0.42)",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:1000,padding:20}}>
+    <div style={{background:DS.card,borderRadius:28,width:"100%",maxWidth:760,boxShadow:"0 32px 80px rgba(15,23,42,0.24)",overflow:"hidden",maxHeight:"90vh",display:"flex",flexDirection:"column",border:"1px solid rgba(226,232,240,0.9)"}}>
+      <div style={{padding:"20px 24px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:14,width:42,height:42,display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}>
             {editDraft?<EditIcon/>:<PlusIcon/>}
           </div>
           <div>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15,fontFamily:DS.font,display:"block"}}>{editDraft?"Edit Draft":"Post Announcement"}</span>
-            <span style={{color:"rgba(255,255,255,0.7)",fontSize:11,fontFamily:DS.font}}>{editDraft?"Update your saved draft":"Publish to all city residents"}</span>
+            <span style={{color:DS.textPrimary,fontWeight:800,fontSize:17,fontFamily:DS.font,display:"block",letterSpacing:-0.3}}>{editDraft?"Edit Announcement Draft":"Create Announcement"}</span>
+            <span style={{color:DS.textMuted,fontSize:12,fontFamily:DS.font}}>{editDraft?"Polish and publish your saved content":"Designed to match the new feed-first dashboard"}</span>
           </div>
         </div>
-        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+        <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:38,height:38,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
       </div>
       <div style={{overflowY:"auto",flex:1}}>
         <AnnouncementForm initial={editDraft||{title:"",content:"",mediaFiles:[],scheduleEnabled:false,scheduledAt:""}} onPost={onPost} onSaveDraft={onSaveDraft} onCancel={onClose}/>
@@ -285,32 +289,46 @@ const PostModal = ({ onClose, onPost, onSaveDraft, editDraft=null }) => (
 
 // ─── Drafts Panel ─────────────────────────────────────────────────────────────
 const DraftsPanel = ({ drafts, onEdit, onDelete, onPost, onClose }) => (
-  <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",display:"flex",alignItems:"flex-start",justifyContent:"flex-end",zIndex:1000}}>
-    <div style={{background:DS.card,width:370,height:"100%",boxShadow:"-4px 0 24px rgba(0,0,0,0.12)",display:"flex",flexDirection:"column"}}>
-      <div style={{background:DS.primaryGrad,padding:"16px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <span style={{color:"#fff",display:"flex"}}><FileTextIcon/></span>
-          <span style={{color:"#fff",fontWeight:700,fontSize:14,fontFamily:DS.font}}>Saved Drafts</span>
-          {drafts.length>0&&<span style={{background:"rgba(255,255,255,0.22)",color:"#fff",borderRadius:12,padding:"1px 8px",fontSize:12,fontWeight:700}}>{drafts.length}</span>}
+  <div onClick={e=>e.target===e.currentTarget&&onClose()} style={{position:"fixed",inset:0,background:"rgba(15,23,42,0.38)",backdropFilter:"blur(8px)",display:"flex",alignItems:"stretch",justifyContent:"flex-end",zIndex:1000,padding:18}}>
+    <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #F8FBFF 100%)",width:"100%",maxWidth:420,height:"100%",boxShadow:"0 28px 70px rgba(15,23,42,0.18)",display:"flex",flexDirection:"column",borderRadius:30,border:"1px solid rgba(226,232,240,0.9)",overflow:"hidden"}}>
+      <div style={{padding:"20px 22px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,borderBottom:`1px solid ${DS.border}`,background:"linear-gradient(180deg,#FFFFFF 0%, #F7FBFF 100%)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:40,height:40,borderRadius:14,background:"#EFF7FF",border:"1px solid #D7E8FA",display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}>
+            <FileTextIcon/>
+          </div>
+          <div>
+            <div style={{color:DS.textPrimary,fontWeight:800,fontSize:16,fontFamily:DS.font,letterSpacing:-0.3}}>Draft Library</div>
+            <div style={{color:DS.textMuted,fontSize:12,fontFamily:DS.font}}>Saved posts you can edit or publish anytime</div>
+          </div>
+          {drafts.length>0&&<span style={{background:"#EFF7FF",color:DS.primary,border:"1px solid #D7E8FA",borderRadius:999,padding:"4px 10px",fontSize:12,fontWeight:800,fontFamily:DS.font}}>{drafts.length}</span>}
         </div>
-        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",borderRadius:6,width:28,height:28,cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+        <button onClick={onClose} style={{background:"#F5F8FC",border:`1px solid ${DS.border}`,color:DS.textSecondary,borderRadius:12,width:38,height:38,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}><XIcon/></button>
       </div>
-      <div style={{flex:1,overflowY:"auto",padding:"12px"}}>
+      <div style={{flex:1,overflowY:"auto",padding:"18px"}}>
         {drafts.length===0?(
-          <div style={{textAlign:"center",padding:"48px 20px",color:DS.textMuted,fontSize:14,fontFamily:DS.font}}>
-            <div style={{marginBottom:10,display:"flex",justifyContent:"center",color:DS.textMuted}}><FileTextIcon/></div>
-            No drafts saved yet.
+          <div style={{textAlign:"center",padding:"72px 24px",color:DS.textMuted,fontSize:14,fontFamily:DS.font}}>
+            <div style={{margin:"0 auto 14px",width:56,height:56,borderRadius:18,background:"#EFF7FF",border:"1px solid #D7E8FA",display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}><FileTextIcon/></div>
+            <div style={{fontSize:16,fontWeight:800,color:DS.textPrimary,marginBottom:6}}>No drafts yet</div>
+            <div style={{lineHeight:1.7}}>Start a post from the composer and save it as a draft to continue later.</div>
           </div>
         ):drafts.map(draft=>(
-          <div key={draft.id} style={{background:DS.bg,border:`1.5px solid ${DS.border}`,borderRadius:10,padding:"14px",marginBottom:10}}>
-            <div style={{fontWeight:700,fontSize:13,color:DS.textPrimary,marginBottom:4,fontFamily:DS.font}}>{draft.title||"Untitled Draft"}</div>
-            <div style={{fontSize:12,color:DS.textMuted,marginBottom:6,fontFamily:DS.font,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{draft.content||"No content yet..."}</div>
-            <div style={{fontSize:11,color:"#A0AEC0",marginBottom:10,fontFamily:DS.font}}>Saved: {draft.savedAt}</div>
-            {draft.scheduledAt&&<div style={{fontSize:11,color:DS.primary,marginBottom:10,fontFamily:DS.font,display:"flex",alignItems:"center",gap:4}}><CalendarIcon/> Scheduled: {new Date(draft.scheduledAt).toLocaleString("en-US",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"})}</div>}
+          <div key={draft.id} style={{background:"#FFFFFF",border:`1px solid ${DS.border}`,borderRadius:22,padding:"16px",marginBottom:14,boxShadow:"0 10px 24px rgba(15,23,42,0.06)"}}>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10,marginBottom:10}}>
+              <div style={{minWidth:0}}>
+                <div style={{fontWeight:800,fontSize:14,color:DS.textPrimary,marginBottom:5,fontFamily:DS.font,letterSpacing:-0.2}}>{draft.title||"Untitled Draft"}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                  <span style={{fontSize:11,color:"#8A94A6",fontFamily:DS.font,background:"#F5F8FC",border:`1px solid ${DS.border}`,borderRadius:999,padding:"4px 8px"}}>Saved {draft.savedAt}</span>
+                  {draft.scheduledAt&&<span style={{fontSize:11,color:DS.primary,fontFamily:DS.font,background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:999,padding:"4px 8px",display:"flex",alignItems:"center",gap:4}}><CalendarIcon/> {new Date(draft.scheduledAt).toLocaleString("en-US",{month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"})}</span>}
+                </div>
+              </div>
+              <button onClick={()=>onDelete(draft.id)} style={{background:"#FFF5F5",border:"1px solid #F6C8C8",borderRadius:12,padding:"9px",cursor:"pointer",color:"#C53030",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><TrashIcon/></button>
+            </div>
+            <div style={{fontSize:12.5,color:DS.textMuted,marginBottom:14,fontFamily:DS.font,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden",lineHeight:1.65}}>
+              {draft.content||"No content yet..."}
+            </div>
             <div style={{display:"flex",gap:8}}>
-              <button onClick={()=>onEdit(draft)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:DS.card,border:`1.5px solid ${DS.primary}`,borderRadius:6,padding:"7px",cursor:"pointer",fontSize:12,fontWeight:600,color:DS.primary,fontFamily:DS.font}}><EditIcon/> Edit</button>
-              <button onClick={()=>onPost(draft)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:DS.primaryGrad,border:"none",borderRadius:6,padding:"7px",cursor:"pointer",fontSize:12,fontWeight:600,color:"#fff",fontFamily:DS.font}}><PlusIcon/> Post</button>
-              <button onClick={()=>onDelete(draft.id)} style={{background:"#FFF5F5",border:"1.5px solid #FEB2B2",borderRadius:6,padding:"7px 10px",cursor:"pointer",color:"#C53030",display:"flex",alignItems:"center"}}><TrashIcon/></button>
+              <button onClick={()=>onEdit(draft)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:14,padding:"10px 12px",cursor:"pointer",fontSize:12.5,fontWeight:700,color:DS.primary,fontFamily:DS.font}}><EditIcon/> Edit</button>
+              <button onClick={()=>onPost(draft)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:DS.primaryGrad,border:"none",borderRadius:14,padding:"10px 12px",cursor:"pointer",fontSize:12.5,fontWeight:700,color:"#fff",fontFamily:DS.font,boxShadow:"0 10px 22px rgba(43,108,176,0.22)"}}><PlusIcon/> Publish</button>
             </div>
           </div>
         ))}
@@ -320,6 +338,37 @@ const DraftsPanel = ({ drafts, onEdit, onDelete, onPost, onClose }) => (
 );
 
 // ─── Announcement Card (Admin — with pin menu) ────────────────────────────────
+const ComposerCard = ({ officeName, draftsCount, onOpenComposer, onOpenDrafts }) => (
+  <div style={{background:"linear-gradient(180deg,#FFFFFF 0%, #FBFDFF 100%)",border:`1px solid ${DS.border}`,borderRadius:28,padding:"18px 20px",boxShadow:"0 16px 34px rgba(15,23,42,0.06)",marginBottom:26}}>
+    <div style={{display:"flex",alignItems:"center",gap:14}}>
+      <Avatar officeName={officeName || "Admin"} size={44}/>
+      <button onClick={onOpenComposer} style={{flex:1,height:50,background:"#F6FAFF",border:"1px solid #D7E8FA",borderRadius:999,cursor:"pointer",padding:"0 18px",textAlign:"left",fontSize:13,color:DS.textMuted,fontFamily:DS.font,boxShadow:"inset 0 1px 2px rgba(15,23,42,0.03)"}}>
+        Share an update with your community...
+      </button>
+      <button onClick={onOpenComposer} style={{width:42,height:42,borderRadius:"50%",border:"1px solid #D7E8FA",background:"#EFF7FF",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",color:DS.primary}}>
+        <PlusIcon/>
+      </button>
+    </div>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,marginTop:16,paddingTop:14,borderTop:`1px solid ${DS.border}`,flexWrap:"wrap"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+          <ImageIcon/> Image
+        </button>
+        <button onClick={onOpenComposer} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+          <VideoIcon/> Video
+        </button>
+        <button onClick={onOpenDrafts} style={{display:"flex",alignItems:"center",gap:8,background:"#F8FBFF",border:"1px solid #E2ECF7",cursor:"pointer",padding:"10px 14px",borderRadius:14,fontSize:12.5,fontWeight:700,color:DS.textSecondary,fontFamily:DS.font}} onMouseEnter={e=>e.currentTarget.style.background="#EEF7FF"} onMouseLeave={e=>e.currentTarget.style.background="#F8FBFF"}>
+          <FileTextIcon/> Draft
+          {draftsCount>0&&<span style={{background:DS.primary,color:"#fff",borderRadius:999,padding:"1px 6px",fontSize:10,fontWeight:700}}>{draftsCount}</span>}
+        </button>
+      </div>
+      <div style={{display:"flex",alignItems:"center",gap:8,fontSize:12,color:DS.primary,fontWeight:700,fontFamily:DS.font,background:"#EFF7FF",border:"1px solid #D7E8FA",borderRadius:999,padding:"9px 12px"}}>
+        <BuildingIcon/> Public
+      </div>
+    </div>
+  </div>
+);
+
 const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
   const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -342,7 +391,7 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
       {isPinned&&(
-        <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.pinned},#B45309)`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(180,83,9,0.3)"}}>
+        <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
           <PinBadgeIcon/> PINNED
         </div>
       )}
@@ -467,24 +516,14 @@ function AdminAnnouncement() {
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
 
-      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:20,flexWrap:"wrap",gap:10}}>
-        <div>
-          <h2 style={{margin:0,fontSize:22,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5}}>Announcements</h2>
-          <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>
-            {normalizedQuery ? `Search results for "${searchQuery}"` : "Oversee and publish official public advisories."}
-          </p>
-          {officeName&&<p style={{margin:"4px 0 0",fontSize:12,color:DS.primary,fontFamily:DS.font,fontWeight:600}}>Logged in as: {officeName}</p>}
-        </div>
-        <div style={{display:"flex",gap:10}}>
-          <button onClick={()=>setShowDrafts(true)} style={{display:"flex",alignItems:"center",gap:6,position:"relative",background:DS.card,border:`1.5px solid ${DS.border}`,padding:"9px 16px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,color:DS.textSecondary,fontFamily:DS.font,boxShadow:DS.shadow}}>
-            <FileTextIcon/> Drafts
-            {drafts.length>0&&<span style={{position:"absolute",top:-7,right:-7,background:"#DC2626",color:"#fff",borderRadius:"50%",width:18,height:18,fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center"}}>{drafts.length}</span>}
-          </button>
-          <button onClick={()=>{setEditingDraft(null);setShowModal(true);}} style={{display:"flex",alignItems:"center",gap:6,background:DS.primaryGrad,border:"none",padding:"9px 18px",borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,color:"#fff",fontFamily:DS.font,boxShadow:"0 2px 8px rgba(43,108,176,0.3)"}}>
-            <PlusIcon/> Post Announcement
-          </button>
-        </div>
-      </div>
+      {!normalizedQuery && (
+        <ComposerCard
+          officeName={officeName}
+          draftsCount={drafts.length}
+          onOpenComposer={()=>{setEditingDraft(null);setShowModal(true);}}
+          onOpenDrafts={()=>setShowDrafts(true)}
+        />
+      )}
 
       {error&&<div style={{background:"#FFF5F5",border:"1.5px solid #FEB2B2",borderRadius:8,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#C53030",fontFamily:DS.font}}>⚠️ {error}</div>}
       {loading&&[1,2].map(i=><CardSkeleton key={i}/>)}

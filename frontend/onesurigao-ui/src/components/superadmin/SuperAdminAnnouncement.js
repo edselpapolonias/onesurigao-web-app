@@ -17,8 +17,8 @@ const DS = {
   textPrimary:   "#1A202C",
   textSecondary: "#4A5568",
   textMuted:     "#718096",
-  pinned:        "#D97706",
-  pinnedBg:      "#FFFBEB",
+  pinned:        "#2B6CB0",
+  pinnedBg:      "#EFF6FF",
   shadow:        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
   shadowHover:   "0 4px 16px rgba(0,0,0,0.10)",
   shadowModal:   "0 20px 60px rgba(0,0,0,0.25)",
@@ -169,7 +169,7 @@ const AnnouncementCard = ({ announcement }) => {
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
       {announcement.isPinned&&(
-        <div style={{ position:"absolute", top:0, right:16, background:`linear-gradient(135deg,${DS.pinned},#B45309)`, color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:"0 0 8px 8px", fontFamily:DS.font, display:"flex", alignItems:"center", gap:4, boxShadow:"0 2px 6px rgba(180,83,9,0.3)" }}>
+        <div style={{ position:"absolute", top:0, right:16, background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`, color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:"0 0 8px 8px", fontFamily:DS.font, display:"flex", alignItems:"center", gap:4, boxShadow:"0 2px 6px rgba(43,108,176,0.3)" }}>
           <PinIcon/> PINNED
         </div>
       )}
@@ -235,12 +235,6 @@ function SuperAdminAnnouncement() {
   return (
     <SuperAdminLayout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
-      <div style={{ marginBottom:20 }}>
-        <h2 style={{ margin:0, fontSize:22, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, letterSpacing:-0.5 }}>Announcements</h2>
-        <p style={{ margin:"4px 0 0", fontSize:13, color:DS.textMuted, fontFamily:DS.font }}>
-          {normalizedQuery ? `Search results for "${searchQuery}"` : "All active announcements from city offices"}
-        </p>
-      </div>
       {error&&<div style={{ background:"#FFF5F5", border:"1.5px solid #FEB2B2", borderRadius:8, padding:"12px 16px", marginBottom:14, fontSize:13, color:"#C53030", fontFamily:DS.font }}>⚠️ {error}</div>}
       {loading&&[1,2,3].map(i=><CardSkeleton key={i}/>)}
       {!loading&&filteredAnnouncements.map(a=><AnnouncementCard key={a.id} announcement={a}/>)}

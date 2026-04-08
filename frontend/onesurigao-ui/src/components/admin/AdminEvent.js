@@ -339,7 +339,6 @@ function AdminEvent() {
           <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>
             {activeTab==="EVENT"?"Community gatherings, holidays and official schedules":activeTab==="PAST"?"Events that have already taken place":"Your submitted events awaiting approval"}
           </p>
-          {officeName&&<p style={{margin:"4px 0 0",fontSize:12,color:DS.primary,fontFamily:DS.font,fontWeight:600}}>Logged in as: {officeName}</p>}
         </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           <TabButton label="Events" active={activeTab==="EVENT"} onClick={()=>setActiveTab("EVENT")}/>

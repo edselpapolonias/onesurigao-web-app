@@ -20,9 +20,9 @@ const DS = {
   textPrimary:   "#1A202C",
   textSecondary: "#4A5568",
   textMuted:     "#718096",
-  pinned:        "#D97706",
-  pinnedBg:      "#FFFBEB",
-  pinnedBorder:  "#FDE68A",
+  pinned:        "#2B6CB0",
+  pinnedBg:      "#EFF6FF",
+  pinnedBorder:  "#BFDBFE",
   shadow:        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
   shadowHover:   "0 4px 16px rgba(0,0,0,0.10)",
   shadowModal:   "0 20px 60px rgba(0,0,0,0.25)",
@@ -46,7 +46,7 @@ const XIcon           = () => (<svg width="14" height="14" viewBox="0 0 24 24" f
 const Avatar = ({ officeName }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase() || "SG";
   return (
-    <div style={{width:42,height:42,borderRadius:"50%",background:`linear-gradient(135deg,${DS.pinned},#B45309)`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:700,fontFamily:DS.font,flexShrink:0,boxShadow:"0 2px 6px rgba(217,119,6,0.3)"}}>
+    <div style={{width:42,height:42,borderRadius:"50%",background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:700,fontFamily:DS.font,flexShrink:0,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
       {initials}
     </div>
   );
@@ -172,7 +172,7 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
       {/* Pinned ribbon */}
-      <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.pinned},#B45309)`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(180,83,9,0.3)"}}>
+      <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
         <PinSolidIcon/> PINNED
       </div>
 
@@ -225,7 +225,7 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
       {/* Footer */}
       <div style={{padding:"8px 20px",display:"flex",alignItems:"center",gap:6,borderTop:`1px solid ${DS.pinnedBorder}`,background:DS.pinnedBg}}>
         <span style={{color:DS.pinned,display:"flex"}}><BuildingIcon/></span>
-        <span style={{fontSize:12,color:"#92400e",fontFamily:DS.font}}>{officeName}</span>
+        <span style={{fontSize:12,color:DS.primaryDark,fontFamily:DS.font}}>{officeName}</span>
       </div>
 
       <ReactionBar announcement={announcement}/>
@@ -265,11 +265,10 @@ function PinnedAnnouncement() {
           <span style={{color:DS.pinned,display:"flex"}}><PinOutlineIcon filled/></span> Pinned Announcements
         </h2>
         <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>Important announcements pinned by city office administrators.</p>
-        {officeName&&<p style={{margin:"4px 0 0",fontSize:12,color:DS.primary,fontFamily:DS.font,fontWeight:600}}>Logged in as: {officeName}</p>}
       </div>
 
       {/* Hint banner */}
-      <div style={{background:DS.pinnedBg,border:`1.5px solid ${DS.pinnedBorder}`,borderRadius:10,padding:"10px 16px",marginBottom:20,fontSize:13,color:"#92400e",fontFamily:DS.font,display:"flex",alignItems:"center",gap:8}}>
+      <div style={{background:DS.pinnedBg,border:`1.5px solid ${DS.pinnedBorder}`,borderRadius:10,padding:"10px 16px",marginBottom:20,fontSize:13,color:DS.primaryDark,fontFamily:DS.font,display:"flex",alignItems:"center",gap:8}}>
         <span style={{display:"flex",color:DS.pinned,flexShrink:0}}><PinSolidIcon/></span>
         Only administrators who posted can unpin. Use the <strong style={{marginLeft:3,marginRight:3}}>⋯</strong> menu on your card to unpin it.
       </div>

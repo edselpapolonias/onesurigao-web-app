@@ -9,6 +9,24 @@ import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
 export const PublicAuthContext = createContext(null);
 export const usePublicAuth = () => useContext(PublicAuthContext);
 
+export const ThemeContext = createContext(null);
+export const useTheme = () => useContext(ThemeContext);
+
+export const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState(() => localStorage.getItem("one-surigao-theme") || "light");
+
+  useEffect(() => {
+    localStorage.setItem("one-surigao-theme", theme);
+    document.body.style.background = theme === "dark" ? "#0B1220" : "#f7f8fb";
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme, isDark: theme === "dark" }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
 export const PublicAuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const id   = sessionStorage.getItem("publicUserID");
@@ -45,8 +63,8 @@ const DS = {
   primaryDark:"#1E4E8C",
   primaryLight:"#EBF4FF",
   primaryGrad:"linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
-  accent:     "#B8FF62",
-  accentSoft: "#EFFFD4",
+  accent:     "#66B7F0",
+  accentSoft: "#EAF5FF",
   bg:         "#F5F7FA",
   card:       "#FFFFFF",
   border:     "#E2E8F0",
@@ -72,6 +90,8 @@ const UserPlusIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill
 const XIcon        = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
 const AlertIcon    = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>);
 const UploadIcon   = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>);
+const MoonIcon     = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3c0 .37 0 .73.05 1.08A7 7 0 0 0 19.92 12c.36.05.72.05 1.08.05z"/></svg>);
+const SunIcon      = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>);
 
 // ─── Seals ────────────────────────────────────────────────────────────────────
 const CipSeal = () => (
@@ -368,19 +388,57 @@ const PublicProfileDropdown = () => {
 // ─── Search Bar ────────────────────────────────────────────────────────────────
 
 // ─── Tab ──────────────────────────────────────────────────────────────────────
-const NavTab = ({ label, icon, active, onClick, grad }) => (
-  <button onClick={onClick} style={{width:"100%",minHeight:46,padding:"0 14px",border:`1px solid ${active?"#DCEAB7":"transparent"}`,background:active?DS.accentSoft:"transparent",color:active?"#17212f":"#475467",fontWeight:active?800:600,fontSize:12.5,letterSpacing:0.1,cursor:"pointer",borderRadius:16,textTransform:"none",fontFamily:DS.font,transition:"all 0.2s",whiteSpace:"nowrap",boxShadow:active?"0 8px 18px rgba(184,255,98,0.18)":"none",display:"flex",alignItems:"center",justifyContent:"flex-start",gap:12}}
-    onMouseEnter={e=>{if(!active){e.currentTarget.style.background="#F8FAFC";e.currentTarget.style.color="#17212f";e.currentTarget.style.transform="translateX(2px)";}}}
-    onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color="#475467";e.currentTarget.style.transform="translateX(0)";}}}>
-    <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:10,background:active?"#DDF3A8":"#F4F6F8",color:"inherit",flexShrink:0}}>{icon}</span>
-    <span>{label}</span>
-  </button>
-);
+const NavTab = ({ label, icon, active, onClick, grad }) => {
+  const { isDark } = useTheme();
+  return (
+    <button onClick={onClick} style={{width:"100%",minHeight:46,padding:"0 14px",border:`1px solid ${active?(isDark?"#35547A":"#CFE7FA"):"transparent"}`,background:active?(isDark?"#17324D":DS.accentSoft):"transparent",color:active?(isDark?"#F8FBFF":"#17212f"):(isDark?"#A7B4C7":"#475467"),fontWeight:active?800:600,fontSize:12.5,letterSpacing:0.1,cursor:"pointer",borderRadius:16,textTransform:"none",fontFamily:DS.font,transition:"all 0.2s",whiteSpace:"nowrap",boxShadow:active?(isDark?"0 8px 18px rgba(30,64,175,0.22)":"0 8px 18px rgba(102,183,240,0.18)"):"none",display:"flex",alignItems:"center",justifyContent:"flex-start",gap:12}}
+      onMouseEnter={e=>{if(!active){e.currentTarget.style.background=isDark?"#111D2E":"#F8FAFC";e.currentTarget.style.color=isDark?"#F8FBFF":"#17212f";e.currentTarget.style.transform="translateX(2px)";}}}
+      onMouseLeave={e=>{if(!active){e.currentTarget.style.background="transparent";e.currentTarget.style.color=isDark?"#A7B4C7":"#475467";e.currentTarget.style.transform="translateX(0)";}}}>
+      <span style={{display:"flex",alignItems:"center",justifyContent:"center",width:28,height:28,borderRadius:10,background:active?(isDark?"#22496E":"#D7EEFF"):(isDark?"#182435":"#F4F6F8"),color:"inherit",flexShrink:0}}>{icon}</span>
+      <span>{label}</span>
+    </button>
+  );
+};
+
+const ThemeToggle = () => {
+  const { theme, setTheme, isDark } = useTheme();
+  const tabStyle = (mode) => ({
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 7,
+    border: "none",
+    background: theme === mode ? "#DDF7A6" : "transparent",
+    color: theme === mode ? "#17212f" : isDark ? "#98A5B8" : "#667085",
+    borderRadius: 12,
+    minHeight: 34,
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700,
+    fontFamily: DS.font,
+    transition: "all 0.2s",
+  });
+
+  return (
+    <div style={{width:"100%",display:"flex",alignItems:"center",gap:4,background:isDark?"#111827":"#F5F7FA",border:`1px solid ${isDark?"#253041":"#E2E8F0"}`,borderRadius:14,padding:4}}>
+      <button onClick={()=>setTheme("dark")} style={tabStyle("dark")}>
+        <MoonIcon/> Dark
+      </button>
+      <button onClick={()=>setTheme("light")} style={tabStyle("light")}>
+        <SunIcon/> Light
+      </button>
+    </div>
+  );
+};
 
 // ─── NavBar shell ─────────────────────────────────────────────────────────────
-const NavBar = ({ left, tabs, activeTab, onTabClick, grad, tone = "public" }) => (
-  <nav style={{width:244,position:"fixed",top:0,left:0,bottom:0,background:"#FFFFFF",borderTop:"none",borderRight:`1px solid #E9EEF5`,borderBottom:"none",borderLeft:"none",borderRadius:"0 28px 28px 0",padding:"18px 12px 16px",display:"flex",flexDirection:"column",height:"100vh",boxShadow:"0 18px 40px rgba(15,40,74,0.06)",boxSizing:"border-box",overflow:"hidden",zIndex:100}}>
-    <div style={{position:"absolute",top:-56,right:-40,width:160,height:160,borderRadius:"50%",background:tone==="superadmin"?"rgba(26,54,93,0.04)":"rgba(49,130,206,0.04)",pointerEvents:"none"}} />
+const NavBar = ({ tabs, activeTab, onTabClick, grad, tone = "public" }) => {
+  const { isDark } = useTheme();
+
+  return (
+  <nav style={{width:244,position:"fixed",top:0,left:0,bottom:0,background:isDark?"#0F1724":"#FFFFFF",borderTop:"none",borderRight:`1px solid ${isDark?"#223046":"#E9EEF5"}`,borderBottom:"none",borderLeft:"none",borderRadius:0,padding:"18px 12px 16px",display:"flex",flexDirection:"column",height:"100vh",boxShadow:isDark?"0 20px 46px rgba(0,0,0,0.32)":"0 18px 40px rgba(15,40,74,0.06)",boxSizing:"border-box",overflow:"hidden",zIndex:100}}>
+    <div style={{position:"absolute",top:-56,right:-40,width:160,height:160,borderRadius:"50%",background:tone==="superadmin"?(isDark?"rgba(96,165,250,0.08)":"rgba(26,54,93,0.04)"):(isDark?"rgba(56,189,248,0.08)":"rgba(49,130,206,0.04)"),pointerEvents:"none"}} />
     <div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",gap:20,height:"100%"}}>
       <div style={{padding:"4px 8px 6px",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
         <img src={oneSurigaoLogo} alt="One Surigao" style={{width:40,height:40,objectFit:"contain",flexShrink:0}} />
@@ -389,12 +447,13 @@ const NavBar = ({ left, tabs, activeTab, onTabClick, grad, tone = "public" }) =>
       <div style={{display:"flex",flexDirection:"column",gap:6}}>
         {tabs.map(tab=><NavTab key={tab.label} label={tab.label} icon={tab.icon} active={activeTab===tab.label} onClick={()=>onTabClick(tab.label)} grad={grad}/>)}
       </div>
-      <div style={{marginTop:"auto",paddingTop:14,borderTop:`1px solid ${DS.border}`,display:"flex",justifyContent:"flex-end",alignItems:"center",gap:12}}>
-        {left}
+      <div style={{marginTop:"auto",paddingTop:14,borderTop:`1px solid ${isDark?"#223046":DS.border}`,display:"flex",justifyContent:"stretch",alignItems:"center",gap:12}}>
+        <ThemeToggle/>
       </div>
     </div>
   </nav>
-);
+  );
+};
 
 // ─── Admin NavBar ──────────────────────────────────────────────────────────────
 export const SurigaoNavBar = ({ officeName="" }) => {
@@ -403,9 +462,8 @@ export const SurigaoNavBar = ({ officeName="" }) => {
   const ROUTES    = { "Announcement":"/announcements","Pinned":"/pinnedAnnouncements","Event":"/events","Report Problem":"/report-problem","Hotlines":"/hotlines","Search":"/search" };
   const R2T       = { "/announcements":"Announcement","/pinnedAnnouncements":"Pinned","/events":"Event","/report-problem":"Report Problem","/hotlines":"Hotlines","/search":"Search" };
   const activeTab = R2T[location.pathname]||"Announcement";
-  const handleLogout = () => { sessionStorage.removeItem("adminID"); sessionStorage.removeItem("officeName"); sessionStorage.removeItem("announcement_drafts"); navigate("/"); };
   return (
-    <NavBar left={<AdminProfileDropdown name={officeName||"Admin"} grad={DS.primaryGrad} role="Office Account" onLogout={handleLogout}/>}
+    <NavBar
       tabs={[
         { label:"Announcement", icon:<FeedTabIcon/> },
         { label:"Pinned", icon:<PinTabIcon/> },
@@ -427,9 +485,8 @@ export const SuperAdminNavBar = ({ superAdminName="" }) => {
   const ROUTES    = { "Announcement":"/superadmin/announcements","Pinned":"/superadmin/pinned","Event":"/superadmin/events","Report Problem":"/superadmin/reports","Hotlines":"/superadmin/hotlines","Search":"/superadmin/search" };
   const R2T       = { "/superadmin/announcements":"Announcement","/superadmin/pinned":"Pinned","/superadmin/events":"Event","/superadmin/reports":"Report Problem","/superadmin/hotlines":"Hotlines","/superadmin/search":"Search" };
   const activeTab = R2T[location.pathname]||"Announcement";
-  const handleLogout = () => { sessionStorage.removeItem("superAdminID"); sessionStorage.removeItem("superAdminName"); navigate("/superadmin"); };
   return (
-    <NavBar left={<AdminProfileDropdown name={superAdminName||"Super Admin"} grad={GRAD} role="Super Admin Account" onLogout={handleLogout}/>}
+    <NavBar
       tabs={[
         { label:"Announcement", icon:<FeedTabIcon/> },
         { label:"Pinned", icon:<PinTabIcon/> },
@@ -452,7 +509,7 @@ export const PublicNavBar = () => {
   const activeTab = R2T[location.pathname]||"Announcement";
 
   return (
-    <NavBar left={<PublicProfileDropdown/>}
+    <NavBar
       tabs={[
         { label:"Announcement", icon:<FeedTabIcon/> },
         { label:"Pinned", icon:<PinTabIcon/> },

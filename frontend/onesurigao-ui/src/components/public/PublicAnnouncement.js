@@ -21,8 +21,8 @@ const DS = {
   textPrimary:   "#1A202C",
   textSecondary: "#4A5568",
   textMuted:     "#718096",
-  pinned:        "#D97706",
-  pinnedBg:      "#FFFBEB",
+  pinned:        "#2B6CB0",
+  pinnedBg:      "#EFF6FF",
   shadow:        "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)",
   shadowHover:   "0 4px 16px rgba(0,0,0,0.10)",
   shadowModal:   "0 20px 60px rgba(0,0,0,0.25)",
@@ -222,7 +222,7 @@ const AnnouncementCard = ({ announcement }) => {
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
       {announcement.isPinned&&(
-        <div style={{ position:"absolute", top:0, right:16, background:`linear-gradient(135deg,${DS.pinned},#B45309)`, color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:"0 0 8px 8px", fontFamily:DS.font, display:"flex", alignItems:"center", gap:4, boxShadow:"0 2px 6px rgba(180,83,9,0.3)" }}>
+        <div style={{ position:"absolute", top:0, right:16, background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`, color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:"0 0 8px 8px", fontFamily:DS.font, display:"flex", alignItems:"center", gap:4, boxShadow:"0 2px 6px rgba(43,108,176,0.3)" }}>
           <PinIcon/> PINNED
         </div>
       )}
