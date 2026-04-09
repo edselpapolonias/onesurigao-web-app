@@ -5,6 +5,19 @@ import { useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/LayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient } from "../../services/authService";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const BASE = "http://127.0.0.1:8000/public";
 
@@ -168,6 +181,19 @@ const ReportDetailModal = ({ report, onClose, onRespond, onResolve, onRefresh })
                   <div style={{fontSize:10,color:DS.textMuted,fontFamily:DS.font,fontWeight:700,textTransform:"uppercase",letterSpacing:0.6,marginBottom:8}}>Description</div>
                   <div style={{fontSize:13,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.75,background:DS.bg,borderRadius:8,padding:"12px 14px"}}>{report.description}</div>
                 </div>
+
+                {/* Map Location */}
+                {report.latitude && report.longitude && (
+                  <div style={{marginBottom:18}}>
+                    <div style={{fontSize:10,color:DS.textMuted,fontFamily:DS.font,fontWeight:700,textTransform:"uppercase",letterSpacing:0.6,marginBottom:10}}>Map Location</div>
+                    <div style={{height: 200, width: "100%", borderRadius: 12, overflow: "hidden", border: `1px solid ${DS.border}`, zIndex: 0}}>
+                      <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+                        <Marker position={[report.latitude, report.longitude]} />
+                      </MapContainer>
+                    </div>
+                  </div>
+                )}
                 {galleryMedia.length>0?(
                   <div>
                     <div style={{fontSize:10,color:DS.textMuted,fontFamily:DS.font,fontWeight:700,textTransform:"uppercase",letterSpacing:0.6,marginBottom:8}}>

@@ -41,6 +41,8 @@ class Report(models.Model):
     barangay        = models.CharField(max_length=100)
     report          = models.CharField(max_length=200)
     description     = models.TextField()
+    latitude        = models.FloatField(null=True, blank=True)
+    longitude       = models.FloatField(null=True, blank=True)
     submittedDate   = models.DateTimeField(auto_now_add=True)
     validatedBy     = models.IntegerField(null=True, blank=True)
     validatedDate   = models.DateTimeField(null=True, blank=True)

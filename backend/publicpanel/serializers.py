@@ -59,7 +59,7 @@ class ReportSerializer(serializers.ModelSerializer):
         model  = Report
         fields = [
             "reportID", "publicUser", "publicUser_id",
-            "location", "barangay", "report", "description",
+            "location", "barangay", "latitude", "longitude", "report", "description",
             "submittedDate", "validatedBy", "validatedDate",
             "status", "rejectionReason",
             "assignedTo",
