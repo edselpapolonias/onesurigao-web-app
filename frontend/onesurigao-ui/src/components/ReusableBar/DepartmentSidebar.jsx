@@ -37,6 +37,7 @@ const TrendIcon = () => (
     <polyline points="17 6 23 6 23 12" />
   </svg>
 );
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 
 const Skel = () => (
   <div style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",marginBottom:6,border:"none",borderRadius:12,background:"#F8FAFD"}}>
@@ -101,12 +102,6 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
   };
 
   const handleOfficeClick = (adminID) => {
-    if (role === "public") {
-      onOfficeFilter?.(adminID);
-      navigate(`/home?office=${adminID}`);
-      return;
-    }
-
     navigate(getDeptPath(role, adminID));
   };
 
@@ -151,9 +146,10 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
                 <OfficeAvatar officeName={admin.officeName} profilePic={admin.profilePic||null} size={42}/>
                 <span style={{position:"absolute",right:0,bottom:0,width:12,height:12,borderRadius:"50%",background:"#16C35B",border:`2px solid ${isDark?"#0F1724":"#fff"}`}} />
               </div>
-              <div style={{overflow:"hidden",flex:1}}>
-                <div style={{fontSize:13,fontWeight:700,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-                  {admin.officeName}
+              <div style={{overflow:"hidden",flex:1}} title={admin.officeName}>
+                <div style={{display:"flex", alignItems:"center", gap: 5, fontSize:13,fontWeight:700,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.3}}>
+                  <span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",minWidth:0}}>{admin.officeName}</span>
+                  <VerifiedBadgeIcon />
                 </div>
                 <div style={{fontSize:11.5,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:2}}>{index < 3 ? "Health & Wellness" : "Community Services"}</div>
               </div>

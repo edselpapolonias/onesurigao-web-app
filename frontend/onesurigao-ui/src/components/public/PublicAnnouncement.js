@@ -43,10 +43,11 @@ const SearchIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="
 const DotsIcon   = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>);
 const ShareIcon  = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>);
 const BookmarkIcon = ({ filled }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill={filled?"currentColor":"none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>);
-
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 // ─── Avatar ───────────────────────────────────────────────────────────────────
-const Avatar = ({ officeName }) => {
+const Avatar = ({ officeName, profilePic }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase() || "SG";
+  if (profilePic) return <img src={profilePic} alt={officeName} style={{ width:42, height:42, borderRadius:'50%', objectFit:'cover', flexShrink:0, boxShadow:'0 2px 6px rgba(0,0,0,0.1)' }} />;
   return (
     <div style={{ width:42, height:42, borderRadius:"50%", background:DS.primaryGrad, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700, fontFamily:DS.font, flexShrink:0, boxShadow:"0 2px 6px rgba(43,108,176,0.25)" }}>
       {initials}
@@ -62,10 +63,11 @@ const OfficeResultCard = ({ office, onOpen }) => (
     onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow=DS.shadowHover;e.currentTarget.style.borderColor=DS.primary;}}
     onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=DS.shadow;e.currentTarget.style.borderColor=DS.border;}}
   >
-    <Avatar officeName={office.officeName} />
+    <Avatar officeName={office.officeName} profilePic={announcement.admin?.profilePic || null}/>
     <div style={{ minWidth:0, flex:1 }}>
-      <div style={{ fontSize:14, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-        {office.officeName}
+      <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize:14, fontWeight:800, color:DS.textPrimary, fontFamily:DS.font, lineHeight: 1.3 }}>
+        <span style={{ whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",minWidth:0 }}>{office.officeName}</span>
+        <VerifiedBadgeIcon />
       </div>
       <div style={{ fontSize:12, color:DS.textMuted, fontFamily:DS.font, marginTop:3 }}>
         City Government Office
@@ -263,9 +265,9 @@ const AnnouncementCard = ({ announcement }) => {
       )}
 
       <div style={{ padding:"16px 20px 0", display:"flex", alignItems:"center", gap:12 }}>
-        <Avatar officeName={officeName}/>
+        <Avatar officeName={officeName} profilePic={announcement.admin?.profilePic || null}/>
         <div>
-          <div style={{ fontWeight:700, fontSize:14, color:DS.textPrimary, fontFamily:DS.font }}>{officeName}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, fontWeight:700, fontSize:14, color:DS.textPrimary, fontFamily:DS.font }}>{officeName} <VerifiedBadgeIcon /></div>
           <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:2, color:DS.textMuted, fontSize:11, fontFamily:DS.font }}>
             <ClockIcon/> {dateStr}{timeStr&&` · ${timeStr}`}
           </div>

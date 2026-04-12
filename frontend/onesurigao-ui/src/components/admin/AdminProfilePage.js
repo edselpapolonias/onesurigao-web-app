@@ -53,6 +53,7 @@ const MessageCircleIcon= () => (<svg width="15" height="15" viewBox="0 0 24 24" 
 const CameraIcon       = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>);
 const LockIcon         = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>);
 const CheckIcon        = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>);
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 
 const inputSt = {width:"100%",padding:"9px 12px",fontSize:13,border:`1.5px solid ${DS.border}`,borderRadius:8,outline:"none",boxSizing:"border-box",fontFamily:DS.font,background:DS.card,transition:"border-color 0.2s",color:DS.textPrimary};
 const labelSt = {display:"block",marginBottom:5,fontWeight:600,fontSize:11,color:DS.textMuted,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.6};
@@ -246,8 +247,11 @@ function AdminProfilePage() {
     axios.get(`http://127.0.0.1:8000/api/admins/${adminID}/`)
       .then(res => { setAdmin(res.data); setProfilePic(res.data.profilePic||null); })
       .finally(() => setLAdmin(false));
-    axios.get(`http://127.0.0.1:8000/api/announcements/?admin_id=${adminID}`)
-      .then(res => setAnn(Array.isArray(res.data)?res.data:res.data.results||[]))
+    axios.get(`http://127.0.0.1:8000/api/announcements/`)
+      .then(res => {
+        const all = Array.isArray(res.data) ? res.data : res.data.results || [];
+        setAnn(all.filter(a => a.admin?.adminID === Number(adminID)));
+      })
       .finally(() => setLAnn(false));
   }, [adminID]);
 
@@ -278,101 +282,106 @@ function AdminProfilePage() {
   return (
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}} @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      
+      <div style={{display:"flex",flexDirection:"column",gap:20}}>
 
-      <div style={{display:"flex",gap:20,alignItems:"flex-start"}}>
+        {/* ── Top Header: Profile Banner ── */}
+        <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`,overflow:"hidden",position:"relative"}}>
+          {/* Cover Photo Area */}
+          <div style={{height:180,background:DS.primaryGrad,position:"relative"}} />
 
-        {/* ── Left sidebar: profile card (sticky) ── */}
-        <div style={{width:290,flexShrink:0,position:"sticky",top:164}}>
+          {/* Profile Details Bar */}
+          <div style={{padding:"20px 24px 20px 180px",display:"flex",alignItems:"center",justifyContent:"space-between",minHeight:90}}>
+            <div>
+              {loadingAdmin ? (
+                <>
+                  <div style={{height:20,width:200,background:"#EDF2F7",borderRadius:6,marginBottom:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
+                  <div style={{height:14,width:140,background:"#EDF2F7",borderRadius:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
+                </>
+              ) : (
+                <>
+                  <div style={{display:"flex", alignItems:"center", gap:6, fontWeight:800,fontSize:22,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.3}}>{admin?.officeName} <VerifiedBadgeIcon /></div>
+                  <div style={{fontSize:14,color:DS.textMuted,fontFamily:DS.font,marginTop:4}}>City Government Department</div>
+                </>
+              )}
+            </div>
+            
+            <div style={{display:"flex",alignItems:"center",gap:20}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontWeight:800,fontSize:18,color:DS.primary,fontFamily:DS.font}}>{announcements.length}</div>
+                <div style={{fontSize:12,color:DS.textMuted,fontFamily:DS.font,fontWeight:600}}>Posts</div>
+              </div>
+              <button onClick={()=>setShowEdit(true)} style={{padding:"10px 16px",background:DS.primaryLight,border:`1.5px solid ${DS.primary}`,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,color:DS.primary,fontFamily:DS.font,display:"flex",alignItems:"center",gap:6,transition:"all 0.2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryGrad;e.currentTarget.style.color="#fff";}}
+                onMouseLeave={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}>
+                <EditIcon/> Edit Profile
+              </button>
+            </div>
+          </div>
 
-          {/* Profile card */}
-          <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`,overflow:"hidden",marginBottom:14}}>
-            {/* Cover */}
-            <div style={{height:90,background:DS.primaryGrad,position:"relative"}}>
-              {/* Profile pic */}
-              <div style={{position:"absolute",bottom:-36,left:20,cursor:"pointer"}} onClick={()=>picRef.current?.click()}>
-                <div style={{position:"relative"}}>
-                  {loadingAdmin
-                    ? <div style={{width:72,height:72,borderRadius:"50%",background:"#EDF2F7",border:"3px solid #fff",animation:"pulse 1.5s ease-in-out infinite"}}/>
-                    : profilePic
-                      ? <img src={profilePic} alt="profile" style={{width:72,height:72,borderRadius:"50%",objectFit:"cover",border:"3px solid #fff",boxShadow:"0 4px 12px rgba(0,0,0,0.15)"}}/>
-                      : <div style={{width:72,height:72,borderRadius:"50%",background:DS.primaryGrad,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:22,fontWeight:800,fontFamily:DS.font,border:"3px solid #fff",boxShadow:"0 4px 12px rgba(43,108,176,0.3)"}}>
-                          {admin?.officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"OF"}
-                        </div>
-                  }
-                  {/* Camera overlay */}
-                  <div style={{position:"absolute",bottom:2,right:2,width:24,height:24,borderRadius:"50%",background:DS.primaryGrad,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 2px 6px rgba(0,0,0,0.2)",border:"2px solid #fff"}}>
-                    <CameraIcon/>
-                  </div>
-                </div>
-                <input ref={picRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handlePicChange(e.target.files[0])}/>
+          {/* Profile Pic overlapping cover & details */}
+          <div style={{position:"absolute",left:30,top:100,cursor:"pointer"}} onClick={()=>picRef.current?.click()}>
+            <div style={{position:"relative"}}>
+              {loadingAdmin
+                ? <div style={{width:130,height:130,borderRadius:"50%",background:"#EDF2F7",border:"4px solid #fff",animation:"pulse 1.5s ease-in-out infinite"}}/>
+                : profilePic
+                  ? <img src={profilePic} alt="profile" style={{width:130,height:130,borderRadius:"50%",objectFit:"cover",border:"4px solid #fff",boxShadow:"0 4px 16px rgba(0,0,0,0.15)"}}/>
+                  : <div style={{width:130,height:130,borderRadius:"50%",background:DS.primaryGrad,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:38,fontWeight:800,fontFamily:DS.font,border:"4px solid #fff",boxShadow:"0 4px 16px rgba(43,108,176,0.3)"}}>
+                      {admin?.officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"OF"}
+                    </div>
+              }
+              <div style={{position:"absolute",bottom:6,right:6,width:32,height:32,borderRadius:"50%",background:DS.primaryGrad,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",boxShadow:"0 2px 6px rgba(0,0,0,0.2)",border:"2px solid #fff"}}>
+                <CameraIcon/>
               </div>
             </div>
+            <input ref={picRef} type="file" accept="image/*" style={{display:"none"}} onChange={e=>handlePicChange(e.target.files[0])}/>
+          </div>
+        </div>
 
-            <div style={{padding:"42px 20px 16px"}}>
+        {/* ── Two-Column Body Below Banner ── */}
+        <div style={{display:"flex",gap:20,alignItems:"flex-start"}}>
+          
+          {/* Account Info (Left Side) */}
+          <div style={{width:320,flexShrink:0,position:"sticky",top:76}}>
+            <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`,padding:"18px 22px"}}>
+              <div style={{fontWeight:800,fontSize:14,color:DS.textPrimary,fontFamily:DS.font,marginBottom:12,textTransform:"uppercase",letterSpacing:0.5}}>About</div>
               {loadingAdmin
-                ? <>
-                    <div style={{height:16,width:"70%",background:"#EDF2F7",borderRadius:6,marginBottom:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
-                    <div style={{height:11,width:"40%",background:"#EDF2F7",borderRadius:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
-                  </>
+                ? [1,2,3].map(i=><div key={i} style={{height:12,background:"#EDF2F7",borderRadius:6,marginBottom:12,animation:"pulse 1.5s ease-in-out infinite"}}/>)
                 : <>
-                    <div style={{fontWeight:800,fontSize:15,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.3}}>{admin?.officeName}</div>
-                    <div style={{fontSize:12,color:DS.textMuted,fontFamily:DS.font,marginTop:3}}>City Government Department</div>
-                    <div style={{display:"flex",gap:16,marginTop:10}}>
-                      <div style={{textAlign:"center"}}>
-                        <div style={{fontWeight:800,fontSize:16,color:DS.primary,fontFamily:DS.font}}>{announcements.length}</div>
-                        <div style={{fontSize:11,color:DS.textMuted,fontFamily:DS.font}}>Posts</div>
-                      </div>
-                    </div>
-                    <button onClick={()=>setShowEdit(true)} style={{width:"100%",marginTop:12,padding:"9px",background:DS.primaryLight,border:`1.5px solid ${DS.primary}`,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:600,color:DS.primary,fontFamily:DS.font,display:"flex",alignItems:"center",justifyContent:"center",gap:6,transition:"all 0.2s"}}
-                      onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryGrad;e.currentTarget.style.color="#fff";}}
-                      onMouseLeave={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}>
-                      <EditIcon/> Edit Profile
-                    </button>
+                    <InfoRow icon={<BuildingIcon/>} label="Office" value={admin?.officeName}/>
+                    <InfoRow icon={<UserIcon/>} label="Username" value={admin?.username}/>
+                    <InfoRow icon={<MailIcon/>} label="Email" value={admin?.email}/>
+                    <InfoRow icon={<PhoneIcon/>} label="Contact" value={admin?.contactNumber}/>
+                    <InfoRow icon={<CalendarIcon/>} label="Member Since" value={memberSince}/>
                   </>
               }
             </div>
           </div>
 
-          {/* About */}
-          <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`,padding:"14px 18px"}}>
-            <div style={{fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font,marginBottom:10,textTransform:"uppercase",letterSpacing:0.5}}>Account Info</div>
-            {loadingAdmin
-              ? [1,2,3].map(i=><div key={i} style={{height:11,background:"#EDF2F7",borderRadius:6,marginBottom:10,animation:"pulse 1.5s ease-in-out infinite"}}/>)
-              : <>
-                  <InfoRow icon={<BuildingIcon/>} label="Office" value={admin?.officeName}/>
-                  <InfoRow icon={<UserIcon/>} label="Username" value={admin?.username}/>
-                  <InfoRow icon={<MailIcon/>} label="Email" value={admin?.email}/>
-                  <InfoRow icon={<PhoneIcon/>} label="Contact" value={admin?.contactNumber}/>
-                  <InfoRow icon={<CalendarIcon/>} label="Member Since" value={memberSince}/>
-                </>
-            }
-          </div>
-        </div>
-
-        {/* ── Right: Announcements feed ── */}
-        <div style={{flex:1}}>
-          <div style={{marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div>
+          {/* Announcements Feed (Right Side) */}
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`,padding:"18px 22px",marginBottom:14}}>
               <h2 style={{margin:0,fontSize:18,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5}}>My Announcements</h2>
-              <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>All announcements posted by your office</p>
+              <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>Track all announcements and posts made by your department</p>
             </div>
+
+            {loadingAnn && [1,2,3].map(i=>(
+              <div key={i} style={{background:DS.card,borderRadius:12,padding:16,marginBottom:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
+                {[80,95,65].map((w,j)=><div key={j} style={{height:12,width:`${w}%`,background:"#EDF2F7",borderRadius:6,marginBottom:9,animation:"pulse 1.5s ease-in-out infinite"}}/>)}
+              </div>
+            ))}
+
+            {!loadingAnn && announcements.length===0 && (
+              <div style={{background:DS.card,borderRadius:12,padding:"48px 20px",textAlign:"center",color:DS.textMuted,fontSize:14,fontFamily:DS.font,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
+                <div style={{marginBottom:10,display:"flex",justifyContent:"center",color:DS.textMuted}}><BuildingIcon/></div>
+                No announcements posted yet. Go to Announcements to create one.
+              </div>
+            )}
+
+            {!loadingAnn && announcements.map(a=><MiniCard key={a.id} announcement={a}/>)}
           </div>
-
-          {loadingAnn && [1,2,3].map(i=>(
-            <div key={i} style={{background:DS.card,borderRadius:12,padding:16,marginBottom:12,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
-              {[80,95,65].map((w,j)=><div key={j} style={{height:12,width:`${w}%`,background:"#EDF2F7",borderRadius:6,marginBottom:9,animation:"pulse 1.5s ease-in-out infinite"}}/>)}
-            </div>
-          ))}
-
-          {!loadingAnn && announcements.length===0 && (
-            <div style={{background:DS.card,borderRadius:12,padding:"48px 20px",textAlign:"center",color:DS.textMuted,fontSize:14,fontFamily:DS.font,boxShadow:DS.shadow,border:`1px solid ${DS.border}`}}>
-              <div style={{marginBottom:10,display:"flex",justifyContent:"center",color:DS.textMuted}}><BuildingIcon/></div>
-              No announcements posted yet. Go to Announcements to create one.
-            </div>
-          )}
-
-          {!loadingAnn && announcements.map(a=><MiniCard key={a.id} announcement={a}/>)}
         </div>
+
       </div>
 
       {showEdit && admin && (

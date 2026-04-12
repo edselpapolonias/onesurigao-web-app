@@ -48,6 +48,7 @@ const TrashIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="n
 const ImageIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>);
 const VideoIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" /></svg>);
 const CalendarIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>);
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 const Avatar = ({ officeName, profilePic, size = 42 }) => {
@@ -371,7 +372,7 @@ const ComposerCard = ({ officeName, profilePic, draftsCount, onOpenComposer, onO
   </div>
 );
 
-const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
+const AnnouncementCard = ({ announcement, currentAdminID, onPin, onEditPost }) => {
   const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -400,9 +401,12 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
 
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, padding: "20px 20px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-          <Avatar officeName={officeName} />
+          <Avatar officeName={officeName} profilePic={announcement.admin?.profilePic || null}/>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.3 }}>
+              <span style={{ whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",minWidth:0 }}>{officeName}</span>
+              <VerifiedBadgeIcon />
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
               <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
             </div>
@@ -417,6 +421,13 @@ const AnnouncementCard = ({ announcement, currentAdminID, onPin }) => {
             </button>
             {menuOpen && (
               <div style={{ position: "absolute", top: "calc(100% + 4px)", right: 0, background: DS.card, borderRadius: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.12)", border: `1px solid ${DS.border}`, minWidth: 170, zIndex: 50, overflow: "hidden" }}>
+                <button onClick={() => { onEditPost && onEditPost(announcement); setMenuOpen(false); }}
+                  style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: DS.textPrimary, fontFamily: DS.font, textAlign: "left" }}
+                  onMouseEnter={e => e.currentTarget.style.background = DS.bg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                  <span style={{ color: DS.textMuted, display: "flex" }}><EditIcon /></span>
+                  Edit Post
+                </button>
+                <div style={{height:1, background:DS.border}}/>
                 <button onClick={() => { onPin(announcement); setMenuOpen(false); }}
                   style={{ width: "100%", display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: isPinned ? DS.pinned : DS.textPrimary, fontFamily: DS.font, textAlign: "left" }}
                   onMouseEnter={e => e.currentTarget.style.background = DS.bg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
@@ -463,6 +474,7 @@ function AdminAnnouncement() {
   const [showModal, setShowModal] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
+  const [editingPost, setEditingPost] = useState(null);
   const [drafts, setDrafts] = useState(() => { try { return JSON.parse(sessionStorage.getItem("announcement_drafts") || "[]"); } catch { return []; } });
 
   useEffect(() => {
@@ -488,6 +500,17 @@ function AdminAnnouncement() {
     fd.append("title", form.title); fd.append("content", form.content);
     if (adminID) fd.append("admin_id", adminID);
     (form.mediaFiles || []).forEach(f => fd.append("mediaFiles", f));
+    
+    if (editingPost) {
+      apiClient.patch(`/api/announcements/${editingPost.id}/`, fd)
+        .then(res => {
+          setAnnouncements(announcements.map(a => a.id === editingPost.id ? res.data : a));
+          setShowModal(false); setEditingPost(null);
+        })
+        .catch(err => alert(`Failed to update: ${JSON.stringify(err.response?.data || err.message)}`));
+      return;
+    }
+
     apiClient.post("/api/announcements/", fd)
       .then(res => { setAnnouncements([res.data, ...announcements]); setShowModal(false); setEditingDraft(null); if (editingDraft) persistDrafts(drafts.filter(d => d.id !== editingDraft.id)); })
       .catch(err => alert(`Failed to post: ${JSON.stringify(err.response?.data || err.message)}`));
@@ -523,7 +546,7 @@ function AdminAnnouncement() {
           officeName={officeName}
           profilePic={sessionStorage.getItem("adminProfilePic") || null}
           draftsCount={drafts.length}
-          onOpenComposer={() => { setEditingDraft(null); setShowModal(true); }}
+          onOpenComposer={() => { setEditingDraft(null); setEditingPost(null); setShowModal(true); }}
           onOpenDrafts={() => setShowDrafts(true)}
         />
       )}
@@ -536,9 +559,9 @@ function AdminAnnouncement() {
           {normalizedQuery ? "No announcements matched your search." : <>No announcements yet. Click <strong>Post Announcement</strong> to add one.</>}
         </div>
       )}
-      {!loading && filteredAnnouncements.map(a => <AnnouncementCard key={a.id} announcement={a} currentAdminID={adminID} onPin={handlePin} />)}
+      {!loading && filteredAnnouncements.map(a => <AnnouncementCard key={a.id} announcement={a} currentAdminID={adminID} onPin={handlePin} onEditPost={(post) => { setEditingPost(post); setShowModal(true); }} />)}
 
-      {showModal && <PostModal onClose={() => { setShowModal(false); setEditingDraft(null); }} onPost={handlePost} onSaveDraft={handleSaveDraft} editDraft={editingDraft} />}
+      {showModal && <PostModal onClose={() => { setShowModal(false); setEditingDraft(null); setEditingPost(null); }} onPost={handlePost} onSaveDraft={handleSaveDraft} editDraft={editingDraft || editingPost} />}
       {showDrafts && <DraftsPanel drafts={drafts} onEdit={d => { setEditingDraft(d); setShowDrafts(false); setShowModal(true); }} onDelete={id => persistDrafts(drafts.filter(d => d.id !== id))} onPost={d => { setEditingDraft(d); handlePost(d); setShowDrafts(false); }} onClose={() => setShowDrafts(false)} />}
     </Layout>
   );

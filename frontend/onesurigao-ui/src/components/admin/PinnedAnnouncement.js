@@ -41,12 +41,14 @@ const BuildingIcon    = () => (<svg width="12" height="12" viewBox="0 0 24 24" f
 const DotsIcon        = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>);
 const SendIcon        = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>);
 const XIcon           = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
-const Avatar = ({ officeName }) => {
-  const initials = officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase() || "SG";
+const Avatar = ({ officeName, profilePic }) => {
+  const initials = officeName?.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase() || "SG";
+  if (profilePic) return <img src={profilePic} alt={officeName} style={{ width:42, height:42, borderRadius:"50%", objectFit:"cover", flexShrink:0, boxShadow:"0 2px 6px rgba(0,0,0,0.1)" }} />;
   return (
-    <div style={{width:42,height:42,borderRadius:"50%",background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:13,fontWeight:700,fontFamily:DS.font,flexShrink:0,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
+    <div style={{ width:42, height:42, borderRadius:"50%", background:DS.primaryGrad, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:13, fontWeight:700, fontFamily:DS.font, flexShrink:0, boxShadow:"0 2px 6px rgba(43,108,176,0.25)" }}>
       {initials}
     </div>
   );
@@ -185,9 +187,9 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
       {/* Header */}
       <div style={{padding:"16px 20px 0",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <Avatar officeName={officeName}/>
+          <Avatar officeName={officeName} profilePic={announcement.admin?.profilePic || null}/>
           <div>
-            <div style={{fontWeight:700,fontSize:14,color:DS.textPrimary,fontFamily:DS.font}}>{officeName}</div>
+            <div style={{display: "flex", alignItems: "center", gap: 5, fontWeight:700,fontSize:14,color:DS.textPrimary,fontFamily:DS.font}}>{officeName} <VerifiedBadgeIcon /></div>
             <div style={{display:"flex",alignItems:"center",gap:4,marginTop:2,color:DS.textMuted,fontSize:11,fontFamily:DS.font}}>
               <ClockIcon/> {dateStr}{timeStr&&` · ${timeStr}`}
             </div>

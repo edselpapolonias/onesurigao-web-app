@@ -36,6 +36,7 @@ const PinIcon          = () => (<svg width="11" height="11" viewBox="0 0 24 24" 
 const ChevronDownIcon  = ({open}) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{transition:"transform 0.2s",transform:open?"rotate(180deg)":"rotate(0deg)"}}><polyline points="6 9 12 15 18 9"/></svg>);
 const SendIcon         = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>);
 const XIcon            = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const OfficeAvatar = ({ officeName, profilePic, size=64 }) => {
@@ -138,7 +139,7 @@ const AnnouncementCard = ({ announcement }) => {
       <div style={{position:"relative",padding:"14px 18px 0",display:"flex",alignItems:"center",gap:10}}>
         <OfficeAvatar officeName={announcement.admin?.officeName} profilePic={announcement.admin?.profilePic} size={38}/>
         <div>
-          <div style={{fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font}}>{announcement.admin?.officeName||"City of Surigao"}</div>
+          <div style={{display:"flex", alignItems:"center", gap:5, fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font}}>{announcement.admin?.officeName||"City of Surigao"} <VerifiedBadgeIcon /></div>
           <div style={{display:"flex",alignItems:"center",gap:4,color:DS.textMuted,fontSize:11,fontFamily:DS.font,marginTop:1}}>
             <ClockIcon/> {dateStr}{timeStr&&` · ${timeStr}`}
           </div>
@@ -237,7 +238,7 @@ function DepartmentPage({ Layout: LayoutComponent, backPath = -1 }) {
               {loadingOffice
                 ? <><div style={{height:16,width:"70%",background:"#EDF2F7",borderRadius:6,marginBottom:6,animation:"pulse 1.5s ease-in-out infinite"}}/><div style={{height:11,width:"40%",background:"#EDF2F7",borderRadius:6,animation:"pulse 1.5s ease-in-out infinite"}}/></>
                 : <>
-                    <div style={{fontWeight:800,fontSize:15,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.3}}>{office?.officeName}</div>
+                    <div style={{display:"flex", alignItems:"center", gap:6, fontWeight:800,fontSize:15,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.3}}>{office?.officeName} <VerifiedBadgeIcon /></div>
                     <div style={{fontSize:12,color:DS.textMuted,fontFamily:DS.font,marginTop:3}}>City Government Department</div>
                   </>
               }

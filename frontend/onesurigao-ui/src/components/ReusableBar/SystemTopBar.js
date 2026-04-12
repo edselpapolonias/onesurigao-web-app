@@ -100,10 +100,10 @@ const SystemTopBar = () => {
         onClick={() => navigate(location.pathname.startsWith("/home") ? "/home" : location.pathname.startsWith("/superadmin") ? "/superadmin/announcements" : "/announcements")}
         style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "transparent", padding: 0, cursor: "pointer", flexShrink: 0 }}
       >
-        <div style={{ width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 42, height: 42, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <img src={oneSurigaoLogo} alt="One Surigao" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
-        <div style={{ fontSize: 16, fontWeight: 900, background: "linear-gradient(135deg, #2AD4FF 0%, #004AAD 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: DS.font, letterSpacing: -0.3, whiteSpace: "nowrap", paddingRight: 4 }}>
+        <div style={{ fontSize: 22, fontWeight: 900, background: "linear-gradient(135deg, #2AD4FF 0%, #004AAD 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: DS.font, letterSpacing: -0.3, whiteSpace: "nowrap", paddingRight: 4 }}>
           ONE SURIGAO
         </div>
       </button>

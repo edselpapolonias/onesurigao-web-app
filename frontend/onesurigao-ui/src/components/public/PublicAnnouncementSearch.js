@@ -85,6 +85,7 @@ const SearchIcon = () => (
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
+const VerifiedBadgeIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="#007BFF" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}><path d="M22.5 12.5l-1.58 1.83.22 2.4-2.39.46-1.12 2.14-2.28-.9-1.92 1.48-1.92-1.48-2.28.9-1.12-2.14-2.39-.46.22-2.4-1.58-1.83 1.58-1.83-.22-2.4 2.39-.46 1.12-2.14 2.28.9 1.92-1.48 1.92 1.48 2.28-.9 1.12 2.14 2.39.46-.22 2.4 1.58 1.83z"/><path d="M9.5 12.5l2 2 4.5-4.5" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
 const MoreIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <circle cx="5" cy="12" r="2" />
@@ -285,9 +286,12 @@ const AnnouncementCard = ({ announcement }) => {
       )}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, padding: "20px 20px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-          <Avatar officeName={officeName} />
+          <Avatar officeName={officeName} profilePic={announcement.admin?.profilePic || null}/>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.3 }}>
+              <span style={{ whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",minWidth:0 }}>{officeName}</span>
+              <VerifiedBadgeIcon />
+            </div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
               <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
             </div>
@@ -317,7 +321,10 @@ const OfficeResultCard = ({ office, onOpen }) => (
   <button type="button" onClick={() => onOpen(office.adminID)} style={{ width: "100%", background: DS.card, border: "none", borderRadius: 20, padding: "16px 18px", display: "flex", alignItems: "center", gap: 14, cursor: "pointer", boxShadow: DS.shadow, transition: "transform 0.18s, box-shadow 0.18s, border-color 0.18s", textAlign: "left" }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = DS.shadowHover; }} onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = DS.shadow; }}>
     <Avatar officeName={office.officeName} profilePic={office.profilePic} />
     <div style={{ minWidth: 0, flex: 1 }}>
-      <div style={{ fontSize: 14, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{office.officeName}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 14, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.3 }}>
+        <span style={{ whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",minWidth:0 }}>{office.officeName}</span>
+        <VerifiedBadgeIcon />
+      </div>
       <div style={{ fontSize: 12, color: DS.textMuted, fontFamily: DS.font, marginTop: 3 }}>City Government Office</div>
       {office.email && <div style={{ fontSize: 12, color: DS.textSecondary, fontFamily: DS.font, marginTop: 6, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{office.email}</div>}
     </div>
