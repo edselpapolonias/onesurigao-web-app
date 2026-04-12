@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { loginPublicUser, logoutAll } from "../../services/authService";
-import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.jpg";
 
 // ─── Public Auth Context (shared across app) ──────────────────────────────────
 export const PublicAuthContext = createContext(null);
@@ -89,6 +89,7 @@ const SparkleTabIcon = () => (
   </svg>
 );
 const UserIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>);
+const MapTabIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>);
 const SettingsIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>);
 const LogoutIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>);
 const LoginIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>);
@@ -273,7 +274,7 @@ const DropdownItem = ({ icon, label, onClick, danger }) => (
 );
 
 // ─── Admin Profile Dropdown ────────────────────────────────────────────────────
-const AdminProfileDropdown = ({ name, grad, role, onLogout }) => {
+export const AdminProfileDropdown = ({ name, grad, role, onLogout }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef(null);
@@ -311,7 +312,7 @@ const AdminProfileDropdown = ({ name, grad, role, onLogout }) => {
 };
 
 // ─── Public Profile Dropdown (with auth modal) ────────────────────────────────
-const PublicProfileDropdown = () => {
+export const PublicProfileDropdown = () => {
   const { user, logout } = usePublicAuth();
   const [open, setOpen] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -443,7 +444,7 @@ const NavBar = ({ tabs, activeTab, onTabClick, grad, tone = "public" }) => {
   const { isDark } = useTheme();
 
   // Split tabs: main tabs vs "quick access" tabs (Search, AI Chat)
-  const quickAccessLabels = ["Search", "AI Chat"];
+  const quickAccessLabels = ["Search", "AI Chat", "Map"];
   const mainTabs = tabs.filter(tab => !quickAccessLabels.includes(tab.label));
   const quickTabs = tabs.filter(tab => quickAccessLabels.includes(tab.label));
 
@@ -475,8 +476,8 @@ const NavBar = ({ tabs, activeTab, onTabClick, grad, tone = "public" }) => {
 export const SurigaoNavBar = ({ officeName = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const ROUTES = { "Announcements": "/announcements", "Pinned": "/pinnedAnnouncements", "Events": "/events", "Report Problem": "/report-problem", "Hotlines": "/hotlines", "Search": "/search" };
-  const R2T = { "/announcements": "Announcements", "/pinnedAnnouncements": "Pinned", "/events": "Events", "/report-problem": "Report Problem", "/hotlines": "Hotlines", "/search": "Search" };
+  const ROUTES = { "Announcements": "/announcements", "Pinned": "/pinnedAnnouncements", "Events": "/events", "Report Problem": "/report-problem", "Hotlines": "/hotlines", "Search": "/search", "Map": "/map" };
+  const R2T = { "/announcements": "Announcements", "/pinnedAnnouncements": "Pinned", "/events": "Events", "/report-problem": "Report Problem", "/hotlines": "Hotlines", "/search": "Search", "/map": "Map" };
   const activeTab = R2T[location.pathname] || "Announcements";
   return (
     <NavBar
@@ -486,7 +487,7 @@ export const SurigaoNavBar = ({ officeName = "" }) => {
         { label: "Events", icon: <CalendarTabIcon /> },
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
-        { label: "Search", icon: <SearchIcon /> },
+        { label: "Map", icon: <MapTabIcon /> },
       ]}
       activeTab={activeTab} onTabClick={t => navigate(ROUTES[t])} grad={DS.primaryGrad}
       tone="admin" />
@@ -498,8 +499,8 @@ export const SuperAdminNavBar = ({ superAdminName = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const GRAD = "linear-gradient(135deg, #1A365D 0%, #2C5282 100%)";
-  const ROUTES = { "Announcements": "/superadmin/announcements", "Pinned": "/superadmin/pinned", "Events": "/superadmin/events", "Report Problem": "/superadmin/reports", "Hotlines": "/superadmin/hotlines", "Search": "/superadmin/search" };
-  const R2T = { "/superadmin/announcements": "Announcements", "/superadmin/pinned": "Pinned", "/superadmin/events": "Events", "/superadmin/reports": "Report Problem", "/superadmin/hotlines": "Hotlines", "/superadmin/search": "Search" };
+  const ROUTES = { "Announcements": "/superadmin/announcements", "Pinned": "/superadmin/pinned", "Events": "/superadmin/events", "Report Problem": "/superadmin/reports", "Hotlines": "/superadmin/hotlines", "Search": "/superadmin/search", "Map": "/superadmin/map" };
+  const R2T = { "/superadmin/announcements": "Announcements", "/superadmin/pinned": "Pinned", "/superadmin/events": "Events", "/superadmin/reports": "Report Problem", "/superadmin/hotlines": "Hotlines", "/superadmin/search": "Search", "/superadmin/map": "Map" };
   const activeTab = R2T[location.pathname] || "Announcements";
   return (
     <NavBar
@@ -509,7 +510,7 @@ export const SuperAdminNavBar = ({ superAdminName = "" }) => {
         { label: "Events", icon: <CalendarTabIcon /> },
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
-        { label: "Search", icon: <SearchIcon /> },
+        { label: "Map", icon: <MapTabIcon /> },
       ]}
       activeTab={activeTab} onTabClick={t => navigate(ROUTES[t])} grad={GRAD}
       tone="superadmin" />
@@ -520,8 +521,8 @@ export const SuperAdminNavBar = ({ superAdminName = "" }) => {
 export const PublicNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const ROUTES = { "Announcements": "/home", "Pinned": "/home/pinned", "Events": "/home/events", "Report Problem": "/home/report", "Hotlines": "/home/hotlines", "AI Chat": "/home/chat", "Search": "/home/search" };
-  const R2T = { "/home": "Announcements", "/home/pinned": "Pinned", "/home/events": "Events", "/home/report": "Report Problem", "/home/hotlines": "Hotlines", "/home/chat": "AI Chat", "/home/search": "Search" };
+  const ROUTES = { "Announcements": "/home", "Pinned": "/home/pinned", "Events": "/home/events", "Report Problem": "/home/report", "Hotlines": "/home/hotlines", "AI Chat": "/home/chat", "Search": "/home/search", "Map": "/home/map" };
+  const R2T = { "/home": "Announcements", "/home/pinned": "Pinned", "/home/events": "Events", "/home/report": "Report Problem", "/home/hotlines": "Hotlines", "/home/chat": "AI Chat", "/home/search": "Search", "/home/map": "Map" };
   const activeTab = R2T[location.pathname] || "Announcements";
 
   return (
@@ -533,7 +534,7 @@ export const PublicNavBar = () => {
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
         { label: "AI Chat", icon: <SparkleTabIcon /> },
-        { label: "Search", icon: <SearchIcon /> },
+        { label: "Map", icon: <MapTabIcon /> },
       ]}
       activeTab={activeTab} onTabClick={t => navigate(ROUTES[t])} grad={DS.primaryGrad}
       tone="public" />

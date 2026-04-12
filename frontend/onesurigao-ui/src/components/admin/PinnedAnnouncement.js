@@ -97,41 +97,48 @@ const CommentModal = ({ announcement, onClose }) => {
   );
 };
 
+
 // ─── Reaction Bar ─────────────────────────────────────────────────────────────
 const ReactionBar = ({ announcement }) => {
-  const [liked,setLiked]=[useState(false),useState(false)][0];const[l2,sl2]=useState(false);
-  const [disliked,setDisliked]=[useState(false),useState(false)][0];const[d2,sd2]=useState(false);
-  const [likes,setLikes]=useState(0);
-  const [dislikes,setDislikes]=useState(0);
-  const [showComments,setShowComments]=useState(false);
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [showComments, setShowComments] = useState(false);
 
-  // Simpler re-implementation to avoid closure issues
-  const [st, setSt] = useState({liked:false,disliked:false,likes:0,dislikes:0});
-  const handleLike    = () => setSt(s=>s.liked?{...s,liked:false,likes:s.likes-1}:{...s,liked:true,likes:s.likes+1,...(s.disliked?{disliked:false,dislikes:s.dislikes-1}:{})});
-  const handleDislike = () => setSt(s=>s.disliked?{...s,disliked:false,dislikes:s.dislikes-1}:{...s,disliked:true,dislikes:s.dislikes+1,...(s.liked?{liked:false,likes:s.likes-1}:{})});
+  const handleLike = () => { if (liked) { setLikes(l => l - 1); setLiked(false); } else { setLikes(l => l + 1); setLiked(true); if (disliked) { setDislikes(d => d - 1); setDisliked(false); } } };
+  const handleDislike = () => { if (disliked) { setDislikes(d => d - 1); setDisliked(false); } else { setDislikes(d => d + 1); setDisliked(true); if (liked) { setLikes(l => l - 1); setLiked(false); } } };
 
-  const btn = (active,activeColor) => ({display:"flex",alignItems:"center",gap:6,background:"none",border:"none",cursor:"pointer",fontSize:13,fontFamily:DS.font,fontWeight:active?700:500,color:active?activeColor:DS.textMuted,padding:"7px 14px",borderRadius:8,transition:"all 0.15s"});
+  const btn = (active, activeColor) => ({
+    display: "flex", alignItems: "center", gap: 6,
+    background: active ? "#F8FBFF" : "transparent", border: "none", cursor: "pointer",
+    fontSize: 12.5, fontFamily: DS.font, fontWeight: active ? 700 : 600,
+    color: active ? activeColor : DS.textMuted,
+    padding: "7px 12px", borderRadius: 12, transition: "all 0.15s",
+  });
 
   return (
     <>
-      <div style={{display:"flex",alignItems:"center",padding:"2px 8px"}}>
-        <button style={btn(st.liked,DS.primary)} onClick={handleLike}
-          onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=st.liked?DS.primary:DS.textMuted;}}>
-          <ThumbsUpIcon filled={st.liked}/> Like{st.likes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{st.likes}</span>}
-        </button>
-        <button style={btn(st.disliked,"#C53030")} onClick={handleDislike}
-          onMouseEnter={e=>{e.currentTarget.style.background="#FFF5F5";e.currentTarget.style.color="#C53030";}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=st.disliked?"#C53030":DS.textMuted;}}>
-          <ThumbsDownIcon filled={st.disliked}/> Dislike{st.dislikes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{st.dislikes}</span>}
-        </button>
-        <button style={btn(false,DS.primary)} onClick={()=>setShowComments(true)}
-          onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=DS.textMuted;}}>
-          <MessageCircleIcon/> Comment
-        </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 12px 10px", borderTop: `1px solid ${DS.border}` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
+          <button style={btn(liked, DS.primary)} onClick={handleLike}
+            onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }}
+            onMouseLeave={e => { e.currentTarget.style.background = liked ? "#F8FBFF" : "transparent"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
+            <ThumbsUpIcon filled={liked} /> Like{likes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{likes}</span>}
+          </button>
+          <button style={btn(disliked, "#C53030")} onClick={handleDislike}
+            onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = disliked ? "#F8FBFF" : "transparent"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
+            <ThumbsDownIcon filled={disliked} /> Dislike{dislikes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{dislikes}</span>}
+          </button>
+          <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)}
+            onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
+            <MessageCircleIcon /> Comment
+          </button>
+        </div>
       </div>
-      {showComments&&<CommentModal announcement={announcement} onClose={()=>setShowComments(false)}/>}
+      {showComments && <CommentModal announcement={announcement} onClose={() => setShowComments(false)} />}
     </>
   );
 };
@@ -171,10 +178,9 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
       onMouseEnter={e=>e.currentTarget.style.boxShadow=DS.shadowHover}
       onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
 
-      {/* Pinned ribbon */}
-      <div style={{position:"absolute",top:0,right:16,background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`,color:"#fff",fontSize:10,fontWeight:700,padding:"4px 10px",borderRadius:"0 0 8px 8px",fontFamily:DS.font,display:"flex",alignItems:"center",gap:4,boxShadow:"0 2px 6px rgba(43,108,176,0.3)"}}>
-        <PinSolidIcon/> PINNED
-      </div>
+      <div style={{ position: "absolute", top: 14, right: 14, background: "#E7F2FF", color: DS.primary, fontSize: 10, fontWeight: 800, padding: "5px 10px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4 }}>
+          <PinSolidIcon /> PINNED
+        </div>
 
       {/* Header */}
       <div style={{padding:"16px 20px 0",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
@@ -211,22 +217,16 @@ const PinnedCard = ({ announcement, currentAdminID, onUnpin }) => {
       </div>
 
       {/* Title */}
-      <div style={{padding:"12px 20px 6px",fontWeight:700,fontSize:16,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.4}}>{announcement.title}</div>
+      <div style={{padding:"14px 20px 0",fontWeight:700,fontSize:17,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.4}}>{announcement.title}</div>
 
       {/* Body */}
-      <div style={{padding:"0 20px 14px",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.75,whiteSpace:"pre-wrap"}}>
+      <div style={{padding:"10px 20px 0",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.8,whiteSpace:"pre-wrap"}}>
         {displayContent}
         {isLong&&<button onClick={()=>setExpanded(!expanded)} style={{display:"inline-flex",alignItems:"center",gap:4,marginLeft:6,background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:DS.pinned,fontFamily:DS.font,padding:0}}>{expanded?"Show less":"Read more"}<ChevronDownIcon open={expanded}/></button>}
       </div>
 
       {/* Media */}
       <MediaGallery media={announcement.media}/>
-
-      {/* Footer */}
-      <div style={{padding:"8px 20px",display:"flex",alignItems:"center",gap:6,borderTop:`1px solid ${DS.pinnedBorder}`,background:DS.pinnedBg}}>
-        <span style={{color:DS.pinned,display:"flex"}}><BuildingIcon/></span>
-        <span style={{fontSize:12,color:DS.primaryDark,fontFamily:DS.font}}>{officeName}</span>
-      </div>
 
       <ReactionBar announcement={announcement}/>
     </div>
@@ -260,18 +260,7 @@ function PinnedAnnouncement() {
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
 
-      <div style={{marginBottom:20}}>
-        <h2 style={{margin:0,fontSize:22,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5,display:"flex",alignItems:"center",gap:8}}>
-          <span style={{color:DS.pinned,display:"flex"}}><PinOutlineIcon filled/></span> Pinned Announcements
-        </h2>
-        <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>Important announcements pinned by city office administrators.</p>
-      </div>
-
-      {/* Hint banner */}
-      <div style={{background:DS.pinnedBg,border:`1.5px solid ${DS.pinnedBorder}`,borderRadius:10,padding:"10px 16px",marginBottom:20,fontSize:13,color:DS.primaryDark,fontFamily:DS.font,display:"flex",alignItems:"center",gap:8}}>
-        <span style={{display:"flex",color:DS.pinned,flexShrink:0}}><PinSolidIcon/></span>
-        Only administrators who posted can unpin. Use the <strong style={{marginLeft:3,marginRight:3}}>⋯</strong> menu on your card to unpin it.
-      </div>
+      
 
       {error&&<div style={{background:"#FFF5F5",border:"1.5px solid #FEB2B2",borderRadius:8,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#C53030",fontFamily:DS.font}}>⚠️ {error}</div>}
       {loading&&[1,2].map(i=><CardSkeleton key={i}/>)}

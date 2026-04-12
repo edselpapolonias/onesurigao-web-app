@@ -14,6 +14,8 @@ class Admin(models.Model):
     createdDate   = models.DateTimeField(auto_now_add=True)
     isActive      = models.BooleanField(default=True)
     profilePic    = models.ImageField(upload_to="admin_profiles/", null=True, blank=True)
+    latitude      = models.FloatField(null=True, blank=True)
+    longitude     = models.FloatField(null=True, blank=True)
 
     def set_password(self, raw_password):
         """Hash and store password."""

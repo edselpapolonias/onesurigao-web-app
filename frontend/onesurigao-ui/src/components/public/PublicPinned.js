@@ -157,9 +157,9 @@ const PinnedCard = ({ announcement }) => {
         </div>
       </div>
 
-      <div style={{padding:"12px 20px 6px",fontWeight:700,fontSize:16,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.4}}>{announcement.title}</div>
+      <div style={{padding:"14px 20px 0",fontWeight:700,fontSize:17,color:DS.textPrimary,fontFamily:DS.font,lineHeight:1.4}}>{announcement.title}</div>
 
-      <div style={{padding:"0 20px 14px",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.75,whiteSpace:"pre-wrap"}}>
+      <div style={{padding:"10px 20px 0",fontSize:14,color:DS.textSecondary,fontFamily:DS.font,lineHeight:1.8,whiteSpace:"pre-wrap"}}>
         {displayContent}
         {isLong&&<button onClick={()=>setExpanded(!expanded)} style={{display:"inline-flex",alignItems:"center",gap:4,marginLeft:6,background:"none",border:"none",cursor:"pointer",fontSize:13,fontWeight:600,color:DS.pinned,fontFamily:DS.font,padding:0}}>{expanded?"Show less":"Read more"}<ChevronDownIcon open={expanded}/></button>}
       </div>
@@ -191,12 +191,7 @@ function PublicPinned() {
   return (
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
-      <div style={{marginBottom:20}}>
-        <h2 style={{margin:0,fontSize:22,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5,display:"flex",alignItems:"center",gap:8}}>
-          <span style={{color:DS.pinned,display:"flex"}}><PinOutlineIcon/></span> Pinned Announcements
-        </h2>
-        <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>Important notices pinned by the City of Surigao</p>
-      </div>
+      
       {error&&<div style={{background:"#FFF5F5",border:"1.5px solid #FEB2B2",borderRadius:8,padding:"12px 16px",marginBottom:14,fontSize:13,color:"#C53030",fontFamily:DS.font}}>⚠️ {error}</div>}
       {loading&&[1,2,3].map(i=><CardSkeleton key={i}/>)}
       {!loading&&announcements.map(a=><PinnedCard key={a.id} announcement={a}/>)}

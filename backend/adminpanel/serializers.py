@@ -32,7 +32,7 @@ class SafeAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Admin
         fields = ["adminID", "officeName", "email", "contactNumber",
-                  "createdDate", "isActive", "profilePic"]
+                  "createdDate", "isActive", "profilePic", "latitude", "longitude"]
         read_only_fields = fields
 
 
@@ -45,8 +45,8 @@ class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Admin
         fields = ["adminID", "officeName", "username", "password",
-                  "email", "contactNumber", "createdDate", "isActive", "profilePic"]
-        read_only_fields = ["adminID", "createdDate"]
+                  "email", "contactNumber", "createdDate", "isActive", "profilePic", "latitude", "longitude"]
+        read_only_fields = ["adminID", "createdDate", "isActive"]
 
     def validate_password(self, value):
         if value:

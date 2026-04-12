@@ -6,6 +6,18 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Layout from "../ReusableBar/LayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { apiClient, changeAdminPassword } from "../../services/authService";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { MAPTILER_TILE_URL, MAPTILER_TILE_LAYER_OPTIONS, MAPTILER_ATTRIBUTION, hasMapTilerKey } from "../../utils/maptiler";
+
+// Fix default Leaflet icon paths
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl:       require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl:     require("leaflet/dist/images/marker-shadow.png"),
+});
 
 const DS = {
   primary:       "#2B6CB0",
@@ -35,6 +47,7 @@ const CalendarIcon     = () => (<svg width="15" height="15" viewBox="0 0 24 24" 
 const UserIcon         = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
 const BuildingIcon     = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1"/></svg>);
 const ThumbsUpIcon     = ({filled}) => (<svg width="15" height="15" viewBox="0 0 24 24" fill={filled?"currentColor":"none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>);
+const MapPinIcon       = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>);
 const ClockIcon        = () => (<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>);
 const MessageCircleIcon= () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>);
 const CameraIcon       = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>);
@@ -83,9 +96,40 @@ const MiniCard = ({ announcement }) => {
   );
 };
 
+
+// ─── Map Picker Component ─────────────
+const LocationPickerMap = ({ form, setForm }) => {
+  const defaultPos = [9.7848, 125.4925]; // Surigao City Center
+  const pos = form.latitude && form.longitude ? [form.latitude, form.longitude] : defaultPos;
+
+  const LocationMarker = () => {
+    useMapEvents({
+      click(e) {
+        setForm(prev => ({ ...prev, latitude: e.latlng.lat, longitude: e.latlng.lng }));
+      },
+    });
+    return form.latitude && form.longitude ? <Marker position={[form.latitude, form.longitude]} /> : null;
+  };
+
+  return (
+    <div style={{ height: 260, width: "100%", borderRadius: 12, overflow: "hidden", border: `1px solid ${DS.border}`, background: DS.bg }}>
+      {hasMapTilerKey ? (
+        <MapContainer center={pos} zoom={13} style={{ height: "100%", width: "100%", zIndex: 0 }}>
+          <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+          <LocationMarker />
+        </MapContainer>
+      ) : (
+        <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, fontSize: 13, fontFamily: DS.font }}>
+          Map missing API Key
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── Edit Profile Modal ────────────────────────────────────────────────────────
 const EditProfileModal = ({ admin, onClose, onSaved }) => {
-  const [form, setForm]       = useState({ officeName:admin.officeName||"", email:admin.email||"", contactNumber:admin.contactNumber||"", username:admin.username||"" });
+  const [form, setForm]       = useState({ officeName:admin.officeName||"", email:admin.email||"", contactNumber:admin.contactNumber||"", username:admin.username||"", latitude:admin.latitude||null, longitude:admin.longitude||null });
   const [pwForm, setPwForm]   = useState({ current:"", next:"", confirm:"" });
   const [tab, setTab]         = useState("info"); // "info" | "password"
   const [saving, setSaving]   = useState(false);
@@ -134,6 +178,7 @@ const EditProfileModal = ({ admin, onClose, onSaved }) => {
         <div style={{display:"flex",borderBottom:`1px solid ${DS.border}`,flexShrink:0}}>
           <Tab id="info" label="Profile Info"/>
           <Tab id="password" label="Change Password"/>
+          <Tab id="location" label="Location Settings"/>
         </div>
 
         <div style={{overflowY:"auto",flex:1,padding:"18px 22px"}}>
@@ -148,6 +193,21 @@ const EditProfileModal = ({ admin, onClose, onSaved }) => {
               <div><label style={labelSt}>Contact Number</label><input value={form.contactNumber} onChange={e=>setForm({...form,contactNumber:e.target.value})} style={inputSt} onFocus={e=>e.target.style.borderColor=DS.borderFocus} onBlur={e=>e.target.style.borderColor=DS.border}/></div>
               <button onClick={handleSaveInfo} disabled={saving} style={{width:"100%",padding:"11px",background:saving?"#9AB8E0":DS.primaryGrad,color:"#fff",border:"none",borderRadius:8,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:DS.font,display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginTop:4}}>
                 <SaveIcon/>{saving?"Saving...":"Save Changes"}
+              </button>
+            </div>
+          )}
+
+          
+          {tab==="location"&&(
+            <div style={{display:"flex",flexDirection:"column",gap:12}}>
+              <div style={{fontSize: 13, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.5}}>
+                Click anywhere on the map to pinpoint your exact office location. This will help citizens identify your department easier!
+              </div>
+              
+              <LocationPickerMap form={form} setForm={setForm} />
+              
+              <button onClick={handleSaveInfo} disabled={saving} style={{width:"100%",padding:"11px",background:saving?"#9AB8E0":DS.primaryGrad,color:"#fff",border:"none",borderRadius:8,cursor:saving?"not-allowed":"pointer",fontSize:13,fontWeight:700,fontFamily:DS.font,display:"flex",alignItems:"center",justifyContent:"center",gap:6,marginTop:4}}>
+                <SaveIcon/>{saving?"Saving...":"Save Location"}
               </button>
             </div>
           )}

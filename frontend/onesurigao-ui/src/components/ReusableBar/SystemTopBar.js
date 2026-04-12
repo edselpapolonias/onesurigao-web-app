@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
-import { usePublicAuth, useTheme } from "./SurigaoHeader";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.jpg";
+import { usePublicAuth, useTheme, AdminProfileDropdown, PublicProfileDropdown } from "./SurigaoHeader";
 
 const DS = {
   primary: "#0f6adf",
@@ -61,8 +61,20 @@ const SystemTopBar = () => {
   const handleSearch = event => {
     event.preventDefault();
     const normalized = query.trim();
-    navigate(normalized ? `${searchRoute}?search=${encodeURIComponent(normalized)}` : searchRoute);
+    navigate(normalized ? `${searchRoute}?q=${encodeURIComponent(normalized)}` : searchRoute);
   };
+
+  const handleAdminLogout = () => {
+    sessionStorage.clear();
+    navigate("/");
+  };
+  const handleSuperadminLogout = () => {
+    sessionStorage.clear();
+    navigate("/superadmin");
+  };
+
+  const isSuper = location.pathname.startsWith("/superadmin");
+  const isPublic = location.pathname.startsWith("/home");
 
   return (
     <header
@@ -88,10 +100,10 @@ const SystemTopBar = () => {
         onClick={() => navigate(location.pathname.startsWith("/home") ? "/home" : location.pathname.startsWith("/superadmin") ? "/superadmin/announcements" : "/announcements")}
         style={{ display: "flex", alignItems: "center", gap: 10, border: "none", background: "transparent", padding: 0, cursor: "pointer", flexShrink: 0 }}
       >
-        <div style={{ width: 32, height: 32, borderRadius: 10, background: "linear-gradient(135deg, #0f6adf 0%, #0b56b6 100%)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <img src={oneSurigaoLogo} alt="One Surigao" style={{ width: 20, height: 20, objectFit: "contain" }} />
+        <div style={{ width: 34, height: 34, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <img src={oneSurigaoLogo} alt="One Surigao" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
         </div>
-        <div style={{ fontSize: 15, fontWeight: 900, color: isDark ? "#f8fafc" : DS.textPrimary, fontFamily: DS.font, letterSpacing: -0.3, whiteSpace: "nowrap" }}>
+        <div style={{ fontSize: 16, fontWeight: 900, background: "linear-gradient(135deg, #2AD4FF 0%, #004AAD 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: DS.font, letterSpacing: -0.3, whiteSpace: "nowrap", paddingRight: 4 }}>
           ONE SURIGAO
         </div>
       </button>
@@ -119,9 +131,23 @@ const SystemTopBar = () => {
           <span style={{ position: "absolute", top: 6, right: 6, width: 8, height: 8, borderRadius: "50%", background: DS.primary, border: `2px solid ${isDark ? "#0F1724" : "#fff"}` }} />
         </button>
 
-        <div style={{ width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #0f6adf 0%, #0b56b6 100%)", color: "#fff", fontSize: 12, fontWeight: 800, fontFamily: DS.font, cursor: "pointer", flexShrink: 0 }}>
-          {badge}
-        </div>
+        {isPublic ? (
+          <PublicProfileDropdown />
+        ) : isSuper ? (
+          <AdminProfileDropdown
+            name={sessionStorage.getItem("superAdminName") || "Super Admin"}
+            grad="linear-gradient(135deg, #1A365D 0%, #2C5282 100%)"
+            role="System Administrator"
+            onLogout={handleSuperadminLogout}
+          />
+        ) : (
+          <AdminProfileDropdown
+            name={sessionStorage.getItem("officeName") || "Office"}
+            grad="linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)"
+            role="Admin"
+            onLogout={handleAdminLogout}
+          />
+        )}
       </div>
     </header>
   );

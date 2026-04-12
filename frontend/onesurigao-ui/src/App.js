@@ -33,6 +33,7 @@ import PublicChat         from "./components/public/PublicChat";
 // Shared Department Page (wraps with the correct Layout based on role)
 import DepartmentPage from "./components/shared/DepartmentPage";
 import SearchPage from "./components/shared/SearchPage";
+import AdminMap from "./components/shared/AdminMap";
 
 // Layouts (needed to pass into DepartmentPage)
 import AdminLayout      from "./components/ReusableBar/LayoutModern";
@@ -55,6 +56,7 @@ function App() {
           <Route path="/report-problem"     element={<AdminReport />} />
           <Route path="/hotlines"           element={<AdminHotlines />} />
           <Route path="/search"             element={<SearchPage mode="admin" Layout={AdminLayout} />} />
+          <Route path="/map"                element={<AdminMap mode="admin" Layout={AdminLayout} />} />
           <Route path="/profile"            element={<AdminProfilePage />} />
           {/* Admin view of a department page */}
           <Route path="/department/:adminID" element={<DepartmentPage Layout={AdminLayout} backPath="/announcements"/>} />
@@ -68,6 +70,7 @@ function App() {
           <Route path="/superadmin/reports"           element={<SuperAdminReport />} />
           <Route path="/superadmin/hotlines"          element={<SuperAdminHotlines />} />
           <Route path="/superadmin/search"            element={<SearchPage mode="superadmin" Layout={SuperAdminLayout} />} />
+          <Route path="/superadmin/map"               element={<AdminMap mode="superadmin" Layout={SuperAdminLayout} />} />
           {/* SuperAdmin view of a department page */}
           <Route path="/superadmin/department/:adminID" element={<DepartmentPage Layout={SuperAdminLayout} backPath="/superadmin/announcements"/>} />
 
@@ -84,6 +87,7 @@ function App() {
                   <Route path="hotlines"  element={<PublicHotlines />} />
                   <Route path="chat"      element={<PublicChat />} />
                   <Route path="search"    element={<SearchPage mode="public" Layout={PublicLayout} />} />
+                  <Route path="map"       element={<AdminMap mode="public" Layout={PublicLayout} />} />
                   {/* Public view of a department page */}
                   <Route path="department/:adminID" element={<DepartmentPage Layout={PublicLayout} backPath="/home"/>} />
                 </Routes>
