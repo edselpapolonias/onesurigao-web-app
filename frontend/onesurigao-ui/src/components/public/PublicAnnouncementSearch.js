@@ -9,20 +9,20 @@ const API_URL = "http://127.0.0.1:8000/public/announcements/";
 const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
 
 const DS = {
-  primary: "#2B6CB0",
-  primaryLight: "#EBF4FF",
-  primaryGrad: "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
+  primary: "#0f6adf",
+  primaryLight: "#EAF3FF",
+  primaryGrad: "linear-gradient(135deg, #0f6adf 0%, #0b56b6 100%)",
   accent: "#66B7F0",
-  accentSoft: "#E7F2FF",
-  bg: "#F5F7FA",
+  accentSoft: "#EAF3FF",
+  bg: "#f0f2f5",
   card: "#FFFFFF",
   border: "#E2E8F0",
   textPrimary: "#1A202C",
   textSecondary: "#4A5568",
   textMuted: "#718096",
-  pinned: "#2B6CB0",
-  shadow: "0 10px 26px rgba(15,23,42,0.07)",
-  shadowHover: "0 16px 34px rgba(15,23,42,0.11)",
+  pinned: "#0f6adf",
+  shadow: "0 1px 3px rgba(0,0,0,0.08)",
+  shadowHover: "0 4px 12px rgba(0,0,0,0.1)",
   shadowModal: "0 20px 60px rgba(0,0,0,0.25)",
   font: "'Segoe UI', system-ui, sans-serif",
 };
@@ -83,12 +83,6 @@ const SearchIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="7" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
-  </svg>
-);
-const GlobeIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
   </svg>
 );
 const MoreIcon = () => (
@@ -185,82 +179,73 @@ const CommentModal = ({ announcement, comments, setComments, onClose }) => {
 };
 
 const ReactionBar = ({ announcement, comments, setComments }) => {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked]       = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [likes, setLikes] = useState(12);
-  const [dislikes, setDislikes] = useState(1);
+  const [saved, setSaved]       = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = React.useRef(null);
 
-  const handleLike = () => {
-    if (liked) {
-      setLikes(value => value - 1);
-      setLiked(false);
-      return;
-    }
-    setLikes(value => value + 1);
-    setLiked(true);
-    if (disliked) {
-      setDislikes(value => value - 1);
-      setDisliked(false);
-    }
-  };
+  React.useEffect(() => {
+    const h = e => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
-  const handleDislike = () => {
-    if (disliked) {
-      setDislikes(value => value - 1);
-      setDisliked(false);
-      return;
-    }
-    setDislikes(value => value + 1);
-    setDisliked(true);
-    if (liked) {
-      setLikes(value => value - 1);
-      setLiked(false);
-    }
-  };
+  const handleLike    = () => { if (liked) { setLiked(false); } else { setLiked(true); if(disliked){setDisliked(false);} } };
+  const handleDislike = () => { if (disliked) { setDisliked(false); } else { setDisliked(true); if(liked){setLiked(false);} } };
 
   const btn = (active, activeColor) => ({
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    background: active ? "#F8FAFC" : "transparent",
-    border: "none",
-    cursor: "pointer",
-    fontSize: 12.5,
-    fontFamily: DS.font,
-    fontWeight: active ? 700 : 500,
-    color: active ? activeColor : DS.textMuted,
-    padding: "8px 12px",
-    borderRadius: 12,
-    transition: "all 0.15s",
+    display:"flex", alignItems:"center", gap:6,
+    background:"none", border:"none", cursor:"pointer",
+    fontSize:13, fontFamily:DS.font, fontWeight:active?700:500,
+    color:active?activeColor:DS.textMuted,
+    padding:"7px 14px", borderRadius:8, transition:"all 0.15s",
   });
+
+  const dropdownItem = (icon, label, onClick, active = false) => (
+    <button onClick={onClick} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? DS.primary : DS.textPrimary, fontFamily: DS.font, textAlign: "left", transition: "background 0.15s" }}
+      onMouseEnter={e => e.currentTarget.style.background = "#F7FAFF"}
+      onMouseLeave={e => e.currentTarget.style.background = "none"}>
+      <span style={{ color: active ? DS.primary : DS.textMuted, display: "flex" }}>{icon}</span>{label}
+    </button>
+  );
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingTop: 14, borderTop: `1px solid ${DS.border}`, marginTop: 16, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-          <button style={btn(liked, DS.primary)} onClick={handleLike} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = liked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = liked ? DS.primary : DS.textMuted; }}>
-            <ThumbsUpIcon filled={liked} /> Like{likes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{likes}</span>}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"2px 8px" }}>
+        <div style={{ display:"flex", alignItems:"center" }}>
+          <button style={btn(liked,DS.primary)} onClick={handleLike}
+            onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=liked?DS.primary:DS.textMuted;}}>
+            <ThumbsUpIcon filled={liked}/> Like
           </button>
-          <button style={btn(disliked, "#C53030")} onClick={handleDislike} onMouseEnter={e => { e.currentTarget.style.background = "#FFF5F5"; e.currentTarget.style.color = "#C53030"; }} onMouseLeave={e => { e.currentTarget.style.background = disliked ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = disliked ? "#C53030" : DS.textMuted; }}>
-            <ThumbsDownIcon filled={disliked} /> Dislike{dislikes > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{dislikes}</span>}
+          <button style={btn(disliked,"#C53030")} onClick={handleDislike}
+            onMouseEnter={e=>{e.currentTarget.style.background="#FFF5F5";e.currentTarget.style.color="#C53030";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=disliked?"#C53030":DS.textMuted;}}>
+            <ThumbsDownIcon filled={disliked}/> Dislike
           </button>
-          <button style={btn(false, DS.primary)} onClick={() => setShowComments(true)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
-            <MessageCircleIcon /> Comment{comments.length > 0 && <span style={{ fontSize: 12, fontWeight: 700, marginLeft: 2 }}>{comments.length}</span>}
-          </button>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <button style={btn(false, DS.primary)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = DS.textMuted; }}>
-            <ShareIcon /> Share
-          </button>
-          <button style={btn(saved, DS.primary)} onClick={() => setSaved(prev => !prev)} onMouseEnter={e => { e.currentTarget.style.background = DS.primaryLight; e.currentTarget.style.color = DS.primary; }} onMouseLeave={e => { e.currentTarget.style.background = saved ? "#F8FAFC" : "transparent"; e.currentTarget.style.color = saved ? DS.primary : DS.textMuted; }}>
-            <BookmarkIcon filled={saved} /> Save
+          <button style={btn(false,DS.primary)} onClick={()=>setShowComments(true)}
+            onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=DS.textMuted;}}>
+            <MessageCircleIcon/> Comment
           </button>
         </div>
-        <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
-          <MoreIcon />
-        </button>
+
+        <div ref={menuRef} style={{ position: "relative", alignSelf: "center", marginRight: 8 }}>
+          <button type="button" onClick={() => setMenuOpen(!menuOpen)} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${DS.border}`, background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
+            <MoreIcon />
+          </button>
+          {menuOpen && (
+            <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 0, background: DS.card, borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.14)", border: `1px solid ${DS.border}`, minWidth: 180, zIndex: 50, overflow: "hidden", animation: "fadeDown 0.16s ease" }}>
+              <style>{`@keyframes fadeDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+              <div style={{ padding: "4px 0" }}>
+                {dropdownItem(<ShareIcon />, "Share", () => setMenuOpen(false))}
+                {dropdownItem(<BookmarkIcon filled={saved} />, saved ? "Unsave" : "Save", () => { setSaved(p => !p); setMenuOpen(false); }, saved)}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       {showComments && <CommentModal announcement={announcement} comments={comments} setComments={setComments} onClose={() => setShowComments(false)} />}
     </>
@@ -268,7 +253,7 @@ const ReactionBar = ({ announcement, comments, setComments }) => {
 };
 
 const CardSkeleton = () => (
-  <div style={{ background: DS.card, borderRadius: 24, padding: "24px", marginBottom: 22, boxShadow: DS.shadow, border: `1px solid ${DS.border}` }}>
+  <div style={{ background: DS.card, borderRadius: 0, padding: "24px", borderBottom: "1px solid #f0f0f0" }}>
     <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
       <div style={{ width: 42, height: 42, borderRadius: "50%", background: "#EDF2F7", animation: "pulse 1.5s ease-in-out infinite", flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
@@ -292,29 +277,25 @@ const AnnouncementCard = ({ announcement }) => {
   const hasMedia = Array.isArray(announcement.media) && announcement.media.length > 0;
 
   return (
-    <div style={{ background: DS.card, borderRadius: 28, boxShadow: DS.shadow, marginBottom: 26, overflow: "hidden", position: "relative", border: `1px solid ${DS.border}`, transition: "box-shadow 0.2s, transform 0.2s", padding: 22 }} onMouseEnter={e => { e.currentTarget.style.boxShadow = DS.shadowHover; e.currentTarget.style.transform = "translateY(-2px)"; }} onMouseLeave={e => { e.currentTarget.style.boxShadow = DS.shadow; e.currentTarget.style.transform = "translateY(0)"; }}>
+    <div style={{ background: DS.card, borderRadius: 0, marginBottom: 0, overflow: "hidden", position: "relative", border: "none", borderBottom: "1px solid #f0f0f0", transition: "background 0.15s", padding: 0 }} onMouseEnter={e => { e.currentTarget.style.background = "#FAFBFC"; }} onMouseLeave={e => { e.currentTarget.style.background = DS.card; }}>
       {announcement.isPinned && (
-        <div style={{ position: "absolute", top: 18, right: 18, background: DS.accentSoft, color: DS.primary, fontSize: 10, fontWeight: 800, padding: "6px 10px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4 }}>
+        <div style={{ position: "absolute", top: 18, right: 18, background: DS.accentSoft, color: DS.primary, fontSize: 10, fontWeight: 800, padding: "5px 9px", borderRadius: 999, fontFamily: DS.font, display: "flex", alignItems: "center", gap: 4, zIndex: 1 }}>
           <PinIcon /> PINNED
         </div>
       )}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, padding: "20px 20px 0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
           <Avatar officeName={officeName} />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 800, fontSize: 15, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
-            <div style={{ fontSize: 12, color: DS.textSecondary, fontFamily: DS.font, marginTop: 3 }}>Public Office Update</div>
+            <div style={{ fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
               <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
             </div>
           </div>
         </div>
-        <button type="button" style={{ width: 34, height: 34, borderRadius: 12, border: `1px solid ${DS.border}`, background: "#F8FAFC", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
-          <MoreIcon />
-        </button>
       </div>
-      <div style={{ paddingTop: 16, fontWeight: 800, fontSize: 20, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.38 }}>{announcement.title}</div>
-      <div style={{ paddingTop: 10, fontSize: 14.5, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.85, whiteSpace: "pre-wrap" }}>
+      <div style={{ padding: "14px 20px 0", fontWeight: 700, fontSize: 17, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.36 }}>{announcement.title}</div>
+      <div style={{ padding: "10px 20px 0", fontSize: 14, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
         {displayContent}
         {isLong && (
           <button onClick={() => setExpanded(prev => !prev)} style={{ display: "inline-flex", alignItems: "center", gap: 4, marginLeft: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: DS.primary, fontFamily: DS.font, padding: 0 }}>
@@ -323,15 +304,10 @@ const AnnouncementCard = ({ announcement }) => {
         )}
       </div>
       {hasMedia && (
-        <div style={{ marginTop: 18, borderRadius: 24, overflow: "hidden", border: `1px solid ${DS.border}`, background: "#F4F7FB" }}>
+        <div style={{ marginTop: 18, overflow: "hidden", background: "#F4F7FB" }}>
           <MediaGallery media={announcement.media} />
         </div>
       )}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14 }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 12px", borderRadius: 999, background: "#F8FAFC", border: `1px solid ${DS.border}`, fontSize: 12, color: DS.textMuted, fontFamily: DS.font }}>
-          <BuildingIcon /> {officeName}
-        </div>
-      </div>
       <ReactionBar announcement={announcement} comments={comments} setComments={setComments} />
     </div>
   );
@@ -360,6 +336,83 @@ const EmptySearchCard = ({ query }) => (
     <div style={{ display: "flex", justifyContent: "center", color: DS.primary, marginBottom: 14 }}><SearchIcon /></div>
     <div style={{ fontSize: 16, fontWeight: 800, color: DS.textPrimary, fontFamily: DS.font, marginBottom: 6 }}>No results for "{query}"</div>
     <div style={{ fontSize: 13, color: DS.textMuted, fontFamily: DS.font }}>Try a different office name or keyword from the announcement post.</div>
+  </div>
+);
+
+const QuickComposerCard = ({ onOpenReport, onOpenEvents, onOpenSearch, onOpenChat }) => (
+  <div style={{ background: DS.card, border: `1px solid ${DS.border}`, borderRadius: 26, padding: 20, boxShadow: DS.shadow, marginBottom: 22 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+      <div style={{ width: 46, height: 46, borderRadius: "50%", background: DS.primaryGrad, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 800, fontFamily: DS.font }}>
+        OS
+      </div>
+      <button
+        type="button"
+        onClick={onOpenSearch}
+        style={{
+          flex: 1,
+          minHeight: 54,
+          border: `1px solid ${DS.border}`,
+          borderRadius: 999,
+          background: "#f0f2f5",
+          color: DS.textMuted,
+          fontSize: 14,
+          fontFamily: DS.font,
+          textAlign: "left",
+          padding: "0 18px",
+          cursor: "pointer",
+        }}
+      >
+        Share an update with your community...
+      </button>
+    </div>
+
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 28, flexWrap: "wrap" }}>
+        {[
+          { label: "Photo", onClick: onOpenSearch },
+          { label: "Video", onClick: onOpenEvents },
+          { label: "Document", onClick: onOpenChat },
+        ].map(action => (
+          <button
+            key={action.label}
+            type="button"
+            onClick={action.onClick}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: DS.textSecondary,
+              fontSize: 13.5,
+              fontWeight: 600,
+              fontFamily: DS.font,
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            {action.label}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={onOpenReport}
+        style={{
+          border: "none",
+          background: DS.primaryGrad,
+          color: "#fff",
+          borderRadius: 14,
+          minHeight: 40,
+          padding: "0 20px",
+          fontSize: 13.5,
+          fontWeight: 800,
+          fontFamily: DS.font,
+          cursor: "pointer",
+          boxShadow: "0 10px 18px rgba(15,106,223,0.22)",
+        }}
+      >
+        Post
+      </button>
+    </div>
   </div>
 );
 
@@ -394,6 +447,8 @@ function PublicAnnouncementSearch() {
   return (
     <Layout>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
+
+
       {error && <div style={{ background: "#FFF5F5", border: "1.5px solid #FEB2B2", borderRadius: 8, padding: "12px 16px", marginBottom: 14, fontSize: 13, color: "#C53030", fontFamily: DS.font }}>Failed to load announcements.</div>}
       {loading && [1, 2, 3].map(index => <CardSkeleton key={index} />)}
       {!loading && !error && hasSearch && hasSearchResults && (
@@ -419,9 +474,9 @@ function PublicAnnouncementSearch() {
         </div>
       )}
       {!loading && !error && hasSearch && !hasSearchResults && <EmptySearchCard query={searchQuery} />}
-      {!loading && !hasSearch && displayAnnouncements.map(announcement => <AnnouncementCard key={announcement.id} announcement={announcement} />)}
+      {!loading && !hasSearch && displayAnnouncements.slice(0, 6).map(announcement => <AnnouncementCard key={announcement.id} announcement={announcement} />)}
       {!loading && !error && !hasSearch && displayAnnouncements.length === 0 && (
-        <div style={{ background: DS.card, borderRadius: 12, padding: "48px 20px", textAlign: "center", color: DS.textMuted, fontSize: 14, fontFamily: DS.font, boxShadow: DS.shadow, border: `1px solid ${DS.border}` }}>
+        <div style={{ background: DS.card, borderRadius: 0, padding: "48px 20px", textAlign: "center", color: DS.textMuted, fontSize: 14, fontFamily: DS.font, border: "none", borderBottom: "1px solid #f0f0f0" }}>
           <div style={{ marginBottom: 12, color: DS.textMuted }}><BuildingIcon /></div>
           No announcements yet.
         </div>

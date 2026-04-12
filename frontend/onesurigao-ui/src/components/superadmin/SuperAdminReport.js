@@ -6,6 +6,12 @@ import SuperAdminLayout from "../ReusableBar/SuperAdminLayoutModern";
 import { apiClient } from "../../services/authService";
 import MediaGallery from "../ReusableBar/MediaGallery";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import {
+  hasMapTilerKey,
+  MAPTILER_ATTRIBUTION,
+  MAPTILER_TILE_LAYER_OPTIONS,
+  MAPTILER_TILE_URL,
+} from "../../utils/maptiler";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -18,6 +24,20 @@ let DefaultIcon = L.icon({
   iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
+
+const mapUnavailableCard = {
+  height: "100%",
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "16px",
+  background: "#F8FBFF",
+  color: "#718096",
+  fontSize: 12,
+  fontFamily: "'Segoe UI', system-ui, sans-serif",
+  textAlign: "center",
+};
 
 const ADMINS_URL = "http://127.0.0.1:8000/api/admins/";
 
@@ -142,10 +162,14 @@ const LegacyReportDetailModal = ({ report, admins, superAdminID, onClose, onAppr
             <div style={{ marginBottom: 18 }}>
               <div style={{ fontSize: 10, color: DS.textMuted, fontFamily: DS.font, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 10 }}>Map Location</div>
               <div style={{ height: 200, width: "100%", borderRadius: 12, overflow: "hidden", border: `1px solid ${DS.border}`, zIndex: 0 }}>
-                <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
-                  <Marker position={[report.latitude, report.longitude]} />
-                </MapContainer>
+                {hasMapTilerKey ? (
+                  <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
+                    <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+                    <Marker position={[report.latitude, report.longitude]} />
+                  </MapContainer>
+                ) : (
+                  <div style={mapUnavailableCard}>Set `REACT_APP_MAPTILER_API_KEY` to display this map.</div>
+                )}
               </div>
             </div>
           )}
@@ -306,10 +330,14 @@ const ReportDetailModal = ({ report, admins, superAdminID, onClose, onApprove, o
                 <div style={{ marginBottom: 18 }}>
                   <div style={{ fontSize: 10, color: DS.textMuted, fontFamily: DS.font, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 10 }}>Map Location</div>
                   <div style={{ height: 200, width: "100%", borderRadius: 12, overflow: "hidden", border: `1px solid ${DS.border}`, zIndex: 0 }}>
-                    <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
-                      <Marker position={[report.latitude, report.longitude]} />
-                    </MapContainer>
+                    {hasMapTilerKey ? (
+                      <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%" }}>
+                        <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+                        <Marker position={[report.latitude, report.longitude]} />
+                      </MapContainer>
+                    ) : (
+                      <div style={mapUnavailableCard}>Set `REACT_APP_MAPTILER_API_KEY` to display this map.</div>
+                    )}
                   </div>
                 </div>
               )}

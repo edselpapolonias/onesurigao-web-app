@@ -11,17 +11,17 @@ const DS = {
   primaryLight: "#EBF4FF",
   primaryGrad:  "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
   accent:       "#D7EEFF",
-  bg:           "#F5F7FA",
+  bg:           "#f0f2f5",
   card:         "#FFFFFF",
   border:       "#E2E8F0",
   textPrimary:  "#1A202C",
   textSecondary:"#4A5568",
   textMuted:    "#718096",
-  shadow:       "0 10px 26px rgba(15,23,42,0.08)",
+  shadow:       "0 1px 3px rgba(0,0,0,0.08)",
   font:         "'Segoe UI', system-ui, sans-serif",
 };
 
-const OfficeAvatar = ({ officeName, profilePic, size=38 }) => {
+const OfficeAvatar = ({ officeName, profilePic, size=42 }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"OF";
   if (profilePic) return <img src={profilePic} alt={officeName} style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0,boxShadow:"0 2px 6px rgba(0,0,0,0.1)"}}/>;
   return (
@@ -31,13 +31,16 @@ const OfficeAvatar = ({ officeName, profilePic, size=38 }) => {
   );
 };
 
-const GridIcon   = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>);
-const RefreshIcon= () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>);
-const PlusIcon = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>);
+const TrendIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+    <polyline points="17 6 23 6 23 12" />
+  </svg>
+);
 
 const Skel = () => (
-  <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 12px",marginBottom:10,border:"none",borderRadius:16,background:"#F8FAFD"}}>
-    <div style={{width:36,height:36,borderRadius:"50%",background:"#EDF2F7",animation:"pulse 1.5s ease-in-out infinite",flexShrink:0}}/>
+  <div style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",marginBottom:6,border:"none",borderRadius:12,background:"#F8FAFD"}}>
+    <div style={{width:42,height:42,borderRadius:"50%",background:"#EDF2F7",animation:"pulse 1.5s ease-in-out infinite",flexShrink:0}}/>
     <div style={{flex:1}}>
       <div style={{height:11,width:"70%",background:"#EDF2F7",borderRadius:6,marginBottom:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
       <div style={{height:9,width:"45%",background:"#EDF2F7",borderRadius:6,animation:"pulse 1.5s ease-in-out infinite"}}/>
@@ -108,44 +111,30 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
   };
 
   return (
-    <div style={{width:280,flexShrink:0,background:isDark?"#0F1724":DS.card,borderRadius:20,boxShadow:isDark?"0 16px 34px rgba(0,0,0,0.24)":DS.shadow,border:"none",overflow:"hidden",alignSelf:"flex-start",position:"sticky",top:14}}>
+    <div style={{width:320,flexShrink:0,background:isDark?"#0F1724":DS.card,borderRadius:16,boxShadow:isDark?"0 1px 4px rgba(0,0,0,0.2)":DS.shadow,border:`1px solid ${isDark?"#223046":DS.border}`,overflow:"hidden",alignSelf:"flex-start",position:"sticky",top:76}}>
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
 
-      <div style={{padding:"14px 16px 10px",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10}}>
+      <div style={{padding:"18px 20px 10px",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10}}>
         <div style={{flex:1}}>
-          <div style={{color:isDark?"#F8FBFF":DS.textPrimary,fontWeight:800,fontSize:15,fontFamily:DS.font}}>Suggested Offices</div>
-          <div style={{color:isDark?"#8FA1B9":DS.textMuted,fontSize:11.5,fontFamily:DS.font,marginTop:3,lineHeight:1.45}}>Quick connect and discover active offices</div>
+          <div style={{display:"flex",alignItems:"center",gap:8,color:"#C17A00",fontWeight:800,fontSize:13.5,fontFamily:DS.font}}>
+            <span style={{display:"flex"}}><TrendIcon/></span>
+            Active Departments
+          </div>
+          <div style={{color:isDark?"#8FA1B9":DS.textMuted,fontSize:12,fontFamily:DS.font,marginTop:6,lineHeight:1.5}}>Browse active city offices and open their public service pages.</div>
         </div>
-        <div style={{background:isDark?"#182435":"#F3F6FA",border:"none",borderRadius:12,width:34,height:34,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:isDark?"#A7B4C7":DS.textSecondary}}><GridIcon/></div>
       </div>
 
-      <div style={{padding:"0 16px 10px"}}>
-        <div style={{height:1,background:isDark?"#223046":"#EDF2F7"}} />
+      <div style={{padding:"0 20px 8px"}}>
+        <div style={{height:1,background:isDark?"#223046":"#e2e8f0"}} />
       </div>
 
-      <div onClick={goHome} onMouseEnter={()=>setHoveredID("all")} onMouseLeave={()=>setHoveredID(null)}
-        style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",margin:"0 12px 10px",border:"none",borderRadius:14,background:!activeAdminID?"#E7F2FF":hoveredID==="all"?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s",boxShadow:!activeAdminID?"0 8px 18px rgba(37,99,235,0.14)":"none"}}>
-        <div style={{width:42,height:42,borderRadius:14,background:!activeAdminID?DS.accent:(isDark?"#182435":"#f4f6f9"),display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"background 0.2s",color:!activeAdminID?DS.textPrimary:(isDark?"#8FA1B9":DS.textMuted)}}>
-          <GridIcon/>
-        </div>
-        <div style={{flex:1}}>
-          <div style={{fontSize:13,fontWeight:800,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,transition:"color 0.15s"}}>Explore All Offices</div>
-          <div style={{fontSize:11,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:3}}>{admins.length} available suggestions</div>
-        </div>
-        {!activeAdminID&&<span style={{fontSize:11,fontWeight:700,color:isDark?"#EAF4FF":"#1E4E8C",background:isDark?"#22496E":"#D8EAFE",padding:"5px 10px",borderRadius:999}}>Viewing</span>}
-      </div>
-
-      <div style={{padding:"2px 16px 10px",fontSize:10.5,fontWeight:700,letterSpacing:0.8,textTransform:"uppercase",color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font}}>
-        Active Offices
-      </div>
-
-      <div style={{maxHeight:"calc(100vh - 244px)",overflowY:"auto",scrollbarWidth:"thin",scrollbarColor:"#CBD5E0 #F5F7FA",padding:"0 12px 12px"}}>
-        {loading && [1,2,3,4,5].map(i=><Skel key={i}/>)}
+      <div style={{maxHeight:"calc(100vh - 240px)",overflowY:"auto",scrollbarWidth:"thin",scrollbarColor:"#CBD5E0 #F5F7FA",padding:"0 14px 10px"}}>
+        {loading && [1,2,3].map(i=><Skel key={i}/>)}
         {error && (
-          <div style={{padding:"16px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:"none",borderRadius:14}}>
+          <div style={{padding:"16px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:"none",borderRadius:12}}>
             <div style={{marginBottom:8}}>{error}</div>
             <button onClick={fetchAdmins} style={{display:"inline-flex",alignItems:"center",gap:5,background:"none",border:"none",borderRadius:8,padding:"6px 10px",cursor:"pointer",fontSize:11,color:DS.primary,fontFamily:DS.font}}>
-              <RefreshIcon/> Retry
+              Retry
             </button>
           </div>
         )}
@@ -157,21 +146,30 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
               onClick={()=>handleOfficeClick(admin.adminID)}
               onMouseEnter={()=>setHoveredID(admin.adminID)}
               onMouseLeave={()=>setHoveredID(null)}
-              style={{display:"flex",alignItems:"center",gap:10,padding:"12px 12px",marginBottom:8,border:"none",borderRadius:14,background:isActive?"#E7F2FF":isHovered?(isDark?"#111D2E":"#F8FAFC"):"transparent",cursor:"pointer",transition:"all 0.15s",boxShadow:isActive?"0 8px 16px rgba(37,99,235,0.12)":"none"}}>
-              <OfficeAvatar officeName={admin.officeName} profilePic={admin.profilePic||null}/>
+              style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",marginBottom:2,border:"none",borderRadius:12,background:isActive?(isDark?"#18314A":"#edf2f7"):isHovered?(isDark?"#111D2E":"#f7f8fa"):"transparent",cursor:"pointer",transition:"all 0.15s",boxShadow:"none"}}>
+              <div style={{position:"relative"}}>
+                <OfficeAvatar officeName={admin.officeName} profilePic={admin.profilePic||null} size={42}/>
+                <span style={{position:"absolute",right:0,bottom:0,width:12,height:12,borderRadius:"50%",background:"#16C35B",border:`2px solid ${isDark?"#0F1724":"#fff"}`}} />
+              </div>
               <div style={{overflow:"hidden",flex:1}}>
-                <div style={{fontSize:12,fontWeight:800,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.35,transition:"color 0.15s",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                <div style={{fontSize:13,fontWeight:700,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,lineHeight:1.3,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                   {admin.officeName}
                 </div>
-                <div style={{fontSize:11,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:3}}>{index < 3 ? "Suggested office" : "Recently active department"}</div>
+                <div style={{fontSize:11.5,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,marginTop:2}}>{index < 3 ? "Health & Wellness" : "Community Services"}</div>
               </div>
-              <span style={{display:"inline-flex",alignItems:"center",gap:4,flexShrink:0,fontSize:10.5,fontWeight:700,color:isDark?"#EAF4FF":"#1E4E8C",background:isDark?"#22496E":"#D8EAFE",padding:"5px 9px",borderRadius:999}}><PlusIcon/> Connect</span>
+              <span style={{display:"inline-flex",alignItems:"center",flexShrink:0,fontSize:18,color:isDark?"#6B7B90":"#CBD5E0"}}>&rsaquo;</span>
             </div>
           );
         })}
         {!loading && !error && admins.length===0 && (
-          <div style={{padding:"28px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:"none",borderRadius:14}}>No offices found.</div>
+          <div style={{padding:"28px 14px",textAlign:"center",fontSize:12,color:isDark?"#8FA1B9":DS.textMuted,fontFamily:DS.font,background:isDark?"#111D2E":"#f8fafc",border:"none",borderRadius:12}}>No offices found.</div>
         )}
+      </div>
+
+      <div style={{padding:"8px 16px 16px"}}>
+        <button onClick={goHome} style={{width:"100%",minHeight:40,borderRadius:12,border:`1px solid ${isDark?"#2B3A4F":DS.border}`,background:isDark?"#111D2E":"#fff",cursor:"pointer",fontSize:13,fontWeight:700,color:isDark?"#F8FBFF":DS.textPrimary,fontFamily:DS.font,transition:"background 0.15s"}}>
+          Explore All Offices
+        </button>
       </div>
     </div>
   );

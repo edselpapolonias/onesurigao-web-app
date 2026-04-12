@@ -2,6 +2,18 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Environment setup
+
+Create a `.env` file in `frontend/onesurigao-ui` and add:
+
+```env
+REACT_APP_API_BASE_URL=http://127.0.0.1:8000
+REACT_APP_MAPTILER_API_KEY=your_maptiler_api_key
+REACT_APP_MAPTILER_STYLE_ID=streets-v2
+```
+
+`REACT_APP_MAPTILER_API_KEY` is required for the report maps and MapTiler geocoding used by the public report form.
+
 ## Available Scripts
 
 In the project directory, you can run:

@@ -17,7 +17,7 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem("one-surigao-theme", theme);
-    document.body.style.background = theme === "dark" ? "#0B1220" : "#f7f8fb";
+    document.body.style.background = theme === "dark" ? "#0B1220" : "#f0f2f5";
   }, [theme]);
 
   return (
@@ -65,7 +65,7 @@ const DS = {
   primaryGrad: "linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)",
   accent: "#66B7F0",
   accentSoft: "#EAF5FF",
-  bg: "#F5F7FA",
+  bg: "#f0f2f5",
   card: "#FFFFFF",
   border: "#E2E8F0",
   textPrimary: "#1A202C",
@@ -77,10 +77,10 @@ const DS = {
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 const SearchIcon = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>);
-const FeedTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="3" /><line x1="8" y1="9" x2="16" y2="9" /><line x1="8" y1="13" x2="18" y2="13" /><line x1="8" y1="17" x2="14" y2="17" /></svg>);
+const FeedTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>);
 const PinTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 17v5" /><path d="M5 3h14" /><path d="M7 3c0 5 2 7 5 8-3 1-5 3-5 8" /><path d="M17 3c0 5-2 7-5 8 3 1 5 3 5 8" /></svg>);
 const CalendarTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="3" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>);
-const ReportTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" /><line x1="8" y1="7" x2="16" y2="7" /><line x1="8" y1="11" x2="16" y2="11" /></svg>);
+const ReportTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>);
 const HotlineTabIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 8.9a16 16 0 0 0 6 6l.8-.8a2 2 0 0 1 2.12-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.92z" /></svg>);
 const SparkleTabIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -397,10 +397,10 @@ const PublicProfileDropdown = () => {
 const NavTab = ({ label, icon, active, onClick, grad }) => {
   const { isDark } = useTheme();
   return (
-    <button onClick={onClick} style={{ width: "100%", minHeight: 40, padding: "0 12px", border: "none", background: active ? (isDark ? "#18314A" : "#E7F2FF") : "transparent", color: active ? (isDark ? "#F8FBFF" : "#0F172A") : (isDark ? "#A7B4C7" : "#475467"), fontWeight: active ? 700 : 600, fontSize: 12.5, letterSpacing: 0.1, cursor: "pointer", borderRadius: 12, textTransform: "none", fontFamily: DS.font, transition: "all 0.2s", whiteSpace: "nowrap", boxShadow: active ? (isDark ? "0 10px 18px rgba(8,47,73,0.26)" : "0 8px 16px rgba(37,99,235,0.12)") : "none", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10 }}
-      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = isDark ? "#111D2E" : "#F8FAFC"; e.currentTarget.style.color = isDark ? "#F8FBFF" : "#17212f"; e.currentTarget.style.transform = "translateX(2px)"; } }}
-      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = isDark ? "#A7B4C7" : "#475467"; e.currentTarget.style.transform = "translateX(0)"; } }}>
-      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 24, height: 24, borderRadius: 8, background: active ? (isDark ? "#22496E" : "#D3E8FF") : (isDark ? "#182435" : "#F3F4F6"), color: "inherit", flexShrink: 0 }}>{icon}</span>
+    <button onClick={onClick} style={{ width: "100%", minHeight: 42, padding: "10px 14px", border: "none", background: active ? (isDark ? "#18314A" : "#edf2f7") : "transparent", color: active ? (isDark ? "#F8FBFF" : "#1A202C") : (isDark ? "#A7B4C7" : "#6B7280"), fontWeight: active ? 700 : 500, fontSize: 14, cursor: "pointer", borderRadius: 10, textTransform: "none", fontFamily: DS.font, transition: "all 0.18s", whiteSpace: "nowrap", boxShadow: "none", display: "flex", alignItems: "center", justifyContent: "flex-start", gap: 10 }}
+      onMouseEnter={e => { if (!active) { e.currentTarget.style.background = isDark ? "#111D2E" : "#f0f2f5"; e.currentTarget.style.color = isDark ? "#F8FBFF" : "#1A202C"; } }}
+      onMouseLeave={e => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = isDark ? "#A7B4C7" : "#6B7280"; } }}>
+      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 8, background: "transparent", color: active ? "#2B6CB0" : "inherit", flexShrink: 0 }}>{icon}</span>
       <span>{label}</span>
     </button>
   );
@@ -442,18 +442,28 @@ const ThemeToggle = () => {
 const NavBar = ({ tabs, activeTab, onTabClick, grad, tone = "public" }) => {
   const { isDark } = useTheme();
 
+  // Split tabs: main tabs vs "quick access" tabs (Search, AI Chat)
+  const quickAccessLabels = ["Search", "AI Chat"];
+  const mainTabs = tabs.filter(tab => !quickAccessLabels.includes(tab.label));
+  const quickTabs = tabs.filter(tab => quickAccessLabels.includes(tab.label));
+
   return (
-    <nav style={{ width: 236, position: "fixed", top: 0, left: 0, bottom: 0, background: isDark ? "#0F1724" : "#FFFFFF", borderTop: "none", borderRight: `1px solid ${isDark ? "#223046" : "#E7ECF3"}`, borderBottom: "none", borderLeft: "none", borderRadius: 0, padding: "14px 10px 12px", display: "flex", flexDirection: "column", height: "100vh", boxShadow: isDark ? "0 18px 44px rgba(0,0,0,0.3)" : "0 12px 32px rgba(15,40,74,0.05)", boxSizing: "border-box", overflow: "hidden", zIndex: 100 }}>
-      <div style={{ position: "absolute", top: -56, right: -40, width: 160, height: 160, borderRadius: "50%", background: tone === "superadmin" ? (isDark ? "rgba(96,165,250,0.08)" : "rgba(26,54,93,0.04)") : (isDark ? "rgba(56,189,248,0.08)" : "rgba(49,130,206,0.04)"), pointerEvents: "none" }} />
-      <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 20, height: "100%" }}>
-        <div style={{ padding: "4px 6px 0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
-          <img src={oneSurigaoLogo} alt="One Surigao" style={{ width: 54, height: 54, objectFit: "contain", flexShrink: 0 }} />
-          <div style={{ fontSize: 14, fontWeight: 900, color: "#2B6CB0", background: "linear-gradient(135deg, #1E4E8C 0%, #4FAEEA 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", fontFamily: "'Georgia','Times New Roman',serif", lineHeight: 1.05, textTransform: "uppercase", textAlign: "center", letterSpacing: 0.4 }}>ONE SURIGAO</div>
+    <nav style={{ width: 250, position: "fixed", top: 56, left: 0, bottom: 0, background: isDark ? "#0F1724" : "#FFFFFF", borderRight: `1px solid ${isDark ? "#223046" : "#e2e8f0"}`, padding: "16px 14px 14px", display: "flex", flexDirection: "column", boxSizing: "border-box", overflow: "hidden", zIndex: 100 }}>
+      <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {mainTabs.map(tab => <NavTab key={tab.label} label={tab.label} icon={tab.icon} active={activeTab === tab.label} onClick={() => onTabClick(tab.label)} grad={grad} />)}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {tabs.map(tab => <NavTab key={tab.label} label={tab.label} icon={tab.icon} active={activeTab === tab.label} onClick={() => onTabClick(tab.label)} grad={grad} />)}
-        </div>
-        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${isDark ? "#223046" : "#EDF2F7"}`, display: "flex", justifyContent: "stretch", alignItems: "center", gap: 12 }}>
+        {quickTabs.length > 0 && (
+          <>
+            <div style={{ padding: "16px 12px 6px", fontSize: 10, fontWeight: 700, color: isDark ? "#6B7B90" : "#9CA3AF", fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 1.2 }}>
+              Quick Access
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {quickTabs.map(tab => <NavTab key={tab.label} label={tab.label === "Search" ? "Search Services" : tab.label} icon={tab.icon} active={activeTab === tab.label} onClick={() => onTabClick(tab.label)} grad={grad} />)}
+            </div>
+          </>
+        )}
+        <div style={{ marginTop: "auto", paddingTop: 16, borderTop: `1px solid ${isDark ? "#223046" : "#e2e8f0"}`, display: "flex", justifyContent: "stretch", alignItems: "center", gap: 12 }}>
           <ThemeToggle />
         </div>
       </div>
@@ -465,15 +475,15 @@ const NavBar = ({ tabs, activeTab, onTabClick, grad, tone = "public" }) => {
 export const SurigaoNavBar = ({ officeName = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const ROUTES = { "Announcement": "/announcements", "Pinned": "/pinnedAnnouncements", "Event": "/events", "Report Problem": "/report-problem", "Hotlines": "/hotlines", "Search": "/search" };
-  const R2T = { "/announcements": "Announcement", "/pinnedAnnouncements": "Pinned", "/events": "Event", "/report-problem": "Report Problem", "/hotlines": "Hotlines", "/search": "Search" };
-  const activeTab = R2T[location.pathname] || "Announcement";
+  const ROUTES = { "Announcements": "/announcements", "Pinned": "/pinnedAnnouncements", "Events": "/events", "Report Problem": "/report-problem", "Hotlines": "/hotlines", "Search": "/search" };
+  const R2T = { "/announcements": "Announcements", "/pinnedAnnouncements": "Pinned", "/events": "Events", "/report-problem": "Report Problem", "/hotlines": "Hotlines", "/search": "Search" };
+  const activeTab = R2T[location.pathname] || "Announcements";
   return (
     <NavBar
       tabs={[
-        { label: "Announcement", icon: <FeedTabIcon /> },
+        { label: "Announcements", icon: <FeedTabIcon /> },
         { label: "Pinned", icon: <PinTabIcon /> },
-        { label: "Event", icon: <CalendarTabIcon /> },
+        { label: "Events", icon: <CalendarTabIcon /> },
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
         { label: "Search", icon: <SearchIcon /> },
@@ -488,15 +498,15 @@ export const SuperAdminNavBar = ({ superAdminName = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const GRAD = "linear-gradient(135deg, #1A365D 0%, #2C5282 100%)";
-  const ROUTES = { "Announcement": "/superadmin/announcements", "Pinned": "/superadmin/pinned", "Event": "/superadmin/events", "Report Problem": "/superadmin/reports", "Hotlines": "/superadmin/hotlines", "Search": "/superadmin/search" };
-  const R2T = { "/superadmin/announcements": "Announcement", "/superadmin/pinned": "Pinned", "/superadmin/events": "Event", "/superadmin/reports": "Report Problem", "/superadmin/hotlines": "Hotlines", "/superadmin/search": "Search" };
-  const activeTab = R2T[location.pathname] || "Announcement";
+  const ROUTES = { "Announcements": "/superadmin/announcements", "Pinned": "/superadmin/pinned", "Events": "/superadmin/events", "Report Problem": "/superadmin/reports", "Hotlines": "/superadmin/hotlines", "Search": "/superadmin/search" };
+  const R2T = { "/superadmin/announcements": "Announcements", "/superadmin/pinned": "Pinned", "/superadmin/events": "Events", "/superadmin/reports": "Report Problem", "/superadmin/hotlines": "Hotlines", "/superadmin/search": "Search" };
+  const activeTab = R2T[location.pathname] || "Announcements";
   return (
     <NavBar
       tabs={[
-        { label: "Announcement", icon: <FeedTabIcon /> },
+        { label: "Announcements", icon: <FeedTabIcon /> },
         { label: "Pinned", icon: <PinTabIcon /> },
-        { label: "Event", icon: <CalendarTabIcon /> },
+        { label: "Events", icon: <CalendarTabIcon /> },
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
         { label: "Search", icon: <SearchIcon /> },
@@ -510,16 +520,16 @@ export const SuperAdminNavBar = ({ superAdminName = "" }) => {
 export const PublicNavBar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const ROUTES = { "Announcement": "/home", "Pinned": "/home/pinned", "Event": "/home/events", "Report Problem": "/home/report", "Hotlines": "/home/hotlines", "AI Chat": "/home/chat", "Search": "/home/search" };
-  const R2T = { "/home": "Announcement", "/home/pinned": "Pinned", "/home/events": "Event", "/home/report": "Report Problem", "/home/hotlines": "Hotlines", "/home/chat": "AI Chat", "/home/search": "Search" };
-  const activeTab = R2T[location.pathname] || "Announcement";
+  const ROUTES = { "Announcements": "/home", "Pinned": "/home/pinned", "Events": "/home/events", "Report Problem": "/home/report", "Hotlines": "/home/hotlines", "AI Chat": "/home/chat", "Search": "/home/search" };
+  const R2T = { "/home": "Announcements", "/home/pinned": "Pinned", "/home/events": "Events", "/home/report": "Report Problem", "/home/hotlines": "Hotlines", "/home/chat": "AI Chat", "/home/search": "Search" };
+  const activeTab = R2T[location.pathname] || "Announcements";
 
   return (
     <NavBar
       tabs={[
-        { label: "Announcement", icon: <FeedTabIcon /> },
+        { label: "Announcements", icon: <FeedTabIcon /> },
         { label: "Pinned", icon: <PinTabIcon /> },
-        { label: "Event", icon: <CalendarTabIcon /> },
+        { label: "Events", icon: <CalendarTabIcon /> },
         { label: "Report Problem", icon: <ReportTabIcon /> },
         { label: "Hotlines", icon: <HotlineTabIcon /> },
         { label: "AI Chat", icon: <SparkleTabIcon /> },

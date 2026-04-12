@@ -1,5 +1,4 @@
-// src/components/public/PublicAnnouncement.js
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import SuperAdminLayout from "../ReusableBar/SuperAdminLayoutModern";
 import MediaGallery from "../ReusableBar/MediaGallery";
@@ -35,6 +34,9 @@ const ClockIcon  = () => (<svg width="11" height="11" viewBox="0 0 24 24" fill="
 const BuildingIcon = () => (<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1"/></svg>);
 const SendIcon   = () => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>);
 const XIcon      = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
+const DotsIcon   = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>);
+const ShareIcon  = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>);
+const BookmarkIcon = ({ filled }) => (<svg width="16" height="16" viewBox="0 0 24 24" fill={filled?"currentColor":"none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>);
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
 const Avatar = ({ officeName }) => {
@@ -59,35 +61,35 @@ const CommentModal = ({ announcement, onClose }) => {
             <div style={{ fontWeight:700, fontSize:14, color:DS.textPrimary, fontFamily:DS.font }}>{announcement.title}</div>
             <div style={{ fontSize:11, color:DS.textMuted, fontFamily:DS.font, marginTop:2 }}>{announcement.admin?.officeName || "City of Surigao"}</div>
           </div>
-          <button onClick={onClose} style={{ background:DS.bg, border:`1px solid ${DS.border}`, borderRadius:"50%", width:32, height:32, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:DS.textMuted }}><XIcon /></button>
+          <button onClick={onClose} style={{ background:"none", border:"none", cursor:"pointer", color:DS.textMuted, display:"flex" }}><XIcon/></button>
         </div>
-        <div style={{ flex:1, overflowY:"auto", padding:"16px 20px" }}>
+        <div style={{ padding:"20px", overflowY:"auto", flex:1, display:"flex", flexDirection:"column" }}>
           {comments.length === 0
-            ? <div style={{ textAlign:"center", padding:"32px 0", color:DS.textMuted, fontSize:13, fontFamily:DS.font }}>
-                <div style={{ fontSize:32, marginBottom:8, color:DS.textMuted }}><MessageCircleIcon /></div>
-                No comments yet. Be the first!
-              </div>
+            ? <div style={{ textAlign:"center", padding:"40px 0", color:DS.textMuted, fontFamily:DS.font, fontSize:14 }}>
+              <div style={{ fontSize:32, marginBottom:8, color:DS.textMuted }}><MessageCircleIcon/></div>
+              No comments yet. Be the first!
+            </div>
             : <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-                {comments.map(c => (
-                  <div key={c.id} style={{ display:"flex", gap:10 }}>
-                    <div style={{ width:32, height:32, borderRadius:"50%", background:DS.primaryLight, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:DS.primary, fontSize:13, fontWeight:700, fontFamily:DS.font }}>U</div>
-                    <div style={{ background:DS.bg, borderRadius:12, padding:"8px 14px", flex:1 }}>
-                      <div style={{ fontSize:12, fontWeight:700, color:DS.textPrimary, fontFamily:DS.font, marginBottom:2 }}>Resident</div>
-                      <div style={{ fontSize:13, color:DS.textSecondary, fontFamily:DS.font, lineHeight:1.5 }}>{c.text}</div>
-                      <div style={{ fontSize:11, color:DS.textMuted, fontFamily:DS.font, marginTop:4 }}>{c.date.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit" })}</div>
-                    </div>
+              {comments.map(c => (
+                <div key={c.id} style={{ display:"flex", gap:10 }}>
+                  <div style={{ width:32, height:32, borderRadius:"50%", background:DS.primaryLight, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:DS.primary, fontSize:13, fontWeight:700, fontFamily:DS.font }}>U</div>
+                  <div style={{ background:DS.bg, borderRadius:12, padding:"8px 14px", flex:1 }}>
+                    <div style={{ fontSize:12, fontWeight:700, color:DS.textPrimary, fontFamily:DS.font, marginBottom:2 }}>Resident</div>
+                    <div style={{ fontSize:13, color:DS.textSecondary, fontFamily:DS.font, lineHeight:1.5 }}>{c.text}</div>
+                    <div style={{ fontSize:11, color:DS.textMuted, fontFamily:DS.font, marginTop:4 }}>{c.date.toLocaleTimeString("en-US",{hour:"2-digit",minute:"2-digit"})}</div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
           }
         </div>
         <div style={{ padding:"12px 20px", borderTop:`1px solid ${DS.border}`, display:"flex", gap:10, alignItems:"flex-end", flexShrink:0 }}>
           <div style={{ width:34, height:34, borderRadius:"50%", background:DS.primaryLight, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, color:DS.primary, fontSize:13, fontWeight:700, fontFamily:DS.font }}>U</div>
           <div style={{ flex:1, background:DS.bg, borderRadius:20, border:`1.5px solid ${DS.border}`, display:"flex", alignItems:"flex-end", padding:"8px 14px", gap:8 }}>
-            <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Write a comment..." onKeyDown={e => { if (e.key==="Enter"&&!e.shiftKey) { e.preventDefault(); handlePost(); } }}
-              style={{ flex:1, background:"none", border:"none", outline:"none", resize:"none", fontSize:13, fontFamily:DS.font, color:DS.textPrimary, lineHeight:1.5, maxHeight:80, minHeight:20 }} rows={1} />
+            <textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Write a comment..." onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();handlePost();}}}
+              style={{ flex:1, background:"none", border:"none", outline:"none", resize:"none", fontSize:13, fontFamily:DS.font, color:DS.textPrimary, lineHeight:1.5, maxHeight:80, minHeight:20 }} rows={1}/>
             <button onClick={handlePost} style={{ background:text.trim()?DS.primaryGrad:"#E2E8F0", border:"none", borderRadius:"50%", width:30, height:30, cursor:text.trim()?"pointer":"default", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", flexShrink:0, transition:"background 0.2s" }}>
-              <SendIcon />
+              <SendIcon/>
             </button>
           </div>
         </div>
@@ -100,12 +102,19 @@ const CommentModal = ({ announcement, onClose }) => {
 const ReactionBar = ({ announcement }) => {
   const [liked, setLiked]       = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [likes, setLikes]       = useState(0);
-  const [dislikes, setDislikes] = useState(0);
+  const [saved, setSaved]       = useState(false);
   const [showComments, setShowComments] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  const handleLike    = () => { if (liked) { setLikes(l=>l-1); setLiked(false); } else { setLikes(l=>l+1); setLiked(true); if(disliked){setDislikes(d=>d-1);setDisliked(false);} } };
-  const handleDislike = () => { if (disliked) { setDislikes(d=>d-1); setDisliked(false); } else { setDislikes(d=>d+1); setDisliked(true); if(liked){setLikes(l=>l-1);setLiked(false);} } };
+  useEffect(() => {
+    const h = e => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const handleLike    = () => { if (liked) { setLiked(false); } else { setLiked(true); if(disliked){setDisliked(false);} } };
+  const handleDislike = () => { if (disliked) { setDisliked(false); } else { setDisliked(true); if(liked){setLiked(false);} } };
 
   const btn = (active, activeColor) => ({
     display:"flex", alignItems:"center", gap:6,
@@ -115,24 +124,49 @@ const ReactionBar = ({ announcement }) => {
     padding:"7px 14px", borderRadius:8, transition:"all 0.15s",
   });
 
+  const dropdownItem = (icon, label, onClick, active = false) => (
+    <button onClick={onClick} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 500, color: active ? DS.primary : DS.textPrimary, fontFamily: DS.font, textAlign: "left", transition: "background 0.15s" }}
+      onMouseEnter={e => e.currentTarget.style.background = "#F7FAFF"}
+      onMouseLeave={e => e.currentTarget.style.background = "none"}>
+      <span style={{ color: active ? DS.primary : DS.textMuted, display: "flex" }}>{icon}</span>{label}
+    </button>
+  );
+
   return (
     <>
-      <div style={{ display:"flex", alignItems:"center", padding:"2px 8px" }}>
-        <button style={btn(liked,DS.primary)} onClick={handleLike}
-          onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=liked?DS.primary:DS.textMuted;}}>
-          <ThumbsUpIcon filled={liked}/> Like{likes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{likes}</span>}
-        </button>
-        <button style={btn(disliked,"#C53030")} onClick={handleDislike}
-          onMouseEnter={e=>{e.currentTarget.style.background="#FFF5F5";e.currentTarget.style.color="#C53030";}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=disliked?"#C53030":DS.textMuted;}}>
-          <ThumbsDownIcon filled={disliked}/> Dislike{dislikes>0&&<span style={{fontSize:12,fontWeight:700,marginLeft:2}}>{dislikes}</span>}
-        </button>
-        <button style={btn(false,DS.primary)} onClick={()=>setShowComments(true)}
-          onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
-          onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=DS.textMuted;}}>
-          <MessageCircleIcon/> Comment
-        </button>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"2px 8px" }}>
+        <div style={{ display:"flex", alignItems:"center" }}>
+          <button style={btn(liked,DS.primary)} onClick={handleLike}
+            onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=liked?DS.primary:DS.textMuted;}}>
+            <ThumbsUpIcon filled={liked}/> Like
+          </button>
+          <button style={btn(disliked,"#C53030")} onClick={handleDislike}
+            onMouseEnter={e=>{e.currentTarget.style.background="#FFF5F5";e.currentTarget.style.color="#C53030";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=disliked?"#C53030":DS.textMuted;}}>
+            <ThumbsDownIcon filled={disliked}/> Dislike
+          </button>
+          <button style={btn(false,DS.primary)} onClick={()=>setShowComments(true)}
+            onMouseEnter={e=>{e.currentTarget.style.background=DS.primaryLight;e.currentTarget.style.color=DS.primary;}}
+            onMouseLeave={e=>{e.currentTarget.style.background="none";e.currentTarget.style.color=DS.textMuted;}}>
+            <MessageCircleIcon/> Comment
+          </button>
+        </div>
+
+        <div ref={menuRef} style={{ position: "relative", alignSelf: "center", marginRight: 8 }}>
+          <button type="button" onClick={() => setMenuOpen(!menuOpen)} style={{ width: 32, height: 32, borderRadius: 10, border: `1px solid ${DS.border}`, background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: DS.textMuted, cursor: "pointer", flexShrink: 0 }}>
+            <DotsIcon />
+          </button>
+          {menuOpen && (
+            <div style={{ position: "absolute", bottom: "calc(100% + 6px)", right: 0, background: DS.card, borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.14)", border: `1px solid ${DS.border}`, minWidth: 180, zIndex: 50, overflow: "hidden", animation: "fadeDown 0.16s ease" }}>
+              <style>{`@keyframes fadeDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+              <div style={{ padding: "4px 0" }}>
+                {dropdownItem(<ShareIcon />, "Share", () => setMenuOpen(false))}
+                {dropdownItem(<BookmarkIcon filled={saved} />, saved ? "Unsave" : "Save", () => { setSaved(p => !p); setMenuOpen(false); }, saved)}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       {showComments && <CommentModal announcement={announcement} onClose={()=>setShowComments(false)}/>}
     </>
@@ -141,7 +175,7 @@ const ReactionBar = ({ announcement }) => {
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 const CardSkeleton = () => (
-  <div style={{ background:DS.card, borderRadius:12, padding:"20px", marginBottom:14, boxShadow:DS.shadow, border:`1px solid ${DS.border}` }}>
+  <div style={{ background:DS.card, borderRadius:0, padding:"20px", borderBottom:"1px solid #f0f0f0" }}>
     <div style={{ display:"flex", gap:12, marginBottom:14 }}>
       <div style={{ width:42, height:42, borderRadius:"50%", background:"#EDF2F7", animation:"pulse 1.5s ease-in-out infinite", flexShrink:0 }}/>
       <div style={{ flex:1 }}>
@@ -164,9 +198,9 @@ const AnnouncementCard = ({ announcement }) => {
   const timeStr     = createdDate?.toLocaleTimeString("en-US",{ hour:"2-digit", minute:"2-digit" })||"";
 
   return (
-    <div style={{ background:DS.card, borderRadius:12, boxShadow:DS.shadow, marginBottom:14, overflow:"hidden", position:"relative", border:`1px solid ${DS.border}`, borderLeft:announcement.isPinned?`4px solid ${DS.pinned}`:`1px solid ${DS.border}`, transition:"box-shadow 0.2s" }}
-      onMouseEnter={e=>e.currentTarget.style.boxShadow=DS.shadowHover}
-      onMouseLeave={e=>e.currentTarget.style.boxShadow=DS.shadow}>
+    <div style={{ background:DS.card, borderRadius:0, marginBottom:0, overflow:"hidden", position:"relative", border:"none", borderBottom:"1px solid #f0f0f0", transition:"background 0.15s" }}
+      onMouseEnter={e=>e.currentTarget.style.background="#FAFBFC"}
+      onMouseLeave={e=>e.currentTarget.style.background=DS.card}>
 
       {announcement.isPinned&&(
         <div style={{ position:"absolute", top:0, right:16, background:`linear-gradient(135deg,${DS.primaryDark},${DS.pinned})`, color:"#fff", fontSize:10, fontWeight:700, padding:"4px 10px", borderRadius:"0 0 8px 8px", fontFamily:DS.font, display:"flex", alignItems:"center", gap:4, boxShadow:"0 2px 6px rgba(43,108,176,0.3)" }}>
@@ -174,29 +208,30 @@ const AnnouncementCard = ({ announcement }) => {
         </div>
       )}
 
-      <div style={{ padding:"16px 20px 0", display:"flex", alignItems:"center", gap:12 }}>
-        <Avatar officeName={officeName}/>
-        <div>
-          <div style={{ fontWeight:700, fontSize:14, color:DS.textPrimary, fontFamily:DS.font }}>{officeName}</div>
-          <div style={{ display:"flex", alignItems:"center", gap:4, marginTop:2, color:DS.textMuted, fontSize:11, fontFamily:DS.font }}>
-            <ClockIcon/> {dateStr}{timeStr&&` · ${timeStr}`}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, padding: "20px 20px 0" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+          <Avatar officeName={officeName} />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontWeight: 800, fontSize: 14, color: DS.textPrimary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{officeName}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 4, color: DS.textMuted, fontSize: 11.5, fontFamily: DS.font }}>
+              <ClockIcon /> {dateStr}{timeStr && ` · ${timeStr}`}
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ padding:"12px 20px 6px", fontWeight:700, fontSize:16, color:DS.textPrimary, fontFamily:DS.font, lineHeight:1.4 }}>{announcement.title}</div>
+      <div style={{ padding: "14px 20px 0", fontWeight: 700, fontSize: 17, color: DS.textPrimary, fontFamily: DS.font, lineHeight: 1.36 }}>{announcement.title}</div>
 
-      <div style={{ padding:"0 20px 14px", fontSize:14, color:DS.textSecondary, fontFamily:DS.font, lineHeight:1.75, whiteSpace:"pre-wrap" }}>
+      <div style={{ padding: "10px 20px 0", fontSize: 14, color: DS.textSecondary, fontFamily: DS.font, lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
         {displayContent}
         {isLong&&<button onClick={()=>setExpanded(!expanded)} style={{ display:"inline-flex", alignItems:"center", gap:4, marginLeft:6, background:"none", border:"none", cursor:"pointer", fontSize:13, fontWeight:600, color:DS.primary, fontFamily:DS.font, padding:0 }}>{expanded?"Show less":"Read more"}<ChevronDownIcon open={expanded}/></button>}
       </div>
 
-      <MediaGallery media={announcement.media}/>
-
-      <div style={{ padding:"8px 20px", display:"flex", alignItems:"center", gap:6, borderTop:`1px solid ${DS.border}` }}>
-        <span style={{ color:DS.textMuted, display:"flex" }}><BuildingIcon/></span>
-        <span style={{ fontSize:12, color:DS.textMuted, fontFamily:DS.font }}>{officeName}</span>
-      </div>
+      {Array.isArray(announcement.media) && announcement.media.length > 0 && (
+        <div style={{ marginTop: 18, overflow: "hidden", background: "#F4F7FB" }}>
+          <MediaGallery media={announcement.media} />
+        </div>
+      )}
 
       <ReactionBar announcement={announcement}/>
     </div>
@@ -239,7 +274,7 @@ function SuperAdminAnnouncement() {
       {loading&&[1,2,3].map(i=><CardSkeleton key={i}/>)}
       {!loading&&filteredAnnouncements.map(a=><AnnouncementCard key={a.id} announcement={a}/>)}
       {!loading&&!error&&filteredAnnouncements.length===0&&(
-        <div style={{ background:DS.card, borderRadius:12, padding:"48px 20px", textAlign:"center", color:DS.textMuted, fontSize:14, fontFamily:DS.font, boxShadow:DS.shadow, border:`1px solid ${DS.border}` }}>
+        <div style={{ background:DS.card, borderRadius:0, padding:"48px 20px", textAlign:"center", color:DS.textMuted, fontSize:14, fontFamily:DS.font, border:"none", borderBottom:"1px solid #f0f0f0" }}>
           <div style={{ marginBottom:12, color:DS.textMuted }}><BuildingIcon/></div>
           {normalizedQuery ? "No announcements matched your search." : "No announcements yet."}
         </div>

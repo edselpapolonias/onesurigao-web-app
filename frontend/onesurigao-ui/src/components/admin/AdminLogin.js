@@ -1,7 +1,33 @@
 // src/components/admin/AdminLogin.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginAdmin } from "../../services/authService";
+
+const LOCKOUT_STORAGE_KEY = "adminLoginLockout";
+const ATTEMPTS_PER_CYCLE = 5;
+const LOCKOUT_INCREMENT_MINUTES = 3;
+
+function getLockoutState() {
+  try {
+    const stored = localStorage.getItem(LOCKOUT_STORAGE_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return { failedAttempts: 0, lockoutUntil: null };
+}
+
+function saveLockoutState(state) {
+  localStorage.setItem(LOCKOUT_STORAGE_KEY, JSON.stringify(state));
+}
+
+function clearLockoutState() {
+  localStorage.removeItem(LOCKOUT_STORAGE_KEY);
+}
+
+function formatCountdown(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -9,19 +35,64 @@ function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Lockout state
+  const [failedAttempts, setFailedAttempts] = useState(() => getLockoutState().failedAttempts);
+  const [lockoutUntil, setLockoutUntil] = useState(() => getLockoutState().lockoutUntil);
+  const [remainingSeconds, setRemainingSeconds] = useState(0);
+
+  const isLockedOut = lockoutUntil && Date.now() < lockoutUntil;
+
+  // Countdown timer
+  useEffect(() => {
+    if (!lockoutUntil) { setRemainingSeconds(0); return; }
+    const tick = () => {
+      const diff = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
+      setRemainingSeconds(diff);
+      if (diff <= 0) {
+        setLockoutUntil(null);
+        saveLockoutState({ failedAttempts, lockoutUntil: null });
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [lockoutUntil, failedAttempts]);
+
   const handleChange = (e) => {
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
     setError(""); // clear error on type
   };
 
+  const recordFailedAttempt = useCallback(() => {
+    const newCount = failedAttempts + 1;
+    setFailedAttempts(newCount);
+
+    if (newCount % ATTEMPTS_PER_CYCLE === 0) {
+      const cycle = newCount / ATTEMPTS_PER_CYCLE;
+      const lockoutMs = cycle * LOCKOUT_INCREMENT_MINUTES * 60 * 1000;
+      const until = Date.now() + lockoutMs;
+      setLockoutUntil(until);
+      saveLockoutState({ failedAttempts: newCount, lockoutUntil: until });
+    } else {
+      saveLockoutState({ failedAttempts: newCount, lockoutUntil: null });
+    }
+  }, [failedAttempts]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isLockedOut) return;
+
     setLoading(true);
     setError("");
 
     loginAdmin(loginData)
       .then((response) => {
         if (response.data.success) {
+          // Successful login — reset lockout state
+          clearLockoutState();
+          setFailedAttempts(0);
+          setLockoutUntil(null);
+
           sessionStorage.setItem("adminID", response.data.adminID);
           sessionStorage.setItem("officeName", response.data.officeName);
 
@@ -32,14 +103,19 @@ function AdminLogin() {
             },
           });
         } else {
+          recordFailedAttempt();
           setError("Invalid username or password.");
         }
       })
       .catch(() => {
+        recordFailedAttempt();
         setError("Login failed. Please try again.");
       })
       .finally(() => setLoading(false));
   };
+
+  const attemptsBeforeNextLock = ATTEMPTS_PER_CYCLE - (failedAttempts % ATTEMPTS_PER_CYCLE);
+  const disableForm = isLockedOut || loading;
 
   return (
     <>
@@ -191,6 +267,12 @@ function AdminLogin() {
           box-shadow: 0 0 0 3px rgba(59,110,246,0.12);
         }
 
+        .login-input:disabled {
+          background: #e8e8ec;
+          color: #999;
+          cursor: not-allowed;
+        }
+
         .login-error {
           background: #fef2f2;
           border: 1px solid #fecaca;
@@ -199,6 +281,55 @@ function AdminLogin() {
           padding: 10px 14px;
           border-radius: 8px;
           margin-bottom: 20px;
+          font-weight: 500;
+        }
+
+        .login-lockout-banner {
+          background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+          border: 1.5px solid #ffb74d;
+          border-radius: 12px;
+          padding: 18px 20px;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .login-lockout-icon { font-size: 28px; margin-bottom: 6px; }
+
+        .login-lockout-title {
+          font-size: 14px;
+          font-weight: 700;
+          color: #e65100;
+          margin-bottom: 4px;
+        }
+
+        .login-lockout-sub {
+          font-size: 12px;
+          color: #bf360c;
+          margin-bottom: 10px;
+        }
+
+        .login-lockout-timer {
+          font-size: 28px;
+          font-weight: 900;
+          color: #d84315;
+          font-family: 'Courier New', monospace;
+          letter-spacing: 2px;
+        }
+
+        .login-lockout-hint {
+          font-size: 11px;
+          color: #999;
+          margin-top: 6px;
+        }
+
+        .login-attempts-warning {
+          background: #fffde7;
+          border: 1.5px solid #fff176;
+          border-radius: 8px;
+          padding: 8px 14px;
+          margin-bottom: 16px;
+          font-size: 12px;
+          color: #f57f17;
           font-weight: 500;
         }
 
@@ -230,8 +361,9 @@ function AdminLogin() {
         }
 
         .login-btn:disabled {
-          opacity: 0.7;
+          opacity: 0.6;
           cursor: not-allowed;
+          box-shadow: none;
         }
 
         .login-register {
@@ -291,7 +423,20 @@ function AdminLogin() {
             <h2 className="login-welcome">Welcome back</h2>
             <p className="login-welcome-sub">Sign in to your account to continue</p>
 
-            {error && <div className="login-error">⚠ {error}</div>}
+            {/* Lockout Banner */}
+            {isLockedOut && (
+              <div className="login-lockout-banner">
+                <div className="login-lockout-icon">🔒</div>
+                <div className="login-lockout-title">Account Temporarily Locked</div>
+                <div className="login-lockout-sub">Too many failed login attempts.</div>
+                <div className="login-lockout-timer">{formatCountdown(remainingSeconds)}</div>
+                <div className="login-lockout-hint">Please wait before trying again.</div>
+              </div>
+            )}
+
+            {error && !isLockedOut && <div className="login-error">⚠ {error}</div>}
+
+
 
             <form onSubmit={handleSubmit}>
               <div className="login-field">
@@ -305,6 +450,7 @@ function AdminLogin() {
                   onChange={handleChange}
                   required
                   autoComplete="username"
+                  disabled={isLockedOut}
                 />
               </div>
 
@@ -319,15 +465,16 @@ function AdminLogin() {
                   onChange={handleChange}
                   required
                   autoComplete="current-password"
+                  disabled={isLockedOut}
                 />
               </div>
 
               <button
                 type="submit"
                 className="login-btn"
-                disabled={loading}
+                disabled={disableForm}
               >
-                {loading ? "Signing in..." : "Sign In"}
+                {isLockedOut ? "Locked" : loading ? "Signing in..." : "Sign In"}
               </button>
             </form>
 

@@ -5,7 +5,14 @@ import { apiClient, loginPublicUser, logoutAll } from "../../services/authServic
 import Layout from "../ReusableBar/PublicLayoutModern";
 import { usePublicAuth } from "../ReusableBar/SurigaoHeader";
 import MediaGallery from "../ReusableBar/MediaGallery";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
+import {
+  buildMapTilerReverseGeocodeUrl,
+  hasMapTilerKey,
+  MAPTILER_ATTRIBUTION,
+  MAPTILER_TILE_LAYER_OPTIONS,
+  MAPTILER_TILE_URL,
+} from "../../utils/maptiler";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -20,8 +27,33 @@ let DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const BASE = "http://127.0.0.1:8000/public";
+const SURIGAO_CITY_CENTER = [9.7891, 125.4952];
 
 const BARANGAYS = ["Anomar", "Balibayon", "Bonifacio", "Cagniog", "Canlanipa", "Capalayan", "Day-asan", "Ipil", "Lipata", "Mabini", "Mabua", "Mapawa", "Mat-i", "Punta Bilar", "Quezon", "Rizal", "Sabang", "Serna", "Silop", "Taft", "Togbongon", "Washington"];
+const BARANGAY_COORDS = {
+  "Anomar": [9.6803, 125.5034],
+  "Balibayon": [9.7642, 125.5245],
+  "Bonifacio": [9.7381, 125.4960],
+  "Cagniog": [9.7619, 125.5045],
+  "Canlanipa": [9.7759, 125.4928],
+  "Capalayan": [9.7404, 125.5439],
+  "Day-asan": [9.7726, 125.5508],
+  "Ipil": [9.7922, 125.4396],
+  "Lipata": [9.8128, 125.4553],
+  "Mabini": [9.6988, 125.4817],
+  "Mabua": [9.8098, 125.4409],
+  "Mapawa": [9.7288, 125.5204],
+  "Mat-i": [9.7182, 125.4768],
+  "Punta Bilar": [9.8227, 125.4443],
+  "Quezon": [9.7230, 125.5056],
+  "Rizal": [9.7823, 125.4633],
+  "Sabang": [9.7979, 125.4720],
+  "Serna": [9.7243, 125.4832],
+  "Silop": [9.7500, 125.5150],
+  "Taft": [9.7847, 125.4975],
+  "Togbongon": [9.7629, 125.4696],
+  "Washington": [9.7843, 125.4887],
+};
 const PROBLEM_CATEGORIES = {
   "Infrastructure Issues": ["Damaged Road / Potholes", "Flooding / Poor Drainage", "Broken Streetlights", "Sidewalk Obstruction", "Unsafe Bridges"],
   "Transportation Problems": ["Traffic Congestion", "Illegal Parking", "Tricycle / Multicab Overloading", "No Proper Loading/Unloading Zone", "Reckless Driving"],
@@ -86,10 +118,13 @@ const inputSt = { width: "100%", padding: "10px 14px", fontSize: 13, border: `1.
 const labelSt = { display: "block", marginBottom: 6, fontWeight: 600, fontSize: 11, color: DS.textMuted, fontFamily: DS.font, textTransform: "uppercase", letterSpacing: 0.6 };
 
 const fetchAddress = async (lat, lon, setForm) => {
+  if (!hasMapTilerKey) return;
   try {
-    const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
-    if (res.data && res.data.display_name) {
-      setForm(prev => ({ ...prev, latitude: lat, longitude: lon, location: res.data.display_name }));
+    const res = await axios.get(buildMapTilerReverseGeocodeUrl(lat, lon));
+    const feature = res.data?.features?.[0];
+    if (feature?.place_name || feature?.text) {
+      const locationLabel = feature.place_name || feature.text;
+      setForm(prev => ({ ...prev, latitude: lat, longitude: lon, location: locationLabel }));
     }
   } catch (e) {
     console.error("Reverse geocoding failed", e);
@@ -108,24 +143,44 @@ const PinDropper = ({ form, setForm }) => {
 };
 
 const MapAutoPanner = ({ barangay }) => {
-  const map = useMapEvents({});
+  const map = useMap();
+  const lastBarangayRef = useRef("");
+
   useEffect(() => {
-    if (!barangay) return;
-    const fetchCoords = async () => {
-      try {
-        const res = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=Barangay ${barangay}, Surigao City, Philippines`);
-        if (res.data && res.data.length > 0) {
-          const { lat, lon } = res.data[0];
-          map.flyTo([parseFloat(lat), parseFloat(lon)], 15, { animate: true, duration: 1.5 });
-        }
-      } catch (e) {
-        console.error("Auto pan failed", e);
-      }
-    };
-    fetchCoords();
+    if (!barangay || !hasMapTilerKey || lastBarangayRef.current === barangay) return;
+
+    lastBarangayRef.current = barangay;
+    const coords = BARANGAY_COORDS[barangay];
+    map.stop();
+    if (coords) {
+      map.setView(coords, 15, { animate: false });
+    } else {
+      map.setView(SURIGAO_CITY_CENTER, 13, { animate: false });
+    }
   }, [barangay, map]);
   return null;
 };
+
+const MapTilerSetupNotice = ({ compact = false }) => (
+  <div
+    style={{
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: compact ? "12px" : "16px",
+      background: "#F8FBFF",
+      color: DS.textMuted,
+      fontSize: 12,
+      fontFamily: DS.font,
+      textAlign: "center",
+      lineHeight: 1.6,
+    }}
+  >
+    Set `REACT_APP_MAPTILER_API_KEY` to enable the MapTiler map.
+  </div>
+);
 
 // ─── Step Indicator ───────────────────────────────────────────────────────────
 const StepIndicator = ({ currentStep }) => {
@@ -332,10 +387,14 @@ const LegacyReportDetailModal = ({ report, onClose }) => {
                 <div style={{ marginBottom: 16 }}>
                   <div style={{ fontSize: 10, color: DS.textMuted, fontFamily: DS.font, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 8 }}>Map Location</div>
                   <div style={{ height: 150, width: "100%", borderRadius: 8, overflow: "hidden", border: `1px solid ${DS.border}`, zIndex: 0 }}>
-                    <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
-                      <Marker position={[report.latitude, report.longitude]} />
-                    </MapContainer>
+                    {hasMapTilerKey ? (
+                      <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
+                        <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+                        <Marker position={[report.latitude, report.longitude]} />
+                      </MapContainer>
+                    ) : (
+                      <MapTilerSetupNotice compact />
+                    )}
                   </div>
                 </div>
               )}
@@ -459,10 +518,14 @@ const ReportDetailModal = ({ report, onClose }) => {
                 <div style={{ marginBottom: 18 }}>
                   <div style={{ fontSize: 10, color: DS.textMuted, fontFamily: DS.font, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 10 }}>Map Location</div>
                   <div style={{ height: 200, width: "100%", borderRadius: 12, overflow: "hidden", border: `1px solid ${DS.border}`, zIndex: 0 }}>
-                    <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
-                      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
-                      <Marker position={[report.latitude, report.longitude]} />
-                    </MapContainer>
+                    {hasMapTilerKey ? (
+                      <MapContainer center={[report.latitude, report.longitude]} zoom={15} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
+                        <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+                        <Marker position={[report.latitude, report.longitude]} />
+                      </MapContainer>
+                    ) : (
+                      <MapTilerSetupNotice />
+                    )}
                   </div>
                 </div>
               )}
@@ -519,7 +582,19 @@ const Step1Form = ({ form, setForm, mediaFiles, setMediaFiles, mediaPreviews, se
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
         <div>
           <label style={labelSt}>Barangay <span style={{ color: "#DC2626" }}>*</span></label>
-          <select value={form.barangay} onChange={e => setForm({ ...form, barangay: e.target.value })} style={{ ...inputSt, cursor: "pointer" }}
+          <select
+            value={form.barangay}
+            onChange={e => {
+              const nextBarangay = e.target.value;
+              const coords = BARANGAY_COORDS[nextBarangay];
+              setForm(prev => ({
+                ...prev,
+                barangay: nextBarangay,
+                latitude: coords ? coords[0] : "",
+                longitude: coords ? coords[1] : "",
+              }));
+            }}
+            style={{ ...inputSt, cursor: "pointer" }}
             onFocus={e => e.target.style.borderColor = DS.borderFocus} onBlur={e => e.target.style.borderColor = DS.border}>
             <option value="">Select Barangay</option>
             {BARANGAYS.map(b => <option key={b} value={b}>{b}</option>)}
@@ -534,11 +609,15 @@ const Step1Form = ({ form, setForm, mediaFiles, setMediaFiles, mediaPreviews, se
       <div style={{ marginBottom: 16 }}>
         <label style={labelSt}>Pinpoint Location on Map <span style={{ fontSize: 11, color: "#A0AEC0", fontWeight: 400, textTransform: "none" }}>(Tap map to set exact location)</span></label>
         <div style={{ height: 200, width: "100%", borderRadius: 8, overflow: "hidden", border: `1.5px solid ${DS.border}`, zIndex: 0 }}>
-          <MapContainer center={[9.7891, 125.4952]} zoom={13} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
-            <PinDropper form={form} setForm={setForm} />
-            <MapAutoPanner barangay={form.barangay} />
-          </MapContainer>
+          {hasMapTilerKey ? (
+            <MapContainer center={SURIGAO_CITY_CENTER} zoom={13} scrollWheelZoom={false} style={{ height: "100%", width: "100%", zIndex: 0 }}>
+              <TileLayer url={MAPTILER_TILE_URL} attribution={MAPTILER_ATTRIBUTION} {...MAPTILER_TILE_LAYER_OPTIONS} />
+              <PinDropper form={form} setForm={setForm} />
+              <MapAutoPanner barangay={form.barangay} />
+            </MapContainer>
+          ) : (
+            <MapTilerSetupNotice />
+          )}
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
