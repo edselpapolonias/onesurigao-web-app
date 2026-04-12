@@ -38,8 +38,9 @@ const SendIcon         = () => (<svg width="14" height="14" viewBox="0 0 24 24" 
 const XIcon            = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const OfficeAvatar = ({ officeName, size=64 }) => {
+const OfficeAvatar = ({ officeName, profilePic, size=64 }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"OF";
+  if (profilePic) return <img src={profilePic} alt={officeName||"Office"} style={{width:size,height:size,borderRadius:"50%",objectFit:"cover",flexShrink:0,boxShadow:"0 4px 16px rgba(43,108,176,0.3)",border:"3px solid #fff"}}/>;
   return (
     <div style={{width:size,height:size,borderRadius:"50%",background:DS.primaryGrad,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:size*0.28,fontWeight:800,fontFamily:DS.font,flexShrink:0,boxShadow:"0 4px 16px rgba(43,108,176,0.3)",border:"3px solid #fff"}}>
       {initials}
@@ -135,7 +136,7 @@ const AnnouncementCard = ({ announcement }) => {
         </div>
       )}
       <div style={{position:"relative",padding:"14px 18px 0",display:"flex",alignItems:"center",gap:10}}>
-        <OfficeAvatar officeName={announcement.admin?.officeName} size={38}/>
+        <OfficeAvatar officeName={announcement.admin?.officeName} profilePic={announcement.admin?.profilePic} size={38}/>
         <div>
           <div style={{fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font}}>{announcement.admin?.officeName||"City of Surigao"}</div>
           <div style={{display:"flex",alignItems:"center",gap:4,color:DS.textMuted,fontSize:11,fontFamily:DS.font,marginTop:1}}>
@@ -228,7 +229,7 @@ function DepartmentPage({ Layout: LayoutComponent, backPath = -1 }) {
               <div style={{position:"absolute",bottom:-28,left:20}}>
                 {loadingOffice
                   ? <div style={{width:56,height:56,borderRadius:"50%",background:"#EDF2F7",border:"3px solid #fff",animation:"pulse 1.5s ease-in-out infinite"}}/>
-                  : <OfficeAvatar officeName={office?.officeName} size={56}/>
+                  : <OfficeAvatar officeName={office?.officeName} profilePic={office?.profilePic} size={56}/>
                 }
               </div>
             </div>
@@ -264,9 +265,6 @@ function DepartmentPage({ Layout: LayoutComponent, backPath = -1 }) {
         {/* ── Right: Announcements feed ── */}
         <div style={{flex:1}}>
           <div style={{marginBottom:14}}>
-            <h2 style={{margin:0,fontSize:18,fontWeight:800,color:DS.textPrimary,fontFamily:DS.font,letterSpacing:-0.5}}>
-              {loadingOffice ? "Loading..." : `${office?.officeName || "Office"} — Posts`}
-            </h2>
             <p style={{margin:"4px 0 0",fontSize:13,color:DS.textMuted,fontFamily:DS.font}}>All announcements from this department</p>
           </div>
 

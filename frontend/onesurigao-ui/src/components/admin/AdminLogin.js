@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginAdmin } from "../../services/authService";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
+import cityhallBg from "../../assets/cityhall.jpg";
 
 const LOCKOUT_STORAGE_KEY = "adminLoginLockout";
 const ATTEMPTS_PER_CYCLE = 5;
@@ -147,8 +149,8 @@ function AdminLogin() {
           position: absolute;
           inset: 0;
           background:
-            linear-gradient(160deg, rgba(10,40,120,0.82) 0%, rgba(30,80,200,0.65) 50%, rgba(10,40,120,0.80) 100%),
-            url('https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1200&q=80') center/cover no-repeat;
+            linear-gradient(160deg, rgba(10,40,120,0.85) 0%, rgba(11,92,203,0.7) 50%, rgba(10,40,120,0.85) 100%),
+            url('${cityhallBg}') center/cover no-repeat;
           z-index: 0;
         }
 
@@ -397,10 +399,8 @@ function AdminLogin() {
 
           {/* Brand */}
           <div className="login-brand">
-            <div className="login-brand-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
+            <div className="login-brand-icon" style={{ border: "none", background: "transparent", width: 44, height: 44 }}>
+              <img src={oneSurigaoLogo} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
             </div>
             <span className="login-brand-name">One-Surigao</span>
           </div>

@@ -50,8 +50,9 @@ const VideoIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="n
 const CalendarIcon = () => (<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>);
 
 // ─── Avatar ───────────────────────────────────────────────────────────────────
-const Avatar = ({ officeName, size = 42 }) => {
+const Avatar = ({ officeName, profilePic, size = 42 }) => {
   const initials = officeName?.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase() || "SG";
+  if (profilePic) return <img src={profilePic} alt={officeName || "Admin"} style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0, boxShadow: "0 2px 6px rgba(43,108,176,0.25)" }} />;
   return (
     <div style={{ width: size, height: size, borderRadius: "50%", background: DS.primaryGrad, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: size * 0.31, fontWeight: 700, fontFamily: DS.font, flexShrink: 0, boxShadow: "0 2px 6px rgba(43,108,176,0.25)" }}>
       {initials}
@@ -277,7 +278,6 @@ const PostModal = ({ onClose, onPost, onSaveDraft, editDraft = null }) => (
           </div>
           <div>
             <span style={{ color: DS.textPrimary, fontWeight: 800, fontSize: 17, fontFamily: DS.font, display: "block", letterSpacing: -0.3 }}>{editDraft ? "Edit Announcement Draft" : "Create Announcement"}</span>
-            <span style={{ color: DS.textMuted, fontSize: 12, fontFamily: DS.font }}>{editDraft ? "Polish and publish your saved content" : "Designed to match the new feed-first dashboard"}</span>
           </div>
         </div>
         <button onClick={onClose} style={{ background: "#F5F8FC", border: `1px solid ${DS.border}`, color: DS.textSecondary, borderRadius: 12, width: 38, height: 38, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><XIcon /></button>
@@ -340,10 +340,10 @@ const DraftsPanel = ({ drafts, onEdit, onDelete, onPost, onClose }) => (
 );
 
 // ─── Announcement Card (Admin — with pin menu) ────────────────────────────────
-const ComposerCard = ({ officeName, draftsCount, onOpenComposer, onOpenDrafts }) => (
+const ComposerCard = ({ officeName, profilePic, draftsCount, onOpenComposer, onOpenDrafts }) => (
   <div style={{ background: "#FFFFFF", border: "none", borderRadius: 18, padding: "14px 16px", boxShadow: DS.shadow, marginBottom: 18 }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <Avatar officeName={officeName || "Admin"} size={44} />
+      <Avatar officeName={officeName || "Admin"} profilePic={profilePic} size={44} />
       <button onClick={onOpenComposer} style={{ flex: 1, height: 44, background: "#F8FAFC", border: "none", borderRadius: 999, cursor: "pointer", padding: "0 14px", textAlign: "left", fontSize: 13, color: DS.textMuted, fontFamily: DS.font }}>
         Share an update with your community...
       </button>
@@ -521,6 +521,7 @@ function AdminAnnouncement() {
       {!normalizedQuery && (
         <ComposerCard
           officeName={officeName}
+          profilePic={sessionStorage.getItem("adminProfilePic") || null}
           draftsCount={drafts.length}
           onOpenComposer={() => { setEditingDraft(null); setShowModal(true); }}
           onOpenDrafts={() => setShowDrafts(true)}

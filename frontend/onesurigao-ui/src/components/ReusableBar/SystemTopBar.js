@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import oneSurigaoLogo from "../../assets/one-surigao-logo.jpg";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
 import { usePublicAuth, useTheme, AdminProfileDropdown, PublicProfileDropdown } from "./SurigaoHeader";
 
 const DS = {
@@ -143,6 +143,7 @@ const SystemTopBar = () => {
         ) : (
           <AdminProfileDropdown
             name={sessionStorage.getItem("officeName") || "Office"}
+            profilePic={sessionStorage.getItem("adminProfilePic") || null}
             grad="linear-gradient(135deg, #1E4E8C 0%, #2B6CB0 100%)"
             role="Admin"
             onLogout={handleAdminLogout}

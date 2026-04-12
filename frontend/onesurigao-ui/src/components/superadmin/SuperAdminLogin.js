@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginSuperAdmin } from "../../services/authService";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
+import superadminBg from "../../assets/superadmin-bg.jpg";
 
 const LOCKOUT_STORAGE_KEY = "superAdminLoginLockout";
 const ATTEMPTS_PER_CYCLE = 5;
@@ -34,7 +36,6 @@ function SuperAdminLogin() {
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   // Lockout state
   const [failedAttempts, setFailedAttempts] = useState(() => getLockoutState().failedAttempts);
@@ -50,7 +51,6 @@ function SuperAdminLogin() {
       const diff = Math.max(0, Math.ceil((lockoutUntil - Date.now()) / 1000));
       setRemainingSeconds(diff);
       if (diff <= 0) {
-        // Lockout expired — keep failedAttempts so next cycle stacks
         setLockoutUntil(null);
         saveLockoutState({ failedAttempts, lockoutUntil: null });
       }
@@ -60,15 +60,17 @@ function SuperAdminLogin() {
     return () => clearInterval(id);
   }, [lockoutUntil, failedAttempts]);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
+  };
 
   const recordFailedAttempt = useCallback(() => {
     const newCount = failedAttempts + 1;
     setFailedAttempts(newCount);
 
-    // Check if we've hit a lockout threshold (every 5 attempts)
     if (newCount % ATTEMPTS_PER_CYCLE === 0) {
-      const cycle = newCount / ATTEMPTS_PER_CYCLE; // 1st cycle=1, 2nd=2, ...
+      const cycle = newCount / ATTEMPTS_PER_CYCLE;
       const lockoutMs = cycle * LOCKOUT_INCREMENT_MINUTES * 60 * 1000;
       const until = Date.now() + lockoutMs;
       setLockoutUntil(until);
@@ -78,8 +80,8 @@ function SuperAdminLogin() {
     }
   }, [failedAttempts]);
 
-  const handleSubmit = async () => {
-    // Block if locked out
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
     if (isLockedOut) return;
 
     if (!form.username || !form.password) { setError("Please fill in all fields."); return; }
@@ -87,7 +89,6 @@ function SuperAdminLogin() {
     try {
       const res = await loginSuperAdmin(form);
       if (res.data.success) {
-        // Successful login — reset lockout state
         clearLockoutState();
         setFailedAttempts(0);
         setLockoutUntil(null);
@@ -114,143 +115,254 @@ function SuperAdminLogin() {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const attemptsBeforeNextLock = ATTEMPTS_PER_CYCLE - (failedAttempts % ATTEMPTS_PER_CYCLE);
   const disableForm = isLockedOut || loading;
 
-  const inputStyle = {
-    width: "100%", padding: "12px 16px", fontSize: 14,
-    border: "1.5px solid #dde3ec", borderRadius: 10,
-    outline: "none", boxSizing: "border-box",
-    fontFamily: "'Segoe UI', sans-serif",
-    background: isLockedOut ? "#f0f0f0" : "#fff",
-    transition: "border-color 0.2s",
-    color: isLockedOut ? "#999" : "#1a1a1a",
-  };
-
   return (
-    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "'Segoe UI', sans-serif" }}>
-      {/* Left Panel */}
-      <div style={{
-        flex: 1, background: "linear-gradient(135deg, #0d3b7a 0%, #1a56a0 50%, #1976d2 100%)",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        padding: 48, position: "relative", overflow: "hidden",
-      }}>
-        <div style={{ position: "absolute", top: -60, left: -60, width: 300, height: 300, borderRadius: "50%", background: "rgba(255,255,255,0.04)" }} />
-        <div style={{ position: "absolute", bottom: -80, right: -80, width: 400, height: 400, borderRadius: "50%", background: "rgba(255,255,255,0.04)" }} />
-        <div style={{ textAlign: "center", zIndex: 1 }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>🛡️</div>
-          <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: "0 0 12px", letterSpacing: 1 }}>
-            SUPER ADMIN
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 14, lineHeight: 1.7, maxWidth: 280, margin: "0 auto" }}>
-            Manage approvals, oversee operations, and maintain the City of Surigao platform.
-          </p>
-          <div style={{ marginTop: 36, display: "flex", flexDirection: "column", gap: 12 }}>
-            {["Event Approvals", "Report Filtering", "Platform Oversight"].map(item => (
-              <div key={item} style={{ display: "flex", alignItems: "center", gap: 10, color: "rgba(255,255,255,0.85)", fontSize: 13 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#7ec8f7", flexShrink: 0 }} />
-                {item}
-              </div>
-            ))}
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .sa-login-root {
+          display: flex;
+          min-height: 100vh;
+          font-family: 'Manrope', sans-serif;
+          background: #f4f6fb;
+        }
+
+        .sa-login-left {
+          flex: 1;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+          padding: 48px;
+          min-height: 100vh;
+        }
+
+        .sa-login-left-bg {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(160deg, rgba(10,40,120,0.85) 0%, rgba(11,92,203,0.7) 50%, rgba(10,40,120,0.85) 100%),
+            url('${superadminBg}') center/cover no-repeat;
+          z-index: 0;
+        }
+
+        .sa-login-left-content { position: relative; z-index: 1; }
+
+        .sa-login-brand {
+          position: absolute;
+          top: 40px; left: 48px;
+          display: flex; align-items: center; gap: 10px;
+          z-index: 1;
+        }
+
+        .sa-login-headline {
+          color: #ffffff;
+          font-size: 42px; font-weight: 800;
+          line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.5px;
+        }
+
+        .sa-login-subtext {
+          color: rgba(255,255,255,0.75);
+          font-size: 15px; font-weight: 400;
+          line-height: 1.6; max-width: 380px;
+        }
+
+        .sa-login-brand-name {
+          color: #ffffff;
+          font-size: 16px; font-weight: 700; letter-spacing: 0.2px;
+        }
+
+        .sa-login-right {
+          width: 520px;
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 48px 56px;
+          background: #f4f6fb;
+        }
+
+        .sa-login-form-box { width: 100%; max-width: 400px; }
+
+        .sa-login-welcome {
+          font-size: 32px; font-weight: 800;
+          color: #0f172a; margin-bottom: 6px; letter-spacing: -0.5px;
+        }
+
+        .sa-login-welcome-sub {
+          font-size: 14px; color: #64748b;
+          margin-bottom: 36px; font-weight: 400;
+        }
+
+        .sa-login-field { margin-bottom: 20px; }
+
+        .sa-login-label {
+          display: block; font-size: 14px;
+          font-weight: 600; color: #0f172a; margin-bottom: 8px;
+        }
+
+        .sa-login-input {
+          width: 100%; padding: 14px 18px; font-size: 14px;
+          font-family: 'Manrope', sans-serif;
+          background: #eef0f6; border: 1.5px solid transparent;
+          border-radius: 12px; outline: none; color: #0f172a;
+          transition: border-color 0.2s, background 0.2s;
+        }
+
+        .sa-login-input::placeholder { color: #94a3b8; }
+        .sa-login-input:focus {
+          background: #ffffff; border-color: #3b6ef6;
+          box-shadow: 0 0 0 3px rgba(59,110,246,0.12);
+        }
+        .sa-login-input:disabled {
+          background: #e8e8ec; color: #999; cursor: not-allowed;
+        }
+
+        .sa-login-error {
+          background: #fef2f2; border: 1px solid #fecaca;
+          color: #dc2626; font-size: 13px;
+          padding: 10px 14px; border-radius: 8px;
+          margin-bottom: 20px; font-weight: 500;
+        }
+
+        .sa-login-lockout-banner {
+          background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+          border: 1.5px solid #ffb74d; border-radius: 12px;
+          padding: 18px 20px; margin-bottom: 20px; text-align: center;
+        }
+
+        .sa-login-lockout-icon { font-size: 28px; margin-bottom: 6px; }
+        .sa-login-lockout-title { font-size: 14px; font-weight: 700; color: #e65100; margin-bottom: 4px; }
+        .sa-login-lockout-sub { font-size: 12px; color: #bf360c; margin-bottom: 10px; }
+        .sa-login-lockout-timer {
+          font-size: 28px; font-weight: 900; color: #d84315;
+          font-family: 'Courier New', monospace; letter-spacing: 2px;
+        }
+        .sa-login-lockout-hint { font-size: 11px; color: #999; margin-top: 6px; }
+
+        .sa-login-btn {
+          width: 100%; padding: 15px;
+          background: linear-gradient(135deg, #3b6ef6 0%, #2554e8 100%);
+          color: #ffffff; font-size: 15px; font-weight: 700;
+          font-family: 'Manrope', sans-serif;
+          border: none; border-radius: 12px; cursor: pointer;
+          letter-spacing: 0.3px; margin-top: 8px;
+          transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+          box-shadow: 0 4px 16px rgba(59,110,246,0.35);
+        }
+
+        .sa-login-btn:hover:not(:disabled) {
+          opacity: 0.93; transform: translateY(-1px);
+          box-shadow: 0 6px 20px rgba(59,110,246,0.4);
+        }
+        .sa-login-btn:active:not(:disabled) { transform: translateY(0); }
+        .sa-login-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+        .sa-login-register {
+          text-align: center; margin-top: 24px;
+          font-size: 14px; color: #64748b;
+        }
+        .sa-login-register a { color: #3b6ef6; font-weight: 700; text-decoration: none; }
+        .sa-login-register a:hover { text-decoration: underline; }
+
+        @media (max-width: 768px) {
+          .sa-login-left { display: none; }
+          .sa-login-right { width: 100%; padding: 32px 24px; }
+        }
+      `}</style>
+
+      <div className="sa-login-root">
+
+        {/* ── Left Panel ── */}
+        <div className="sa-login-left">
+          <div className="sa-login-left-bg" />
+
+          {/* Brand */}
+          <div className="sa-login-brand">
+            <div style={{ width: 44, height: 44, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <img src={oneSurigaoLogo} alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+            </div>
+            <span className="sa-login-brand-name">One-Surigao</span>
+          </div>
+
+          {/* Bottom content */}
+          <div className="sa-login-left-content">
+            <h1 className="sa-login-headline">
+              Super Admin<br />Control Panel
+            </h1>
+            <p className="sa-login-subtext">
+              Manage approvals, oversee operations, and maintain the City of Surigao platform.
+            </p>
           </div>
         </div>
-      </div>
 
-      {/* Right Panel */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 48, background: "#f8fafd" }}>
-        <div style={{ width: "100%", maxWidth: 400 }}>
-          <div style={{ marginBottom: 36 }}>
-            <h2 style={{ margin: 0, fontSize: 26, fontWeight: 900, color: "#1a1a1a" }}>Sign In</h2>
-            <p style={{ margin: "6px 0 0", fontSize: 14, color: "#888" }}>Super Admin Portal — City of Surigao</p>
-          </div>
+        {/* ── Right Panel ── */}
+        <div className="sa-login-right">
+          <div className="sa-login-form-box">
+            <h2 className="sa-login-welcome">Welcome back</h2>
+            <p className="sa-login-welcome-sub">Sign in to the Super Admin portal</p>
 
-          {/* Lockout Banner */}
-          {isLockedOut && (
-            <div style={{
-              background: "linear-gradient(135deg, #fff3e0, #ffe0b2)", border: "1.5px solid #ffb74d",
-              borderRadius: 10, padding: "14px 18px", marginBottom: 18, textAlign: "center",
-            }}>
-              <div style={{ fontSize: 28, marginBottom: 6 }}>🔒</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#e65100", marginBottom: 4 }}>
-                Account Temporarily Locked
+            {/* Lockout Banner */}
+            {isLockedOut && (
+              <div className="sa-login-lockout-banner">
+                <div className="sa-login-lockout-icon">🔒</div>
+                <div className="sa-login-lockout-title">Account Temporarily Locked</div>
+                <div className="sa-login-lockout-sub">Too many failed login attempts.</div>
+                <div className="sa-login-lockout-timer">{formatCountdown(remainingSeconds)}</div>
+                <div className="sa-login-lockout-hint">Please wait before trying again.</div>
               </div>
-              <div style={{ fontSize: 12, color: "#bf360c", marginBottom: 8 }}>
-                Too many failed login attempts.
+            )}
+
+            {error && !isLockedOut && <div className="sa-login-error">⚠ {error}</div>}
+
+            <form onSubmit={handleSubmit}>
+              <div className="sa-login-field">
+                <label className="sa-login-label">Username</label>
+                <input
+                  className="sa-login-input"
+                  type="text" name="username"
+                  placeholder="Enter your username"
+                  value={form.username}
+                  onChange={handleChange}
+                  required autoComplete="username"
+                  disabled={isLockedOut}
+                />
               </div>
-              <div style={{
-                fontSize: 28, fontWeight: 900, color: "#d84315",
-                fontFamily: "'Courier New', monospace", letterSpacing: 2,
-              }}>
-                {formatCountdown(remainingSeconds)}
+
+              <div className="sa-login-field">
+                <label className="sa-login-label">Password</label>
+                <input
+                  className="sa-login-input"
+                  type="password" name="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange}
+                  required autoComplete="current-password"
+                  disabled={isLockedOut}
+                />
               </div>
-              <div style={{ fontSize: 11, color: "#999", marginTop: 4 }}>
-                Please wait before trying again.
-              </div>
-            </div>
-          )}
 
-          {error && !isLockedOut && (
-            <div style={{ background: "#fff3f3", border: "1.5px solid #ffcdd2", borderRadius: 8, padding: "10px 14px", marginBottom: 18, fontSize: 13, color: "#c62828" }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-
-
-          <div style={{ marginBottom: 16 }}>
-            <label style={{ display: "block", marginBottom: 6, fontWeight: 600, fontSize: 12, color: "#555", textTransform: "uppercase", letterSpacing: 0.5 }}>Username</label>
-            <input
-              name="username" value={form.username} onChange={handleChange}
-              placeholder="Enter your username" style={inputStyle}
-              disabled={isLockedOut}
-              onFocus={e => { if (!isLockedOut) e.target.style.borderColor = "#1976d2"; }}
-              onBlur={e => e.target.style.borderColor = "#dde3ec"}
-              onKeyDown={e => e.key === "Enter" && handleSubmit()}
-            />
-          </div>
-
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ display: "block", marginBottom: 6, fontWeight: 600, fontSize: 12, color: "#555", textTransform: "uppercase", letterSpacing: 0.5 }}>Password</label>
-            <div style={{ position: "relative" }}>
-              <input
-                name="password" type={showPassword ? "text" : "password"}
-                value={form.password} onChange={handleChange}
-                placeholder="Enter your password"
-                style={{ ...inputStyle, paddingRight: 48 }}
-                disabled={isLockedOut}
-                onFocus={e => { if (!isLockedOut) e.target.style.borderColor = "#1976d2"; }}
-                onBlur={e => e.target.style.borderColor = "#dde3ec"}
-                onKeyDown={e => e.key === "Enter" && handleSubmit()}
-              />
-              <button onClick={() => setShowPassword(!showPassword)}
-                style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#aaa", fontSize: 13, fontWeight: 600 }}>
-                {showPassword ? "Hide" : "Show"}
+              <button type="submit" className="sa-login-btn" disabled={disableForm}>
+                {isLockedOut ? "Locked" : loading ? "Signing in..." : "Sign In"}
               </button>
+            </form>
+
+            <div className="sa-login-register">
+              Don't have an account?{" "}
+              <Link to="/superadmin/register">Create an account</Link>
             </div>
           </div>
-
-          <button
-            onClick={handleSubmit} disabled={disableForm}
-            style={{
-              width: "100%", padding: "13px", fontSize: 14, fontWeight: 700,
-              background: disableForm ? "#9ab8e0" : "linear-gradient(135deg, #0d3b7a, #1976d2)",
-              color: "#fff", border: "none", borderRadius: 10, cursor: disableForm ? "not-allowed" : "pointer",
-              boxShadow: disableForm ? "none" : "0 4px 14px rgba(25,118,210,0.35)", transition: "all 0.2s", letterSpacing: 0.5,
-              opacity: isLockedOut ? 0.6 : 1,
-            }}
-          >
-            {isLockedOut ? "Locked" : loading ? "Signing in..." : "Sign In"}
-          </button>
-
-          <p style={{ textAlign: "center", marginTop: 24, fontSize: 13, color: "#888" }}>
-            No account?{" "}
-            <Link to="/superadmin/register" style={{ color: "#1976d2", fontWeight: 700, textDecoration: "none" }}>
-              Create one
-            </Link>
-          </p>
         </div>
+
       </div>
-    </div>
+    </>
   );
 }
 

@@ -116,7 +116,7 @@ export const DepartmentSidebar = ({ selectedAdminID = null, onOfficeFilter = nul
 
       <div style={{padding:"18px 20px 10px",display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:10}}>
         <div style={{flex:1}}>
-          <div style={{display:"flex",alignItems:"center",gap:8,color:"#C17A00",fontWeight:800,fontSize:13.5,fontFamily:DS.font}}>
+          <div style={{display:"flex",alignItems:"center",gap:8,color:DS.primary,fontWeight:800,fontSize:13.5,fontFamily:DS.font}}>
             <span style={{display:"flex"}}><TrendIcon/></span>
             Active Departments
           </div>

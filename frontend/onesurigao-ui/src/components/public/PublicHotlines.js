@@ -26,6 +26,35 @@ const ChevronIcon  = ({ open }) => (<svg width="16" height="16" viewBox="0 0 24 
 const HeadphonesIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>);
 const AlertTriangleIcon = () => (<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>);
 
+// ─── Category SVG Icons ───────────────────────────────────────────────────────
+const CategoryPhoneIcon    = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.4a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11l-.8.87a16 16 0 0 0 6 6l.81-.81a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>);
+const CategoryAlertIcon    = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>);
+const CategoryBuildingIcon = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 22V12h6v10M9 7h1M14 7h1M9 12h1M14 12h1"/></svg>);
+const CategoryShieldIcon   = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3 4 7v5c0 5 3.4 9.7 8 11 4.6-1.3 8-6 8-11V7l-8-4Z"/></svg>);
+const CategoryBoltIcon     = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>);
+const CategoryGlobeIcon    = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>);
+const CategoryUsersIcon    = ({ size = 18 }) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>);
+
+const CATEGORY_ICON_MAP = [
+  { value: "\uD83D\uDCDE", Icon: CategoryPhoneIcon },
+  { value: "\uD83D\uDEA8", Icon: CategoryAlertIcon },
+  { value: "\uD83C\uDFE5", Icon: CategoryBuildingIcon },
+  { value: "\uD83D\uDD12", Icon: CategoryShieldIcon },
+  { value: "\u26A1",       Icon: CategoryBoltIcon },
+  { value: "\uD83C\uDF10", Icon: CategoryGlobeIcon },
+  { value: "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1", Icon: CategoryUsersIcon },
+];
+const CATEGORY_ICON_ALIASES = {
+  "\uD83D\uDE92": CategoryAlertIcon, "\uD83D\uDE91": CategoryAlertIcon, "\uD83D\uDE93": CategoryAlertIcon,
+  "\uD83D\uDCA1": CategoryBoltIcon, "\uD83C\uDFEB": CategoryBuildingIcon, "\uD83C\uDF0A": CategoryAlertIcon,
+  "\uD83D\uDDD1\uFE0F": CategoryBuildingIcon, "\uD83D\uDEA6": CategoryAlertIcon,
+  "\uD83D\uDEE1\uFE0F": CategoryShieldIcon, "\uD83D\uDCDD": CategoryBuildingIcon,
+};
+const resolveCategoryIcon = iconValue =>
+  CATEGORY_ICON_ALIASES[iconValue] ||
+  CATEGORY_ICON_MAP.find(opt => opt.value === iconValue)?.Icon ||
+  CategoryPhoneIcon;
+
 const HotlineCard = ({ hotline }) => (
   <div style={{background:DS.card,border:`1.5px solid ${DS.border}`,borderRadius:10,padding:"14px 16px",transition:"border-color 0.2s, box-shadow 0.2s, transform 0.2s"}}
     onMouseEnter={e=>{e.currentTarget.style.borderColor=DS.primary;e.currentTarget.style.boxShadow=DS.shadowHover;e.currentTarget.style.transform="translateY(-1px)";}}
@@ -44,6 +73,7 @@ const HotlineCard = ({ hotline }) => (
 
 const CategoryAccordion = ({ category, defaultOpen }) => {
   const [open, setOpen] = useState(defaultOpen);
+  const CatIcon = resolveCategoryIcon(category.icon);
   return (
     <div style={{background:DS.card,borderRadius:12,boxShadow:DS.shadow,marginBottom:12,overflow:"hidden",border:`1px solid ${DS.border}`,transition:"box-shadow 0.2s"}}
       onMouseEnter={e=>e.currentTarget.style.boxShadow=DS.shadowHover}
@@ -52,7 +82,7 @@ const CategoryAccordion = ({ category, defaultOpen }) => {
         onMouseEnter={e=>e.currentTarget.style.background="#EBF4FF"}
         onMouseLeave={e=>e.currentTarget.style.background=open?"#F7FAFF":DS.card}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:36,height:36,borderRadius:"50%",background:DS.primaryLight,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>{category.icon}</div>
+          <div style={{width:36,height:36,borderRadius:"50%",background:DS.primaryLight,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:DS.primary}}><CatIcon size={18}/></div>
           <span style={{fontWeight:700,fontSize:13,color:DS.textPrimary,fontFamily:DS.font,textTransform:"uppercase",letterSpacing:0.5}}>{category.name}</span>
           <span style={{fontSize:11,background:DS.primaryLight,color:DS.primary,borderRadius:12,padding:"2px 8px",fontWeight:700,fontFamily:DS.font}}>{category.hotlines.length}</span>
         </div>

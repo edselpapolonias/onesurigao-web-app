@@ -3,7 +3,7 @@ import { useState, useRef, useEffect, createContext, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { loginPublicUser, logoutAll } from "../../services/authService";
-import oneSurigaoLogo from "../../assets/one-surigao-logo.jpg";
+import oneSurigaoLogo from "../../assets/one-surigao-logo.png";
 
 // ─── Public Auth Context (shared across app) ──────────────────────────────────
 export const PublicAuthContext = createContext(null);
@@ -274,7 +274,7 @@ const DropdownItem = ({ icon, label, onClick, danger }) => (
 );
 
 // ─── Admin Profile Dropdown ────────────────────────────────────────────────────
-export const AdminProfileDropdown = ({ name, grad, role, onLogout }) => {
+export const AdminProfileDropdown = ({ name, grad, role, profilePic, onLogout }) => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const ref = useRef(null);
@@ -282,17 +282,17 @@ export const AdminProfileDropdown = ({ name, grad, role, onLogout }) => {
   useEffect(() => { const h = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); }; document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h); }, []);
   return (
     <div ref={ref} style={{ position: "relative", flexShrink: 0 }}>
-      <button onClick={() => setOpen(!open)} style={{ width: 36, height: 36, borderRadius: "50%", background: grad, border: `2px solid ${DS.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: DS.font, boxShadow: "0 1px 4px rgba(0,0,0,0.15)", transition: "box-shadow 0.2s, transform 0.15s" }}
+      <button onClick={() => setOpen(!open)} style={{ width: 36, height: 36, borderRadius: "50%", background: profilePic ? "transparent" : grad, border: `2px solid ${DS.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "#fff", fontSize: 13, fontWeight: 700, fontFamily: DS.font, boxShadow: "0 1px 4px rgba(0,0,0,0.15)", transition: "box-shadow 0.2s, transform 0.15s", overflow: "hidden", padding: 0 }}
         onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 3px 12px rgba(0,0,0,0.2)"; e.currentTarget.style.transform = "scale(1.07)"; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.15)"; e.currentTarget.style.transform = "scale(1)"; }}>
-        {initials}
+        {profilePic ? <img src={profilePic} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
       </button>
       {open && (
         <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, background: DS.card, borderRadius: 12, boxShadow: "0 8px 32px rgba(0,0,0,0.14)", border: `1px solid ${DS.border}`, minWidth: 220, zIndex: 999, overflow: "hidden", animation: "fadeDown 0.16s ease" }}>
           <style>{`@keyframes fadeDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
           <div style={{ padding: "14px 16px", borderBottom: `1px solid ${DS.border}`, background: "#F7FAFF" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ width: 38, height: 38, borderRadius: "50%", background: grad, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0 }}>{initials}</div>
+              <div style={{ width: 38, height: 38, borderRadius: "50%", background: profilePic ? "transparent" : grad, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 700, flexShrink: 0, overflow: "hidden" }}>{profilePic ? <img src={profilePic} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}</div>
               <div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: DS.primary, fontFamily: DS.font, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 150 }}>{name || "Account"}</div>
                 <div style={{ fontSize: 11, color: DS.textMuted, fontFamily: DS.font }}>{role}</div>
